@@ -295,15 +295,15 @@ class InputManager:
         Returns
         -------
         str
-            ``<description>: <failure_message>`` if the block's ``failure_message`` is a non-empty string, otherwise
-            the block's ``description``.
+            ``<title>: <description>`` if the block's ``description`` is a non-empty string, otherwise the block's
+            ``title``.
 
         """
-        description = str(cross_validation_block.get("description", "unnamed block"))
-        failure_message = cross_validation_block.get("failure_message")
-        if isinstance(failure_message, str) and failure_message:
-            return f"{description}: {failure_message}"
-        return description
+        title = str(cross_validation_block.get("title", "unnamed block"))
+        description = cross_validation_block.get("description")
+        if isinstance(description, str) and description:
+            return f"{title}: {description}"
+        return title
 
     def _validate_required_file_blobs(self, metadata_file_names: set[str]) -> None:
         """

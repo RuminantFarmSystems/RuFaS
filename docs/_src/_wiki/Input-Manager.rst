@@ -502,12 +502,13 @@ Structure of a validation block
 
 Each block has the following top-level keys:
 
-- ``description`` — short label identifying the block.
-- ``failure_message`` *(optional)* — plain-language explanation of
-  what the block enforces, naming the input variables involved and how
-  to fix them. When the block fails, it is reported together with the
-  description as ``<description>: <failure_message>``. If it is missing
-  or not a non-empty string, ``description`` alone is reported instead.
+- ``title`` — very short label identifying the block.
+- ``description`` — detailed, plain-language explanation of the rule
+  the block enforces, naming every input variable involved by its full
+  data address (and, where useful, how to fix it). It doubles as the
+  failure message: when the block fails, it is reported together with
+  the title as ``<title>: <description>``. If it is missing or not a
+  non-empty string, ``title`` alone is reported instead.
 - ``aliases`` — maps short local names (used inside this block) to
   actual data addresses or literal constant values.
 - ``apply_when`` *(optional)* — an array of condition clauses that
@@ -521,8 +522,8 @@ Template:
 ::
 
    {
-     "description": "<human-readable label>",
-     "failure_message": "<message reported when the block fails>",
+     "title": "<short label>",
+     "description": "<detailed rule, naming full data addresses; reported when the block fails>",
      "aliases": {
        "variables": {
          "<alias>": "<dot-separated address in IM pool>"
@@ -712,8 +713,8 @@ Error behaviour and ``eager_termination``
 
 When a block's rules fail, Input Manager adds one
 ``Cross Validation Failure`` error for that block, whose message is
-``<description>: <failure_message>`` (or the ``description`` alone if no
-``failure_message`` is given). Each rule that is not satisfied is also
+``<title>: <description>`` (or the ``title`` alone if no
+``description`` is given). Each rule that is not satisfied is also
 logged as ``Rule not satisfied: <comparison>``, naming the compared
 variables and their data addresses. Two termination modes control what
 happens next:
@@ -746,8 +747,8 @@ if the first pen is not a calf pen:
 ::
 
    {
-     "description": "Number of stalls in calf pen",
-     "failure_message": "The total number of stalls in calf pens (animal.pen_information.0.number_of_stalls) must be at least the number of calves (animal.herd_information.calf_num) divided by the pen's max_stocking_density.",
+     "title": "Number of stalls in calf pen",
+     "description": "The total number of stalls in calf pens (animal.pen_information.0.number_of_stalls) must be at least the number of calves (animal.herd_information.calf_num) divided by the pen's max_stocking_density.",
      "aliases": {
        "variables": {
          "number_of_calves":    "animal.herd_information.calf_num",

@@ -268,7 +268,7 @@ def test_load_cross_validation(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_cross_validation in file input_manager.py"""
     with patch(
         "builtins.open",
-        mock_open(read_data='[{"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
+        mock_open(read_data='[{"title": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
     ):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             mock_input_manager._load_cross_validation(["path/dummy_cv.json"])
@@ -279,7 +279,7 @@ def test_load_multiple_cross_validation(mock_input_manager: InputManager) -> Non
     """Unit test for function _load_cross_validation in file input_manager.py when multiple files are provided."""
     with patch(
         "builtins.open",
-        mock_open(read_data='[{"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
+        mock_open(read_data='[{"title": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
     ):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             mock_input_manager._load_cross_validation(["path/dummy_cv.json", "path/dummy_cv2.json"])
@@ -495,8 +495,8 @@ def test_cross_validate_data(
         cv_blocks = [
             {
                 "cross_validation": [
-                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
-                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
+                    {"title": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"title": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
                 ]
             }
         ]
@@ -506,8 +506,8 @@ def test_cross_validate_data(
         cv_blocks = [
             {
                 "cross_validation": [
-                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
-                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
+                    {"title": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"title": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
                 ]
             }
         ]
@@ -517,14 +517,14 @@ def test_cross_validate_data(
         cv_blocks = [
             {
                 "cross_validation": [
-                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"title": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
                     {
-                        "description": "cv2",
-                        "failure_message": "cv2 failed: fix the cv2 inputs.",
+                        "title": "cv2",
+                        "description": "cv2 failed: fix the cv2 inputs.",
                         "aliases": {"x": 2},
                         "rules": [{"r": 2}],
                     },
-                    {"description": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
+                    {"title": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
                 ]
             }
         ]
@@ -534,13 +534,13 @@ def test_cross_validate_data(
         cv_blocks = [
             {
                 "cross_validation": [
-                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
-                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
+                    {"title": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"title": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
                 ]
             },
             {
                 "cross_validation": [
-                    {"description": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
+                    {"title": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
                 ]
             },
         ]
@@ -590,7 +590,7 @@ def test_cross_validate_data_routes_cross_validator_logs(
     mocker.patch.object(
         mock_input_manager,
         "_load_cross_validation",
-        return_value=[{"cross_validation": [{"description": "cv1", "failure_message": "Fix cv1.", "rules": []}]}],
+        return_value=[{"cross_validation": [{"title": "cv1", "description": "Fix cv1.", "rules": []}]}],
     )
     cv_logs = [{"error": "Invalid data length validation", "message": "msg", "info_map": {}}]
     mocker.patch.object(mock_input_manager.cross_validator, "flush_event_logs", return_value=cv_logs)
@@ -625,7 +625,7 @@ def test_cross_validate_data_routes_cross_validator_logs_on_success(
     mocker.patch.object(
         mock_input_manager,
         "_load_cross_validation",
-        return_value=[{"cross_validation": [{"description": "cv1", "rules": []}, {"description": "cv2", "rules": []}]}],
+        return_value=[{"cross_validation": [{"title": "cv1", "rules": []}, {"title": "cv2", "rules": []}]}],
     )
     cv_logs = [{"error": "Alias name not found.", "message": "msg", "info_map": {}}]
     mocker.patch.object(mock_input_manager.cross_validator, "flush_event_logs", side_effect=[cv_logs, []])
@@ -639,17 +639,17 @@ def test_cross_validate_data_routes_cross_validator_logs_on_success(
 @pytest.mark.parametrize(
     "block,expected",
     [
-        ({"description": "desc", "failure_message": "Readable message."}, "desc: Readable message."),
-        ({"description": "desc", "failure_message": ""}, "desc"),
-        ({"description": "desc", "failure_message": 42}, "desc"),
-        ({"description": "desc"}, "desc"),
+        ({"title": "Title", "description": "Readable message."}, "Title: Readable message."),
+        ({"title": "Title", "description": ""}, "Title"),
+        ({"title": "Title", "description": 42}, "Title"),
+        ({"title": "Title"}, "Title"),
         ({}, "unnamed block"),
     ],
 )
 def test_get_cross_validation_failure_message(
     mock_input_manager: InputManager, block: dict[str, Any], expected: str
 ) -> None:
-    """The failure message pairs the description with failure_message, falling back to the description alone."""
+    """The failure message pairs the title with the description, falling back to the title alone."""
     assert mock_input_manager._get_cross_validation_failure_message(block) == expected
 
 

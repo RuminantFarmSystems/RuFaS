@@ -4438,7 +4438,7 @@ def test_cross_validate_data_does_not_log_rule_failure_for_apply_when() -> None:
     """An unsatisfied apply_when clause skips the block without logging a rule failure error."""
     cv = CrossValidator()
     block = {
-        "description": "guarded",
+        "title": "guarded",
         "aliases": {"variables": {"kind": "animal.kind"}, "constants": {"calf": "CALF"}},
         "apply_when": [
             {

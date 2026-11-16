@@ -1,8 +1,8 @@
 {
   "cross_validation": [
     {
-      "description": "Corn schedule 0 has equal planting year/day lengths",
-      "failure_message": "Corn.crop_schedules.0.planting_years and Corn.crop_schedules.0.planting_days must have the same number of entries (one planting day per planting year).",
+      "title": "Corn schedule 0 planting years/days",
+      "description": "Corn.crop_schedules.0.planting_years and Corn.crop_schedules.0.planting_days must have the same number of entries (one planting day per planting year).",
       "aliases": {
         "variables": {
           "planting_years": "Corn.crop_schedules.0.planting_years",
@@ -34,8 +34,8 @@
       ]
     },
     {
-      "description": "Corn schedule 0 has equal harvest year/day lengths",
-      "failure_message": "Corn.crop_schedules.0.harvest_years and Corn.crop_schedules.0.harvest_days must have the same number of entries (one harvest day per harvest year).",
+      "title": "Corn schedule 0 harvest years/days",
+      "description": "Corn.crop_schedules.0.harvest_years and Corn.crop_schedules.0.harvest_days must have the same number of entries (one harvest day per harvest year).",
       "aliases": {
         "variables": {
           "harvest_years": "Corn.crop_schedules.0.harvest_years",
