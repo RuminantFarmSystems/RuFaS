@@ -456,7 +456,7 @@ class Growth:
                 growth_inputs.days_in_milk, growth_inputs.days_in_pregnancy, self.tissue_changed, p1, p2
             )
         body_weight_tissue = self._calculate_dry_cow_tissue_change(
-            growth_inputs.days_in_milk, growth_inputs.gestation_length, p1, p2
+            growth_inputs.days_since_calving, growth_inputs.gestation_length, p1, p2
         )
         return body_weight_tissue, self.tissue_changed
 
@@ -533,14 +533,14 @@ class Growth:
         return body_weight_tissue, updated_tissue_changed
 
     @staticmethod
-    def _calculate_dry_cow_tissue_change(days_in_milk: int, gestation_length: int, p1: float, p2: float) -> float:
+    def _calculate_dry_cow_tissue_change(days_since_calving: int, gestation_length: int, p1: float, p2: float) -> float:
         """
         Calculates the body weight tissue change for a dry cow.
 
         Parameters
         ----------
-        days_in_milk : int
-            Number of days the cow has been lactating (simulation days).
+        days_since_calving : int
+            Number of days since the cow last calved (simulation days).
         gestation_length : int
             Total gestation period of the cow (simulation days).
         p1 : float
@@ -561,8 +561,8 @@ class Growth:
         """
         return float(
             p1
-            * days_in_milk
+            * days_since_calving
             / p2
-            * np.exp(1 - days_in_milk / p2)
+            * np.exp(1 - days_since_calving / p2)
             / (gestation_length - AnimalConfig.dry_off_day_of_pregnancy)
         )

@@ -3590,11 +3590,11 @@ The gestation length for cows is estimated with the same methods that are used f
     \end{table}
 
 
-    During the dry period, the net tissue mobilized during lactation is assumed to be restored \parencite{Li2023}. The net tissue change is estimated on each day of the dry period as:
+    During the dry period, the net tissue mobilized during lactation is assumed to be restored \parencite{Li2023}. Because DIM resets to 0 at dry off, the net tissue change is estimated on each day of the dry period using days since calving (DSC):
     \vspace{0.5cm}
     
     \begin{center}
-    \(tissue\_changed = P_1\ *\ \frac{DIM}{P_2}\ *\ exp\ (1\ -\ \frac{DIM}{P_2})\)
+    \(tissue\_changed = P_1\ *\ \frac{DSC}{P_2}\ *\ exp\ (1\ -\ \frac{DSC}{P_2})\)
     \end{center}
     \vspace{0.5cm}
     

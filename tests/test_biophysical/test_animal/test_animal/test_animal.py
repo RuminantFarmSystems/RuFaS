@@ -2187,8 +2187,72 @@ def test_daily_growth_update(mock_lactating_cow: Animal, mocker: MockerFixture) 
     assert inputs_arg.calf_birth_weight == 45
     assert inputs_arg.calves == 2
     assert inputs_arg.calving_interval == 365
+    assert inputs_arg.days_since_calving == 0
     assert animal.body_weight == dummy_outputs.body_weight
     assert animal.conceptus_weight == dummy_outputs.conceptus_weight
+
+
+@pytest.mark.parametrize(
+    "animal_type, days_in_milk, expected_days_since_calving, should_calculate",
+    [
+        (AnimalType.DRY_COW, 0, 330, True),
+        (AnimalType.LAC_COW, 60, 0, False),
+        (AnimalType.HEIFER_II, 0, 0, False),
+    ],
+)
+def test_daily_growth_update_days_since_calving(
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
+    animal_type: AnimalType,
+    days_in_milk: int,
+    expected_days_since_calving: int,
+    should_calculate: bool,
+) -> None:
+    """Days since calving is only calculated and passed to growth for dry cows."""
+    animal = mock_lactating_cow
+    animal.days_in_pregnancy = 230
+    animal.body_weight = 500
+    animal.mature_body_weight = 600
+    animal.birth_weight = 50
+    animal.days_born = 1000
+    animal.conceptus_weight = 20
+    animal.gestation_length = 280
+    animal.calf_birth_weight = 45
+    animal.calves = 2
+    animal.calving_interval = 365
+    animal.animal_type = animal_type
+    animal.days_in_milk = days_in_milk
+    mock_days_since_calving = mocker.patch.object(
+        Animal, "days_since_calving", new_callable=PropertyMock, return_value=330
+    )
+    dummy_outputs = GrowthOutputs(body_weight=510, conceptus_weight=22, events=AnimalEvents())
+    spy = mocker.patch.object(animal.growth, "evaluate_body_weight_change", return_value=dummy_outputs)
+
+    animal.daily_growth_update(MagicMock(RufasTime))
+
+    inputs_arg = spy.call_args[0][0]
+    assert inputs_arg.days_since_calving == expected_days_since_calving
+    assert mock_days_since_calving.called is should_calculate
+
+
+@pytest.mark.parametrize(
+    "days_born, last_calving_day, expected",
+    [
+        (1000, 700, 300),
+        (1000, 1000, 0),
+        (1000, -1, 0),
+    ],
+)
+def test_days_since_calving(
+    mock_lactating_cow: Animal, mocker: MockerFixture, days_born: int, last_calving_day: int, expected: int
+) -> None:
+    """Days since calving is measured from the most recent calving event, or 0 if the animal has never calved."""
+    animal = mock_lactating_cow
+    animal.days_born = days_born
+    mock_get_date = mocker.patch.object(animal.events, "get_most_recent_date", return_value=last_calving_day)
+
+    assert animal.days_since_calving == expected
+    mock_get_date.assert_called_once_with(animal_constants.NEW_BIRTH)
 
 
 @pytest.mark.parametrize(

@@ -526,6 +526,7 @@ def test_calculate_cow_body_weight_tissue_change(
     mock_growth_inputs.is_milking = is_milking
     mock_growth_inputs.calves = calves
     mock_growth_inputs.days_in_milk = 120
+    mock_growth_inputs.days_since_calving = 330
     mock_growth_inputs.days_in_pregnancy = 60
     mock_growth_inputs.gestation_length = 280
 
@@ -542,7 +543,7 @@ def test_calculate_cow_body_weight_tissue_change(
         assert result_body_weight_tissue == -0.2
         assert result_updated_tissue_changed == 6.0
     else:
-        mock_dry.assert_called_once_with(120, 280, expected_p1, expected_p2)
+        mock_dry.assert_called_once_with(330, 280, expected_p1, expected_p2)
         mock_lactating.assert_not_called()
         assert result_body_weight_tissue == 0.1
         assert result_updated_tissue_changed == 5.0
@@ -612,19 +613,19 @@ def test_calculate_lactating_cow_tissue_change(
 
 
 @pytest.mark.parametrize(
-    "days_in_milk, gestation_length, p1, p2, expected_body_weight_tissue",
+    "days_since_calving, gestation_length, p1, p2, expected_body_weight_tissue",
     [
         # Primiparous
         (300, 280, 20.0, 65.0, 0.0400594161950243),
         # Multiparous
         (300, 280, 40.0, 75.0, 0.12848275707835857),
-        # No days in milk, no tissue restored
+        # Never calved, no tissue restored
         (0, 280, 40.0, 75.0, 0.0),
     ],
 )
 def test_calculate_dry_cow_tissue_change(
     mocker: MockerFixture,
-    days_in_milk: int,
+    days_since_calving: int,
     gestation_length: int,
     p1: float,
     p2: float,
@@ -633,7 +634,7 @@ def test_calculate_dry_cow_tissue_change(
     """Dry period tissue change is the tissue change numerator spread over the length of the dry period."""
     mocker.patch.object(AnimalConfig, "dry_off_day_of_pregnancy", 218)
 
-    result = Growth._calculate_dry_cow_tissue_change(days_in_milk, gestation_length, p1, p2)
+    result = Growth._calculate_dry_cow_tissue_change(days_since_calving, gestation_length, p1, p2)
 
     assert isinstance(result, float)
     assert result == pytest.approx(expected_body_weight_tissue)
