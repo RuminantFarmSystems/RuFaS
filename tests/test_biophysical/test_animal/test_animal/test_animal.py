@@ -3391,8 +3391,7 @@ def test_calculate_nutrition_requirements_ndf_percentage(
             NutrientStandard.NASEM,
             NASEMRequirementsCalculator,
             "ndf_percentage",
-            AnimalModuleConstants.DEFAULT_NDF_FRACTION
-            * GeneralConstants.FRACTION_TO_PERCENTAGE,
+            AnimalModuleConstants.DEFAULT_NDF_FRACTION * GeneralConstants.FRACTION_TO_PERCENTAGE,
         ),
         (
             NutrientStandard.NRC,
