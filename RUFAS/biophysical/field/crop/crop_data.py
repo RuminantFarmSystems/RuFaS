@@ -46,13 +46,13 @@ class CropData:
 
     Attributes
     ----------
-    name : str | None
+    name : str
         The name of this specific crop instance.
     id : Any | None
         The unique identifier for this crop instance.
-    plant_category : PlantCategory | None
+    plant_category : PlantCategory
         Classification of the plant (Reference SWAT crop.dat file, IDC variable).
-    is_perennial : bool | None
+    is_perennial : bool
         Indicates if this plant is perennial.
     is_nitrogen_fixer : bool
         Indicates if the plant is a nitrogen fixer.
@@ -78,7 +78,7 @@ class CropData:
         Optimal harvest index under ideal growth conditions (unitless).
     minimum_harvest_index : float
         Minimum harvest index under drought conditions (unitless).
-    yield_phosphorus_fraction : float | None
+    yield_phosphorus_fraction : float
         Fraction of phosphorus in yield (unitless).
     crude_protein_percent_at_harvest : float
         Percentage of dry matter mass that is dietary crude protein at the point of harvest (unitless).
@@ -114,7 +114,7 @@ class CropData:
     light_use_efficiency : float
         Light use efficiency of the plant (dg/MJ). Reference SWAT Appendix A - Model Databases, Table A-5 for these
         values (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
-    yield_nitrogen_fraction : float | None
+    yield_nitrogen_fraction : float
         Fraction of nitrogen in yield (unitless).
     leaf_area_index : float
         Leaf area index of the plant (unitless).
@@ -128,7 +128,7 @@ class CropData:
         Upper limit of biomass accumulation for the day (kg/ha).
     above_ground_biomass : float
         Above ground plant biomass excluding roots (kg/ha).
-    root_biomass : float | None
+    root_biomass : float
         Biomass stored in roots (kg/ha).
     nitrogen : float, default 0.0
         Nitrogen stored in plant biomass (kg/ha).
@@ -158,13 +158,13 @@ class CropData:
         Fraction of potential heat units for maturity (unitless).
     root_depth : float
         Current depth of plant roots in soil (mm).
-    optimal_nitrogen_fraction : float | None
+    optimal_nitrogen_fraction : float
         Optimal nitrogen proportion in biomass for current stage (unitless).
-    total_soil_layers : int | None
+    total_soil_layers : int
         Total number of layers in the soil profile (unitless).
-    accessible_soil_layers : int | None
+    accessible_soil_layers : int
         Number of soil layers accessible to plant roots (unitless).
-    inaccessible_soil_layers : int | None
+    inaccessible_soil_layers : int
         Number of soil layers inaccessible to plant roots (unitless).
     emergence_phosphorus_fraction : float, default 0.005
         Phosphorus fraction of biomass at emergence (unitless).
@@ -188,9 +188,9 @@ class CropData:
         Total water lost to transpiration by the plant during the growing season (mm).
     cumulative_potential_evapotranspiration : float, default 0.0
         Total expected maximum water loss by the plant during the growing season (mm).
-    water_deficiency : float | None
+    water_deficiency : float
         Water deficiency factor for the plant (unitless).
-    max_transpiration : float | None
+    max_transpiration : float
         Maximum transpiration on a given day (mm).
     canopy_water : float, default 0
         Amount of water currently held in the canopy (mm).
@@ -215,9 +215,9 @@ class CropData:
         Optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless).
     user_harvest_index : float | None
         A user-specified harvest index (unitless). If given, 'harvest-index-override' is triggered.
-    dormancy_loss_fraction : float | None
+    dormancy_loss_fraction : float
         Fraction of biomass the crop loses when it goes dormant (unitless). Fraction of biomass the crop loses when it
-        goes dormant. Default 0.1 for perennials, 0.3 for trees.
+        goes dormant. Default 0.1 for perennials, 0.3 for trees, and 0.0 for all other plant categories.
         Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description
 
     The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
@@ -225,10 +225,10 @@ class CropData:
     """
 
     # ID variables (SWAT Table A-1 ish)
-    name: str | None = "default generic annual crop"
+    name: str = "default generic annual crop"
     id: Any | None = None
-    plant_category: PlantCategory | None = PlantCategory("cool_annual")
-    is_perennial: bool | None = False
+    plant_category: PlantCategory = PlantCategory("cool_annual")
+    is_perennial: bool = False
     is_nitrogen_fixer: bool = False
     field_proportion: float = 1.0
     is_alive: bool = True
@@ -242,7 +242,7 @@ class CropData:
     harvest_heat_fraction: float = 1.10
     optimal_harvest_index: float = 0.5
     minimum_harvest_index: float = 0.3
-    yield_phosphorus_fraction: float | None = 0.0
+    yield_phosphorus_fraction: float = 0.0
     crude_protein_percent_at_harvest: float = 12.481
     non_protein_nitrogen_at_harvest: float = 2.518
     starch_at_harvest: float = 72.586
@@ -264,7 +264,7 @@ class CropData:
     senescent_heat_fraction: float = 0.9
 
     # SWAT Table A-8
-    yield_nitrogen_fraction: float | None = 0.2
+    yield_nitrogen_fraction: float = 0.2
 
     # ---- biomass allocation
     leaf_area_index: float = 0.0
@@ -273,7 +273,7 @@ class CropData:
     root_fraction: float = 1 / 3
     biomass_growth_max: float = 0.0
     above_ground_biomass: float = 0.1
-    root_biomass: float | None = 0.0
+    root_biomass: float = 0.0
     light_use_efficiency: float = 30
 
     # ---- growth constraints
@@ -298,10 +298,10 @@ class CropData:
     half_mature_heat_fraction: float = 0.5
     mature_heat_fraction: float = 1.0
     root_depth: float = 1
-    optimal_nitrogen_fraction: float | None = 0.001
-    total_soil_layers: int | None = 2
-    accessible_soil_layers: int | None = 1
-    inaccessible_soil_layers: int | None = 1
+    optimal_nitrogen_fraction: float = 0.001
+    total_soil_layers: int = 2
+    accessible_soil_layers: int = 1
+    inaccessible_soil_layers: int = 1
 
     # ---- phosphorus incorporation
     emergence_phosphorus_fraction: float = 0.005
@@ -317,8 +317,8 @@ class CropData:
     cumulative_evaporation: float = 0.0
     cumulative_transpiration: float = 0.0
     cumulative_potential_evapotranspiration: float = 0.0
-    water_deficiency: float | None = 0
-    max_transpiration: float | None = 0
+    water_deficiency: float = 0
+    max_transpiration: float = 0
     canopy_water: float = 0
     max_canopy_water_capacity: float = 0.8
 
@@ -332,7 +332,7 @@ class CropData:
     user_harvest_index: float | None = None
 
     # ---- dormancy
-    dormancy_loss_fraction: float | None = None
+    dormancy_loss_fraction: float = 0.0
 
     def __post_init__(self) -> None:
         """

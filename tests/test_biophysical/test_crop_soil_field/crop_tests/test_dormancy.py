@@ -118,6 +118,7 @@ def test_go_into_dormancy(
     pre_dormant = incorp.data.is_dormant
 
     soil_data = MagicMock(SoilData)
+    soil_data.soil_layers = [MagicMock()]
 
     incorp.enter_dormancy(soil_data)
 

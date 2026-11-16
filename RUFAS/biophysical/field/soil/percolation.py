@@ -8,16 +8,12 @@ from RUFAS.output_manager import OutputManager
 class Percolation:
     """
     This class is based on the 'Percolation' section (2:3.2) in SWAT, designed to manage and simulate soil percolation
-    processes. It either accepts an existing SoilData object to work with or creates a new one based on the provided
-    field size.
+    processes.
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        The SoilData object used by this module to track percolation. A new SoilData object is created if one is not
-        provided.
-    field_size : float, optional
-        The size of the field (ha).
+    soil_data : SoilData
+        The SoilData object used by this module to track percolation.
 
     Attributes
     ----------
@@ -26,8 +22,8 @@ class Percolation:
 
     """
 
-    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
     def percolate(self, has_seasonal_high_water_table: bool) -> None:
         """

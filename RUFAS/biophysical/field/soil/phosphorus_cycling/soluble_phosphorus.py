@@ -12,11 +12,8 @@ class SolublePhosphorus:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        An instance of SoilData for tracking the movement of phosphorus through the soil profile. If not provided, a new
-        instance will be created with the specified field size.
-    field_size : float, optional
-        The size of the field (ha).
+    soil_data : SoilData
+        An instance of SoilData for tracking the movement of phosphorus through the soil profile.
 
     Attributes
     ----------
@@ -25,21 +22,17 @@ class SolublePhosphorus:
 
     """
 
-    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
+    def __init__(self, soil_data: SoilData):
         """
-        This method initializes the SoilData object that this module will work with, or create one if none provided.
+        This method initializes the SoilData object that this module will work with.
 
         Parameters
         ----------
-        soil_data : SoilData, optional
-            The SoilData object used by this module to track phosphorus as it moves through the soil profile, creates
-            new one if one is not provided.
-        field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha).
+        soil_data : SoilData
+            The SoilData object used by this module to track phosphorus as it moves through the soil profile.
 
         """
-        self.data = soil_data or SoilData(field_size=field_size)
+        self.data = soil_data
 
     def daily_update_routine(self, runoff: float, field_size: float) -> None:
         """

@@ -19,12 +19,9 @@ class Soil:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
+    soil_data : SoilData
         A SoilData object containing initial attribute values as well as attributes tracked and updated throughout the
         simulation.
-    field_size : float, optional
-        The size of the field in hectares (ha), used to initialize a SoilData object if a pre-configured SoilData object
-        is not provided.
 
     Attributes
     ----------
@@ -51,8 +48,8 @@ class Soil:
 
     """
 
-    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
         self.soil_temp = SoilTemp(self.data)
         self.phosphorus_cycling = PhosphorusCycling(self.data)
