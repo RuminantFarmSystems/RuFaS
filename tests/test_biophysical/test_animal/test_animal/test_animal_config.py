@@ -213,6 +213,8 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
             return {}
         if key == "animal_top_listing_semen":
             return {}
+        if key == "animal_national_average_breeding_value":
+            return {}
         raise KeyError(key)
 
     mock_im.get_data.side_effect = get_data_side_effect
@@ -305,7 +307,7 @@ def test_initialize_animal_config_selects_dose_of_chosen_mitigation_method(
             return animal_data
         if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
             return 1.23
-        if key in ("animal_mean_phenotype", "animal_top_listing_semen"):
+        if key in ("animal_mean_phenotype", "animal_top_listing_semen", "animal_national_average_breeding_value"):
             return {}
         raise KeyError(key)
 
@@ -341,7 +343,7 @@ def test_initialize_animal_config_warns_when_selected_mitigation_dose_field_is_m
             return animal_data
         if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
             return 1.23
-        if key in ("animal_mean_phenotype", "animal_top_listing_semen"):
+        if key in ("animal_mean_phenotype", "animal_top_listing_semen", "animal_national_average_breeding_value"):
             return {}
         raise KeyError(key)
 
@@ -490,6 +492,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
             return {}
         if key == "animal_top_listing_semen":
             return {}
+        if key == "animal_national_average_breeding_value":
+            return {}
         raise KeyError(key)
 
     mock_im.get_data.side_effect = get_data_side_effect
@@ -534,7 +538,7 @@ def test_initialize_animal_config_reads_genetics_inputs(mocker: pytest_mock.Mock
             return animal_data
         if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
             return 1.23
-        if key in ("animal_mean_phenotype", "animal_top_listing_semen"):
+        if key in ("animal_mean_phenotype", "animal_top_listing_semen", "animal_national_average_breeding_value"):
             return {}
         raise KeyError(key)
 
@@ -552,3 +556,43 @@ def test_initialize_animal_config_reads_genetics_inputs(mocker: pytest_mock.Mock
     assert AnimalConfig.temporary_environment_fat_variance == 7.7
     assert AnimalConfig.temporary_environment_protein_variance == 8.8
     assert AnimalConfig.temporary_environment_correlation == 0.9
+
+
+def test_initialize_animal_config_reads_national_average_breeding_values(mocker: pytest_mock.MockerFixture) -> None:
+    """The national average breeding values are read into ``AnimalConfig`` and keyed by birth year."""
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
+    mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
+
+    mock_im = mock_im_cls.return_value
+
+    animal_data = {
+        "animal_config": _make_base_animal_config("5dCG2P", "TAI"),
+        "methane_model": {"dummy": "model"},
+        "methane_mitigation": {"methane_mitigation_method": "None"},
+        "herd_information": {"simulate_genetics": True},
+        "genetics": _make_genetics(),
+    }
+
+    def get_data_side_effect(key: str) -> Any:
+        if key == "animal":
+            return animal_data
+        if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
+            return 1.23
+        if key in ("animal_mean_phenotype", "animal_top_listing_semen"):
+            return {}
+        if key == "animal_national_average_breeding_value":
+            return {
+                "birth_year": [2021, 2020, 2019],
+                "fat_kg": [9.1, 0.0, -10.0],
+                "protein_kg": [5.0, 0.0, -5.0],
+            }
+        raise KeyError(key)
+
+    mock_im.get_data.side_effect = get_data_side_effect
+
+    AnimalConfig.initialize_animal_config()
+
+    assert AnimalConfig.national_average_breeding_value == {
+        "fat_kg": {2021: 9.1, 2020: 0.0, 2019: -10.0},
+        "protein_kg": {2021: 5.0, 2020: 0.0, 2019: -5.0},
+    }
