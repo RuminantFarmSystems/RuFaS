@@ -73,6 +73,9 @@ Input Configuration
     other non-data outputs to files.
   - ``output_pool_path``: Specifies a JSON file path for loading output
     data for post-processing.
+  - ``run_eee``: Runs the Emissions, Energy, and Economics estimators
+    during post-processing, after any saved output pools are loaded.
+    False by default.
   - ``random_seed``: Provides a random seed for the simulation. If this
     seed is 0, then a seed will be randomly generated.
   - ``SA_input_variables``: The input variables for Sensitivity

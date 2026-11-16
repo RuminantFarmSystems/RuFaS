@@ -34,6 +34,7 @@
       "json_output_directory": "output/JSONs/.",
       "report_directory": "output/reports/.",
       "graphics_directory": "output/graphics/.",
+      "run_eee": true,
       "cross_validation_file_paths": []
     }
   ]

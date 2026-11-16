@@ -438,6 +438,7 @@ def test_task_manager_start(
             "input_data_csv_export_path": Path(""),
             "input_data_csv_import_path": Path(""),
             "output_prefix": "task_manager",
+            "run_eee": False,
         },
         input_manager=mock_im,
         output_manager=mock_output_manager,
@@ -760,6 +761,7 @@ def test_run_e2e_simulation(
         should_flush_im_pool=True,
     )
 
+    assert args["run_eee"] is True
     assert add_log.call_count == 2
 
 
@@ -899,7 +901,7 @@ def test_process_e2e_group_results(
             accepted_ranges={},
         )
         mock_post_processing.assert_called_once_with(
-            args={**e2e_runs[0], "output_prefix": e2e_group},
+            args={**e2e_runs[0], "output_prefix": e2e_group, "run_eee": False},
             input_manager=mock_input_manager,
             output_manager=mock_output_manager,
             task_id="E2E comparison 1/1",
@@ -1104,6 +1106,66 @@ def test_handle_post_processing_load_pool(
     mock_flush_pools.assert_called_once()
     mock_load_variables_pool_from_file.assert_called_once_with(args["output_pool_path"])
     mock_set_metadata_prefix.assert_called_once_with("reload")
+
+
+@pytest.mark.parametrize("run_eee", [True, False])
+def test_handle_post_processing_run_eee(
+    task_manager: TaskManager,
+    mock_output_manager: OutputManager,
+    mocker: MockerFixture,
+    run_eee: bool,
+) -> None:
+    """Unit test for TaskManager.handle_post_processing() running EEE only when run_eee is True."""
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mock_run_eee = mocker.patch.object(TaskManager, "_run_eee")
+    args = {
+        "exclude_info_maps": False,
+        "variable_name_style": "verbose",
+        "logs_directory": Path("/fake/logs"),
+        "suppress_log_files": True,
+        "output_prefix": "output_prefix",
+        "run_eee": run_eee,
+    }
+
+    task_manager.handle_post_processing(
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id="1/1",
+        should_flush_im_pool=False,
+    )
+
+    if run_eee:
+        mock_run_eee.assert_called_once_with(args, mock_input_manager)
+    else:
+        mock_run_eee.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "args, config_simulation_type, expected_flags",
+    [
+        ({"simulation_type": "field_and_feed"}, None, (False, True, True, False)),
+        ({}, "field_and_feed", (False, True, True, False)),
+    ],
+)
+def test_run_eee(
+    mocker: MockerFixture,
+    args: dict[str, Any],
+    config_simulation_type: str | None,
+    expected_flags: tuple[bool, bool, bool, bool],
+) -> None:
+    """Unit test for TaskManager._run_eee() using args["simulation_type"] or the InputManager config."""
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mock_input_manager.get_data.return_value = config_simulation_type
+    mock_estimate_all = mocker.patch("RUFAS.task_manager.EEEManager.estimate_all")
+
+    TaskManager._run_eee(args, mock_input_manager)
+
+    mock_estimate_all.assert_called_once_with(*expected_flags)
+    if "simulation_type" in args:
+        mock_input_manager.get_data.assert_not_called()
+    else:
+        mock_input_manager.get_data.assert_called_once_with("config.simulation_type")
 
 
 def test_handle_post_processing_save_result(

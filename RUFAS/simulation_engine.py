@@ -5,7 +5,6 @@ import time as timer
 from datetime import date, timedelta
 from typing import Any
 
-from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.EEE.emissions import EmissionsEstimator
 from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
@@ -393,18 +392,12 @@ class SimulationEngine:
 
         self._run_simulation_main_loop()
 
-        self._post_simulation_processing()
-
         t_end_sim = timer.time()
         total_simulation_time = t_end_sim - t_start_sim
 
         self._post_simulation_reporting()
 
         self._post_simulation_logging(total_simulation_time, info_map)
-
-    def _post_simulation_processing(self) -> None:
-        """Runs end-of-simulation calculations for all active modules."""
-        EEEManager.estimate_all(self.simulate_animals, self.simulate_feed, self.simulate_fields, self.simulate_manure)
 
     def _post_simulation_reporting(self) -> None:
         """Runs end-of-simulation reporting for all active modules."""

@@ -8,7 +8,6 @@ from unittest.mock import MagicMock, PropertyMock, call
 
 from pytest_mock import MockerFixture
 
-from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
@@ -160,7 +159,6 @@ def test_simulate(
     # Arrange
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
     mock_run_simulation_main_loop = mocker.patch.object(simulation_engine, "_run_simulation_main_loop")
-    mock_post_loop_processing = mocker.patch.object(simulation_engine, "_post_simulation_processing")
     mock_post_loop_reporting = mocker.patch.object(simulation_engine, "_post_simulation_reporting")
     mock_post_loop_logging = mocker.patch.object(simulation_engine, "_post_simulation_logging")
 
@@ -175,26 +173,8 @@ def test_simulate(
 
     # Assert
     mock_run_simulation_main_loop.assert_called_once_with()
-    mock_post_loop_processing.assert_called_once_with()
     mock_post_loop_reporting.assert_called_once_with()
     mock_post_loop_logging.assert_called_once_with(expected_simulation_time, info_map)
-
-
-def test_post_loop_processing(
-    simulation_engine: SimulationEngine,
-    mocker: MockerFixture,
-) -> None:
-    """
-    Unit test for function _post_loop_processing in simulation_engine.py
-    """
-    # Arrange
-    mock_estimate_all = mocker.patch.object(EEEManager, "estimate_all")
-
-    # Act
-    simulation_engine._post_simulation_processing()
-
-    # Assert
-    mock_estimate_all.assert_called_once_with(True, True, True, True)
 
 
 @pytest.mark.parametrize(
