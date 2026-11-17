@@ -2354,9 +2354,7 @@ class HerdManager:
             else 0
         )
 
-    def _update_sold_and_died_cow_statistics(  # noqa: C901
-            self, sold_and_died_cows: list[Animal]
-    ) -> None:
+    def _update_sold_and_died_cow_statistics(self, sold_and_died_cows: list[Animal]) -> None:  # noqa: C901
         """
         Updates the herd statistics with details of cows that are sold or have died.
 
@@ -2534,9 +2532,9 @@ class HerdManager:
             self.herd_statistics.milk_production_at_removal_sum += cow.milk_production.daily_milk_produced
             self.herd_statistics.milk_production_at_removal_count += 1
         if sold_and_died_cows:
-            self.herd_statistics.average_dcc_at_removal = (
-                sum(cow.days_in_pregnancy for cow in sold_and_died_cows) / len(sold_and_died_cows)
-            )
+            self.herd_statistics.average_dcc_at_removal = sum(
+                cow.days_in_pregnancy for cow in sold_and_died_cows
+            ) / len(sold_and_died_cows)
 
         for parity in self.herd_statistics.parity_culling_stats_range.keys():
             if parity == "greater_than_5":

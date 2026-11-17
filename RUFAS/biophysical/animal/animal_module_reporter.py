@@ -1116,16 +1116,8 @@ class AnimalModuleReporter:
         for death_category in ("fresh", "other"):
             for parity in ("1", "2", "3_plus"):
                 variable_name = f"{death_category}_cow_deaths_parity_{parity}"
-                om.add_variable(
-                    variable_name,
-                    getattr(herd_statistics, variable_name),
-                    sold_and_died_info_map
-                )
-        om.add_variable(
-            "average_dcc_at_removal",
-            herd_statistics.average_dcc_at_removal,
-            sold_and_died_info_map
-        )
+                om.add_variable(variable_name, getattr(herd_statistics, variable_name), sold_and_died_info_map)
+        om.add_variable("average_dcc_at_removal", herd_statistics.average_dcc_at_removal, sold_and_died_info_map)
 
     @classmethod
     def report_daily_reproduction_statistics(
