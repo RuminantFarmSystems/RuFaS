@@ -756,7 +756,6 @@ class HerdManager:
             ("calves", self.calves),
             ("heiferIs", self.heiferIs),
             ("heiferIIs", self.heiferIIs),
-            # TODO: Rank heifers to enter the herd or sold # GitHub Issue 1214
             ("heiferIIIs", self.heiferIIIs),
             ("cows", self.cows),
         ]
@@ -772,6 +771,24 @@ class HerdManager:
             if animal_group_name == "heiferIIIs":
                 self.herd_statistics.heiferIII_to_cow_transitions += sum(
                     animal.animal_type == AnimalType.LAC_COW for animal in group_graduated_animals
+                )
+            elif animal_group_name == "cows":
+                self.herd_statistics.multiparous_calvings += sum(
+                    animal.events.get_most_recent_date(animal_constants.NEW_BIRTH) == time.simulation_day
+                    and animal.reproduction.calves >= 2
+                    for animal in animals
+                )
+            if animal_group_name == "calves":
+                weaned_calves = [
+                    calf
+                    for calf in group_graduated_animals
+                    if calf.animal_type == AnimalType.HEIFER_I
+                ]
+
+                self.herd_statistics.average_age_at_weaning = (
+                    sum(calf.days_born for calf in weaned_calves) / len(weaned_calves)
+                    if weaned_calves
+                    else None
                 )
             collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
             if collect_birth_results:
@@ -1005,6 +1022,10 @@ class HerdManager:
         self.calf_retention_policy.begin_day(time)
 
         daily_herd_updates = self._process_daily_herd_updates(time)
+        self.herd_statistics.calves_entering_farm_system = sum(
+            calf.sex == Sex.FEMALE and calf.bred_from_semen != SemenType.BEEF
+            for calf in daily_herd_updates.newborn_calves
+        )
         self.herd_statistics.born_calf_num = len(
             daily_herd_updates.stillborn_newborn_calves
             + daily_herd_updates.sold_newborn_calves
@@ -2369,6 +2390,36 @@ class HerdManager:
         low_production_cows = [
             cow for cow in sold_and_died_cows if cow.cull_reason == animal_constants.LOW_PRODUCTION_CULL
         ]
+
+        low_production_cow_count = len(low_production_cows)
+        total_low_production_cow_count = self.herd_statistics.sold_cow_low_production_num
+
+        if low_production_cow_count > 0:
+            previous_count = total_low_production_cow_count - low_production_cow_count
+
+            for attribute, values in (
+                (
+                    "milk_production_at_low_production_sale_avg",
+                    [cow.milk_production.daily_milk_produced for cow in low_production_cows],
+                ),
+                (
+                    "days_in_milk_at_low_production_sale_avg",
+                    [cow.days_in_milk for cow in low_production_cows],
+                ),
+                (
+                    "parity_at_low_production_sale_avg",
+                    [cow.reproduction.calves for cow in low_production_cows],
+                ),
+                (
+                    "days_pregnant_at_low_production_sale_avg",
+                    [cow.days_in_pregnancy for cow in low_production_cows],
+                ),
+            ):
+                previous_average = getattr(self.herd_statistics, attribute)
+                new_average = (
+                    previous_average * previous_count + sum(values)
+                ) / total_low_production_cow_count
+                setattr(self.herd_statistics, attribute, new_average)
 
         self.herd_statistics.sold_cow_low_production_num += len(low_production_cows)
 
