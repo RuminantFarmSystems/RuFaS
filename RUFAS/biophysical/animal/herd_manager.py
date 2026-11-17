@@ -779,16 +779,10 @@ class HerdManager:
                     for animal in animals
                 )
             if animal_group_name == "calves":
-                weaned_calves = [
-                    calf
-                    for calf in group_graduated_animals
-                    if calf.animal_type == AnimalType.HEIFER_I
-                ]
+                weaned_calves = [calf for calf in group_graduated_animals if calf.animal_type == AnimalType.HEIFER_I]
 
                 self.herd_statistics.average_age_at_weaning = (
-                    sum(calf.days_born for calf in weaned_calves) / len(weaned_calves)
-                    if weaned_calves
-                    else None
+                    sum(calf.days_born for calf in weaned_calves) / len(weaned_calves) if weaned_calves else None
                 )
             collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
             if collect_birth_results:
@@ -2416,9 +2410,7 @@ class HerdManager:
                 ),
             ):
                 previous_average = getattr(self.herd_statistics, attribute)
-                new_average = (
-                    previous_average * previous_count + sum(values)
-                ) / total_low_production_cow_count
+                new_average = (previous_average * previous_count + sum(values)) / total_low_production_cow_count
                 setattr(self.herd_statistics, attribute, new_average)
 
         self.herd_statistics.sold_cow_low_production_num += len(low_production_cows)
