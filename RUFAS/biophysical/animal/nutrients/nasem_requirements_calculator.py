@@ -25,7 +25,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         body_condition_score_5: float,
         days_in_milk: int | None,
         average_daily_gain_heifer: float | None,
-        tissue_weight_gain: float,
+        tissue_weight_change: float,
         animal_type: AnimalType,
         parity: int,
         calving_interval: int | None,
@@ -58,7 +58,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             Days in milk. None if the animal is not milking.
         average_daily_gain_heifer : float
             Average daily gain (g).
-        tissue_weight_gain : float
+        tissue_weight_change : float
             Daily body weight change due to body reserve (tissue) gain or loss (kg).
         animal_type : AnimalType
             A type or subtype of animal specified in AnimalType enum.
@@ -115,7 +115,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             lactating,
             body_weight,
             frame_weight_gain,
-            tissue_weight_gain,
+            tissue_weight_change,
             gravid_uterine_weight_gain,
             dry_matter_intake,
             milk_true_protein,
@@ -370,7 +370,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         lactating: bool,
         body_weight: float,
         frame_weight_gain: float,
-        tissue_weight_gain: float,
+        tissue_weight_change: float,
         gravid_uterine_weight_gain: float,
         dry_matter_intake_estimate: float,
         milk_true_protein: float,
@@ -388,7 +388,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             Body weight (kg)
         frame_weight_gain : float
             Frame weight gain refers to the accretion of both fat and protein in carcass (g)
-        tissue_weight_gain : float
+        tissue_weight_change : float
             Daily body weight change due to body reserve (tissue) gain or loss (kg)
         gravid_uterine_weight_gain : float
             Daily energy requirement associated with increased gain of reproductive tissues as pregnancy advances (Mcal)
@@ -437,7 +437,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         metabolic_fecal_crude_protein_req: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
         net_metabolic_fecal_crude_protein_req: float = metabolic_fecal_crude_protein_req * 0.73
         frame_growth_net_req: float = frame_weight_gain * 0.11 * 0.86
-        tissue_growth_net_req: float = tissue_weight_gain * 0.08 * 0.86
+        tissue_growth_net_req: float = tissue_weight_change * 0.08 * 0.86
         gestation_net_protein_req: float = gravid_uterine_weight_gain * 125
         milk_net_protein_req: float = (
             milk_true_protein * GeneralConstants.PERCENTAGE_TO_FRACTION * milk_production * GeneralConstants.KG_TO_GRAMS
