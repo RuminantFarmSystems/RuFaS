@@ -2536,6 +2536,7 @@ class OutputManager(object):
         json_output_directory: Path,
         output_prefixes: list[str],
         e2e_random_seeds: dict[str, list[int]],
+        expected_results_random_seeds: dict[str, dict[str, list[int]]],
         failed_e2e_groups: list[str] | None = None,
     ) -> None:
         """
@@ -2551,6 +2552,8 @@ class OutputManager(object):
             A list of output prefixes to look for in the filenames.
         e2e_random_seeds : dict[str, list[int]]
             The random seeds used for each e2e test group.
+        expected_results_random_seeds : dict[str, dict[str, list[int]]]
+            The random seeds used to generate the expected results, organized by E2E test group and domain.
         failed_e2e_groups : list[str] | None, default None
             The output prefixes of the tasks that failed. They are summarized as not run, and any results files found
             for them are ignored because they were left by an earlier run.
@@ -2603,24 +2606,58 @@ class OutputManager(object):
             "Successfully opened e2e test results directory", "Directory opened and files successfully read", info_map
         )
 
-        self._print_e2e_results_summary(e2e_results_summary, e2e_random_seeds)
+        self._print_e2e_results_summary(
+            e2e_results_summary,
+            e2e_random_seeds,
+            expected_results_random_seeds,
+        )
 
     def _print_e2e_results_summary(
         self,
         e2e_results_summary: dict[str, dict[str, bool | str]],
         e2e_random_seeds: dict[str, list[int]],
+        expected_results_random_seeds: dict[str, dict[str, list[int]]],
     ) -> None:
-        """Prints the end-to-end results summary to the console."""
+        """
+        Prints the end-to-end results summary to the console.
+
+        Parameters
+        ----------
+        e2e_results_summary : dict[str, dict[str, bool | str]]
+            The comparison results for each E2E test group and module.
+        e2e_random_seeds : dict[str, list[int]]
+            The random seeds used for the current E2E testing runs.
+        expected_results_random_seeds : dict[str, dict[str, list[int]]]
+            The random seeds used to generate the expected results, organized by E2E test group and domain.
+        """
         sys.stdout.write("\nSummary of e2e results:\n\n")
+
         for prefix, results in e2e_results_summary.items():
             sys.stdout.write(f"{prefix} results:\n")
-            random_seeds = e2e_random_seeds.get(prefix)
-            if random_seeds:
-                formatted_seeds = ", ".join(str(seed) for seed in random_seeds)
-                sys.stdout.write(f"  Results averaged across random seeds: " f"{formatted_seeds}\n")
+
+            current_seeds = e2e_random_seeds.get(prefix)
+            if current_seeds is not None:
+                sys.stdout.write(f"  Current E2E testing random seeds: {current_seeds}\n")
+
+            expected_seeds_by_domain = expected_results_random_seeds.get(prefix, {})
+
+            if expected_seeds_by_domain:
+                unique_seed_lists = {tuple(seeds) for seeds in expected_seeds_by_domain.values()}
+
+                if len(unique_seed_lists) == 1:
+                    expected_seeds = next(iter(expected_seeds_by_domain.values()))
+                    sys.stdout.write(f"  Expected results random seeds: {expected_seeds}\n")
+                else:
+                    sys.stdout.write("  Expected results random seeds differ by domain:\n")
+                    for domain, seeds in expected_seeds_by_domain.items():
+                        sys.stdout.write(f"    {domain}: {seeds}\n")
+            else:
+                sys.stdout.write("  Expected results random seeds: Not available\n")
+
             for module, result in results.items():
                 result = "Passing" if result is True else "Failing" if result is False else result
                 sys.stdout.write(f"  {module}: {result}\n")
+
             sys.stdout.write("\n")
 
     @staticmethod

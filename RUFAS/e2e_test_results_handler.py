@@ -36,7 +36,13 @@ ResultPathType = namedtuple(
     ],
     defaults=["", "", TOLERANCE_TYPE_PERCENT, ""],
 )
-ORDERED_EXPECTED_RESULTS_FILE_KEYS = ["name", "filters", "expected_results_last_updated", "expected_results"]
+ORDERED_EXPECTED_RESULTS_FILE_KEYS = [
+    "name",
+    "filters",
+    "random_seeds",
+    "expected_results_last_updated",
+    "expected_results",
+]
 MUST_CHANGE_VARIABLES_KEY = "must_change_variables"
 ACCEPTED_RANGES_KEY = "accepted_ranges"
 ACCEPTED_RANGE_MIN_KEY = "min"
@@ -185,7 +191,7 @@ class E2ETestResultsHandler:
         convert_variable_table_path: str | None,
         filters_directory: Path,
         use_accepted_ranges: bool,
-    ) -> tuple[set[str], dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
+    ) -> tuple[set[str], dict[str, dict[str, Any]], dict[str, dict[str, Any]], dict[str, list[int]]]:
         """
         Validates the comparison configuration of an end-to-end testing input set before the simulation runs.
 
@@ -205,10 +211,12 @@ class E2ETestResultsHandler:
 
         Returns
         -------
-        tuple[set[str], dict[str, dict[str, Any]], dict[str, dict[str, Any]]]
-            The names of the variables flagged as must change, the accepted ranges keyed by variable name (empty
-            when ``use_accepted_ranges`` is ``False``), and the tolerance overrides keyed by variable name, for
-            ``compare_actual_and_expected_test_results``.
+        tuple[set[str], dict[str, dict[str, Any]], dict[str, dict[str, Any]], dict[str, list[int]]]
+            - The names of the variables flagged as must change.
+            - The accepted ranges keyed by variable name (empty when ``use_accepted_ranges`` is ``False``),
+            for ``compare_actual_and_expected_test_results``.
+            - The tolerance overrides keyed by variable name, for ``compare_actual_and_expected_test_results``.
+            - The random seeds used to generate the expected e2e results.
 
         Raises
         ------
@@ -262,6 +270,7 @@ class E2ETestResultsHandler:
         matched_ranged_variables: set[str] = set()
         matched_overridden_variables: set[str] = set()
         all_expected_results_loaded = True
+        expected_results_random_seeds: dict[str, list[int]] = {}
         for path_set in test_result_path_sets:
             file_content = E2ETestResultsHandler._validate_result_path_set(
                 path_set, output_prefix, filters_directory, errors, convert_variable_table_path
@@ -270,6 +279,7 @@ class E2ETestResultsHandler:
                 all_expected_results_loaded = False
                 continue
             expected_results = file_content["expected_results"]
+            expected_results_random_seeds[path_set.domain] = file_content.get("random_seeds", [])
             matched_must_change_variables.update(name for name in must_change_variables if name in expected_results)
             matched_ranged_variables.update(name for name in accepted_ranges if name in expected_results)
             matched_overridden_variables.update(name for name in variable_tolerances if name in expected_results)
@@ -298,7 +308,7 @@ class E2ETestResultsHandler:
             )
         if errors:
             E2ETestResultsHandler._raise_configuration_errors(errors)
-        return must_change_variables, accepted_ranges, variable_tolerances
+        return must_change_variables, accepted_ranges, variable_tolerances, expected_results_random_seeds
 
     @staticmethod
     def validate_update_configuration(output_prefix: str, filters_directory: Path) -> None:
@@ -2006,7 +2016,7 @@ class E2ETestResultsHandler:
 
     @staticmethod
     def filter_nested(
-        values_changed: dict[str, dict[str, float | str]],
+        values_changed: dict[str, Any],
         tolerance: float,
         tolerance_type: str = TOLERANCE_TYPE_PERCENT,
         variable_tolerances: dict[str, dict[str, Any]] | None = None,
@@ -2082,7 +2092,7 @@ class E2ETestResultsHandler:
         return diff_result
 
     @staticmethod
-    def update_expected_test_results(output_dir: Path, output_prefix: str) -> None:
+    def update_expected_test_results(output_dir: Path, output_prefix: str, random_seeds: list[int]) -> None:
         """
         Compares the actual end-to-end testing results for various RuFaS domains and updates the expected
         results in the appropriate domain filter file if differences are found.
@@ -2093,6 +2103,8 @@ class E2ETestResultsHandler:
             The directory to which the actual results are written to.
         output_prefix : str
             The prefix to give the output file names.
+        random_seeds : list[int]
+            The list of random seeds over which the new expected results set have been averaged.
 
         Notes
         -----
@@ -2139,7 +2151,7 @@ class E2ETestResultsHandler:
                 )
                 expected_results["expected_results"] = minified_actual_results
                 expected_results["expected_results_last_updated"] = Utility.get_timestamp(include_millis=False)
-                E2ETestResultsHandler._write_formatted_json(expected_results_path, expected_results)
+                E2ETestResultsHandler._write_formatted_json(expected_results_path, expected_results, random_seeds)
             except (IOError, json.JSONDecodeError) as e:
                 error_message = (
                     f"Failed to update expected results for {path_set.domain} domain. Error: {str(e)}."
@@ -2211,7 +2223,7 @@ class E2ETestResultsHandler:
             raise ValueError(f"E2E testing error: Missing required keys in data for JSON file: {missing_keys}")
 
     @staticmethod
-    def _write_formatted_json(file_path: Path, data: dict[str, str]) -> None:
+    def _write_formatted_json(file_path: Path, data: dict[str, str | list[int]], random_seeds: list[int]) -> None:
         """
         Writes a JSON file with custom serialization settings for the ``expected_results`` field.
 
@@ -2219,17 +2231,20 @@ class E2ETestResultsHandler:
         ----------
         file_path : Path
             The path to the JSON file.
-        data : dict[str, str]
+        data : dict[str, str | list[int]]
             The data to write to the JSON file.
+        random_seeds : list[int]
+            The list of random seeds over which the new expected results set have been averaged.
 
         Raises
         ------
         ValueError
             If the input data is missing required keys.
         """
-        E2ETestResultsHandler._check_expected_results_file_keys(data)
+        updated_data = {**data, "random_seeds": random_seeds}
+        E2ETestResultsHandler._check_expected_results_file_keys(updated_data)
         key_order = ORDERED_EXPECTED_RESULTS_FILE_KEYS
-        ordered_data = {key: data[key] for key in key_order}
+        ordered_data = {key: updated_data[key] for key in key_order}
         compact_expected_results = json.dumps(ordered_data["expected_results"], separators=(",", ":"))
         ordered_data["expected_results"] = "__EXPECTED_RESULTS_PLACEHOLDER__"
 
