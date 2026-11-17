@@ -784,6 +784,30 @@ class HerdManager:
                 self.herd_statistics.average_age_at_weaning = (
                     sum(calf.days_born for calf in weaned_calves) / len(weaned_calves) if weaned_calves else None
                 )
+            if animal_group_name == "heiferIs":
+                graduated_heifers = [
+                    heifer
+                    for heifer in group_graduated_animals
+                    if heifer.animal_type == AnimalType.HEIFER_II
+                ]
+
+                self.herd_statistics.average_age_at_heiferII_graduation = (
+                    sum(heifer.days_born for heifer in graduated_heifers) / len(graduated_heifers)
+                    if graduated_heifers
+                    else None
+                )
+            if animal_group_name == "heiferIIs":
+                graduated_heifers = [
+                    heifer
+                    for heifer in group_graduated_animals
+                    if heifer.animal_type == AnimalType.HEIFER_III
+                ]
+
+                self.herd_statistics.average_age_at_heiferII_graduation = (
+                    sum(heifer.days_born for heifer in graduated_heifers) / len(graduated_heifers)
+                    if graduated_heifers
+                    else None
+                )
             collect_birth_results = animal_group_name in ["heiferIIIs", "cows"]
             if collect_birth_results:
                 daily_herd_updates.stillborn_newborn_calves += group_stillborn_newborn_calves
@@ -2448,6 +2472,12 @@ class HerdManager:
         self.herd_statistics.acute_sale_cows_parity_3_plus += sum(
             cow.reproduction.calves >= 3 for cow in acute_sale_cows
         )
+        self.herd_statistics.fresh_cow_acute_sales += sum(
+            0 < cow.days_in_milk < 50 for cow in acute_sale_cows
+        )
+        self.herd_statistics.other_cow_acute_sales += sum(
+            50 <= cow.days_in_milk for cow in acute_sale_cows
+        )
 
         self.herd_statistics.total_cow_removals_parity_1 += sum(
             cow.reproduction.calves == 1 for cow in sold_and_died_cows
@@ -2464,6 +2494,54 @@ class HerdManager:
         self.herd_statistics.cow_deaths_parity_1 += sum(cow.reproduction.calves == 1 for cow in dead_cows)
         self.herd_statistics.cow_deaths_parity_2 += sum(cow.reproduction.calves == 2 for cow in dead_cows)
         self.herd_statistics.cow_deaths_parity_3_plus += sum(cow.reproduction.calves >= 3 for cow in dead_cows)
+        self.herd_statistics.fresh_cow_deaths += sum(0 < cow.days_in_milk < 50 for cow in dead_cows)
+        self.herd_statistics.other_cow_deaths += sum(50 <= cow.days_in_milk for cow in dead_cows)
+
+        for cow in dead_cows:
+            if cow.days_in_milk == 0:
+                continue
+
+            removal_category = "fresh" if cow.days_in_milk < 50 else "other"
+
+            if cow.reproduction.calves == 1:
+                parity = "1"
+            elif cow.reproduction.calves == 2:
+                parity = "2"
+            else:
+                parity = "3_plus"
+
+            attribute = f"{removal_category}_cow_deaths_parity_{parity}"
+
+            setattr(
+                self.herd_statistics,
+                attribute,
+                getattr(self.herd_statistics, attribute) + 1,
+            )
+
+        removed_cows = [
+            cow
+            for cow in acute_sale_cows + dead_cows
+            if cow.days_in_milk > 0
+        ]
+
+        for cow in removed_cows:
+            removed_parity = cow.reproduction.calves
+
+            if removed_parity == 1:
+                parity_suffix = "1"
+            elif removed_parity == 2:
+                parity_suffix = "2"
+            else:
+                parity_suffix = "3_plus"
+
+            removal_category = "fresh" if 0 < cow.days_in_milk < 50 else "other"
+
+            attribute = f"{removal_category}_cow_removals_parity_{parity_suffix}"
+            setattr(
+                self.herd_statistics,
+                attribute,
+                getattr(self.herd_statistics, attribute) + 1,
+            )
 
         for cow in sold_and_died_cows:
             self.herd_statistics.milk_production_at_removal_sum += cow.milk_production.daily_milk_produced

@@ -849,6 +849,24 @@ class AnimalModuleReporter:
             },
         )
         om.add_variable(
+            "average_age_at_heiferII_graduation",
+            herd_statistics.average_age_at_heiferII_graduation,
+            {
+                **info_map,
+                "units": MeasurementUnits.DAYS,
+                "data_origin": [("HerdManager", "_process_daily_herd_updates")],
+            },
+        )
+        om.add_variable(
+            "average_age_at_heiferIII_graduation",
+            herd_statistics.average_age_at_heiferIII_graduation,
+            {
+                **info_map,
+                "units": MeasurementUnits.DAYS,
+                "data_origin": [("HerdManager", "_process_daily_herd_updates")],
+            },
+        )
+        om.add_variable(
             "avg_mature_body_weight",
             herd_statistics.avg_mature_body_weight,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
@@ -1018,6 +1036,16 @@ class AnimalModuleReporter:
             sold_and_died_info_map,
         )
         om.add_variable(
+            "fresh_cow_deaths",
+            herd_statistics.fresh_cow_deaths,
+            sold_and_died_info_map
+        )
+        om.add_variable(
+            "other_cow_deaths",
+            herd_statistics.other_cow_deaths,
+            sold_and_died_info_map
+        )
+        om.add_variable(
             "milk_production_at_low_production_sale_avg",
             herd_statistics.milk_production_at_low_production_sale_avg,
             {
@@ -1086,6 +1114,38 @@ class AnimalModuleReporter:
             herd_statistics.sold_cow_low_production_parity_3_plus,
             sold_and_died_info_map,
         )
+        om.add_variable(
+            "fresh_cow_acute_sales",
+            herd_statistics.fresh_cow_acute_sales,
+            sold_and_died_info_map
+        )
+        om.add_variable(
+            "other_cow_acute_sales",
+            herd_statistics.other_cow_acute_sales,
+            sold_and_died_info_map
+        )
+        for removal_category in ("fresh", "other"):
+            for parity in ("1", "2", "3_plus"):
+                variable_name = f"{removal_category}_cow_removals_parity_{parity}"
+
+                om.add_variable(
+                    variable_name,
+                    getattr(herd_statistics, variable_name),
+                    sold_and_died_info_map
+                )
+        for death_category in ("fresh", "other"):
+            for parity in ("1", "2", "3_plus"):
+                variable_name = f"{death_category}_cow_deaths_parity_{parity}"
+
+                om.add_variable(
+                    variable_name,
+                    getattr(herd_statistics, variable_name),
+                    {
+                        **info_map,
+                        "units": MeasurementUnits.ANIMALS,
+                        "data_origin": [("HerdManager", "_update_sold_and_died_cow_statistics")],
+                    },
+                )
 
     @classmethod
     def report_daily_reproduction_statistics(
