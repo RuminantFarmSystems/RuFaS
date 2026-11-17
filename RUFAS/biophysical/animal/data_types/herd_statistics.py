@@ -57,7 +57,7 @@ class HerdStatistics:
     beef_sold_calf_num : int
         Number of beef-on-dairy calves sold during a specific period, (unitless).
     sold_cow_low_production_num : int
-        Number of surplus cow sold, (unitless).
+        Number of cows sold due to low milk production, (unitless).
     bought_heifer_num : int
         Number of heifers purchased during a specific period, (unitless).
     sold_heiferII_num : int
@@ -70,6 +70,10 @@ class HerdStatistics:
         The total amount of calf born, including stillborn, newborn and sold.
     heiferIII_to_cow_transitions : int
         The total number of heiferIIIs transitioning to cows on a particular day.
+    multiparous_calvings : int
+        Number of calvings by cows in their second or greater parity on a particular day, (unitless).
+    calves_entering_farm_system : int
+        Number of live dairy female calves entering the farm system on a particular day, (unitless).
     calf_percent : float
         Proportion of calves in the herd expressed as a percentage, (unitless).
     heiferI_percent : float
@@ -144,6 +148,18 @@ class HerdStatistics:
         Average age at culling for cows, (simulation days).
     avg_mature_body_weight : float
         Average weight of mature animals in the herd, (kg).
+    average_age_at_weaning : float | None
+        Average age of calves weaned on a particular day, (simulation days).
+        None if no calves were weaned.
+    average_age_at_heiferII_graduation : float | None
+        Average age of heifers transitioning from Heifer I to Heifer II on a particular day, (simulation days).
+        None if no heifers transitioned to Heifer II.
+    average_age_at_heiferIII_graduation : float | None
+        Average age of heifers transitioning from Heifer II to Heifer III on a particular day, (simulation days).
+        None if no heifers transitioned to Heifer III.
+    average_dcc_at_removal : float | None
+        Average days carried calf (DCC) among cows sold or deceased on a particular day, (simulation days).
+        None if no cows were removed.
     parity_culling_stats_range : dict[str, int]
         Count of culled animals categorized by their parity classes ("1", "2", "3",
         "greater_than_3"), (unitless).
@@ -187,12 +203,56 @@ class HerdStatistics:
         Number of cow deaths in parity 2 group.
     cow_deaths_parity_3_plus : int
         Number of cow deaths in parity 3+ group.
+    fresh_cow_deaths : int
+        Number of cows that died between 1 and 49 days in milk (DIM) on a particular day, (unitless).
+    other_cow_deaths : int
+        Number of cows that died at 50 or more days in milk (DIM) on a particular day, (unitless).
+    fresh_cow_acute_sales : int
+        Number of cows sold for acute reasons between 1 and 49 days in milk (DIM), (unitless).
+    other_cow_acute_sales : int
+        Number of cows sold for acute reasons at 50 or more days in milk (DIM), (unitless).
     sold_cow_low_production_parity_1 : int
         Number of parity 1 cows sold due to low milk production.
     sold_cow_low_production_parity_2 : int
         Number of parity 2 cows sold due to low milk production.
     sold_cow_low_production_parity_3_plus : int
         Number of parity 3+ cows sold due to low milk production.
+    fresh_cow_removals_parity_1 : int
+        Number of parity 1 cows removed through acute sales or deaths between 1 and 49 DIM, (unitless).
+    fresh_cow_removals_parity_2 : int
+        Number of parity 2 cows removed through acute sales or deaths between 1 and 49 DIM, (unitless).
+    fresh_cow_removals_parity_3_plus : int
+        Number of parity 3+ cows removed through acute sales or deaths between 1 and 49 DIM, (unitless).
+    other_cow_removals_parity_1 : int
+        Number of parity 1 cows removed through acute sales or deaths at 50 or more DIM, (unitless).
+    other_cow_removals_parity_2 : int
+        Number of parity 2 cows removed through acute sales or deaths at 50 or more DIM, (unitless).
+    other_cow_removals_parity_3_plus : int
+        Number of parity 3+ cows removed through acute sales or deaths at 50 or more DIM, (unitless).
+    fresh_cow_deaths_parity_1 : int
+        Number of parity 1 cows that died between 1 and 49 DIM, (unitless).
+    fresh_cow_deaths_parity_2 : int
+        Number of parity 2 cows that died between 1 and 49 DIM, (unitless).
+    fresh_cow_deaths_parity_3_plus : int
+        Number of parity 3+ cows that died between 1 and 49 DIM, (unitless).
+    other_cow_deaths_parity_1 : int
+        Number of parity 1 cows that died at 50 or more DIM, (unitless).
+    other_cow_deaths_parity_2 : int
+        Number of parity 2 cows that died at 50 or more DIM, (unitless).
+    other_cow_deaths_parity_3_plus : int
+        Number of parity 3+ cows that died at 50 or more DIM, (unitless).
+    milk_production_at_removal_sum : float
+        Total daily milk production of cows removed through sales or deaths, (kg).
+    milk_production_at_removal_count : int
+        Number of cows included in the milk production at removal calculation, (unitless).
+    milk_production_at_low_production_sale_avg : float
+        Average daily milk production of cows sold due to low production, (kg/day).
+    days_in_milk_at_low_production_sale_avg : float
+        Average days in milk of cows sold due to low production, (simulation days).
+    parity_at_low_production_sale_avg : float
+        Average parity of cows sold due to low production, (unitless).
+    days_pregnant_at_low_production_sale_avg : float
+        Average days pregnant of cows sold due to low production, (simulation days).
     milk_production_at_removal : list[dict[str, Any]]
         Records of cows removed from the herd, including cow ID, removal day, culling reason, and estimated daily milk
         production at the time of removal.
@@ -280,7 +340,7 @@ class HerdStatistics:
     average_age_at_weaning: float | None = None
     average_age_at_heiferII_graduation: float | None = None
     average_age_at_heiferIII_graduation: float | None = None
-    average_dcc_at_removal: float | None
+    average_dcc_at_removal: float | None = None
 
     parity_culling_stats_range: dict[str, int]
 
