@@ -163,6 +163,9 @@ class AnimalConfig:
         Average genetic phenotype values used for genetic simulations.
     top_listing_semen : dict[str, dict[str, float]]
         Semen sire information used for genetic simulations and breeding selection.
+    national_average_breeding_value : dict[str, dict[int, float]]
+        National average breeding values (BV) for fat and protein by birth year, on the same genetic base as
+        ``top_listing_semen``, (kg).
     simulate_genetics : bool
         Whether genetic simulation functionality is enabled.
     tbv_fat_variance : float
@@ -317,6 +320,7 @@ class AnimalConfig:
 
     average_phenotype: dict[str, dict[int, float]] = {}
     top_listing_semen: dict[str, dict[str, float]] = {}
+    national_average_breeding_value: dict[str, dict[int, float]] = {}
     simulate_genetics: bool = False
     tbv_fat_variance: float = 25.8
     tbv_protein_variance: float = 13.4
@@ -518,6 +522,13 @@ class AnimalConfig:
             trait: dict(zip(top_listing_semen["year_month"], values))
             for trait, values in top_listing_semen.items()
             if trait != "year_month"
+        }
+
+        national_average_breeding_value = im.get_data("animal_national_average_breeding_value")
+        cls.national_average_breeding_value = {
+            trait: dict(zip(national_average_breeding_value["birth_year"], values))
+            for trait, values in national_average_breeding_value.items()
+            if trait != "birth_year"
         }
         cls.simulate_genetics = animal_data["herd_information"]["simulate_genetics"]
 
