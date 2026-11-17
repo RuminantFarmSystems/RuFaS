@@ -230,6 +230,8 @@ class HerdStatistics:
     sold_cow_num = 0
     born_calf_num = 0
     heiferIII_to_cow_transitions = 0
+    multiparous_calvings = 0
+    calves_entering_farm_system = 0
 
     calf_percent = 0.0
     heiferI_percent = 0.0
@@ -275,6 +277,9 @@ class HerdStatistics:
     avg_heifer_culling_age = 0.0
     avg_cow_culling_age = 0.0
     avg_mature_body_weight = 0.0
+    average_age_at_weaning: float | None = None
+    average_age_at_heiferII_graduation: float | None = None
+    average_age_at_heiferIII_graduation: float | None = None
 
     parity_culling_stats_range: dict[str, int]
 
@@ -287,9 +292,26 @@ class HerdStatistics:
     cow_deaths_parity_1 = 0
     cow_deaths_parity_2 = 0
     cow_deaths_parity_3_plus = 0
+    fresh_cow_deaths = 0
+    other_cow_deaths = 0
     sold_cow_low_production_parity_1 = 0
     sold_cow_low_production_parity_2 = 0
     sold_cow_low_production_parity_3_plus = 0
+    fresh_cow_acute_sales = 0
+    other_cow_acute_sales = 0
+    fresh_cow_removals_parity_1 = 0
+    fresh_cow_removals_parity_2 = 0
+    fresh_cow_removals_parity_3_plus = 0
+    other_cow_removals_parity_1 = 0
+    other_cow_removals_parity_2 = 0
+    other_cow_removals_parity_3_plus = 0
+    fresh_cow_deaths_parity_1 = 0
+    fresh_cow_deaths_parity_2 = 0
+    fresh_cow_deaths_parity_3_plus = 0
+
+    other_cow_deaths_parity_1 = 0
+    other_cow_deaths_parity_2 = 0
+    other_cow_deaths_parity_3_plus = 0
 
     avg_age_for_calving: dict[str, float]
     avg_age_for_parity: dict[str, float]
@@ -303,6 +325,10 @@ class HerdStatistics:
     herd_milk_protein_percent = 0.0
     milk_production_at_removal_sum = 0.0
     milk_production_at_removal_count = 0
+    milk_production_at_low_production_sale_avg: float = 0.0
+    days_in_milk_at_low_production_sale_avg: float = 0.0
+    parity_at_low_production_sale_avg: float = 0.0
+    days_pregnant_at_low_production_sale_avg: float = 0.0
 
     heifer_average_daily_gain_by_pen: dict[str, float | None]
     heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
@@ -386,6 +412,8 @@ class HerdStatistics:
         self.sold_cow_num = 0
         self.born_calf_num = 0
         self.heiferIII_to_cow_transitions = 0
+        self.multiparous_calvings = 0
+        self.calves_entering_farm_system = 0
 
         self.calf_percent = 0.0
         self.heiferI_percent = 0.0
@@ -438,6 +466,9 @@ class HerdStatistics:
         self.avg_heifer_culling_age = 0.0
         self.avg_cow_culling_age = 0.0
         self.avg_mature_body_weight = 0.0
+        self.average_age_at_weaning = None
+        self.average_age_at_heiferII_graduation = None
+        self.average_age_at_heiferIII_graduation = None
 
         self.acute_sale_cows_parity_1 = 0
         self.acute_sale_cows_parity_2 = 0
@@ -450,10 +481,26 @@ class HerdStatistics:
         self.cow_deaths_parity_1 = 0
         self.cow_deaths_parity_2 = 0
         self.cow_deaths_parity_3_plus = 0
+        self.fresh_cow_deaths = 0
+        self.other_cow_deaths = 0
 
         self.sold_cow_low_production_parity_1 = 0
         self.sold_cow_low_production_parity_2 = 0
         self.sold_cow_low_production_parity_3_plus = 0
+        self.fresh_cow_acute_sales = 0
+        self.other_cow_acute_sales = 0
+        self.fresh_cow_removals_parity_1 = 0
+        self.fresh_cow_removals_parity_2 = 0
+        self.fresh_cow_removals_parity_3_plus = 0
+        self.other_cow_removals_parity_1 = 0
+        self.other_cow_removals_parity_2 = 0
+        self.other_cow_removals_parity_3_plus = 0
+        self.fresh_cow_deaths_parity_1 = 0
+        self.fresh_cow_deaths_parity_2 = 0
+        self.fresh_cow_deaths_parity_3_plus = 0
+        self.other_cow_deaths_parity_1 = 0
+        self.other_cow_deaths_parity_2 = 0
+        self.other_cow_deaths_parity_3_plus = 0
 
         self.daily_milk_production = 0.0
         self.herd_milk_fat_kg = 0.0
@@ -462,6 +509,10 @@ class HerdStatistics:
         self.herd_milk_protein_percent = 0.0
         self.milk_production_at_removal_sum = 0.0
         self.milk_production_at_removal_count = 0
+        self.milk_production_at_low_production_sale_avg = 0.0
+        self.days_in_milk_at_low_production_sale_avg = 0.0
+        self.parity_at_low_production_sale_avg = 0.0
+        self.days_pregnant_at_low_production_sale_avg = 0.0
 
         for pen_id in self.heifer_average_daily_gain_by_pen:
             self.heifer_average_daily_gain_by_pen[pen_id] = None
