@@ -1,0 +1,22 @@
+% preamble.tex
+
+% Language / paragraph style
+\usepackage[english]{babel}
+\setlength{\parindent}{0pt}
+
+% Core packages
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{longtable}
+\makeatletter
+\renewcommand{\tagform@}[1]{}
+\makeatother
+
+% Fonts: Arial-like / Calibri-like via XeLaTeX
+\usepackage{fontspec}
+\setmainfont{Arial}
+\setsansfont{Arial}
+
+% If Arial fails on your machine, replace both lines above with:
+% \setmainfont{TeX Gyre Heros}
+% \setsansfont{TeX Gyre Heros}

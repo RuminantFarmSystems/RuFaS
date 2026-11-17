@@ -1,0 +1,9 @@
+Source module,Output (recording method),Variables used,Units
+Soil and Crop,Daily soil layer N2O emissions (FieldDataReporter.send_soil_layer_daily_variables),nitrous_oxide_emissions by field and soil layer,kg N2O-N/ha
+Soil and Crop,Daily soil layer NH3 emissions (FieldDataReporter.send_soil_layer_daily_variables),ammonia_emissions by field and soil layer,kg NH3-N/ha
+Soil and Crop,Fertilizer application events (Field._record_fertilizer_application),"nitrogen, phosphorus, potassium, field_name, year, day",kg
+Soil and Crop,Manure application events (Field._record_manure_application),"nitrogen, field_name, year, day",kg
+Soil and Crop,Harvest events (CropManagement._record_yield),"dry_yield, crop, field_name, field_size, harvest_type, harvest_year, harvest_day","kg DM/ha, ha"
+Feed Storage,Crops received into storage (crop_received),"field_name, crop_name, feed_id",--
+Feed Storage,Daily farmgrown feed deductions (FeedManager._log_feed_deductions),farmgrown_feed_[ID]_fed,kg DM/d
+EEE,Purchased feed emission factor database (county-level),Total and land use change emission factors by Feed ID,kg CO2-eq/kg DM

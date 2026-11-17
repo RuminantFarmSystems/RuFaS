@@ -1,0 +1,4 @@
+Handlers,Description
+ Handler (Processor) , handler.py contains basic methods that are applicable to all handlers
+ Single StreamHandler (Handler) ,"single_stream_handler.py contains alley scraper, manual scraping, and flush system-specific methods"
+ ParlorCleaning (Handler) , parlor_cleaning.py contains parlor cleaning-specific methods
