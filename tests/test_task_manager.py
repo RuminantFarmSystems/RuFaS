@@ -1160,6 +1160,7 @@ def test_process_e2e_group_results(
         return_value=(
             False,
             {},
+            {},
             expected_results_random_seeds,
         ),
     )
@@ -1213,6 +1214,7 @@ def test_process_e2e_group_results(
             output_prefix=e2e_group,
             must_change_variables=False,
             accepted_ranges={},
+            variable_tolerances={},
         )
         mock_post_processing.assert_called_once_with(
             args={**e2e_runs[0], "output_prefix": e2e_group},
@@ -1315,6 +1317,7 @@ def test_process_e2e_group_results_exception(
         "validate_comparison_configuration",
         return_value=(
             False,
+            {},
             {},
             {
                 "Animal": [42, 51],
