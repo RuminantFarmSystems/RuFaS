@@ -87,7 +87,7 @@
       "herd_size_adjustment_period": {
         "type": "number",
         "description": "The period between each check to adjust the herd's size.",
-        "default": 30,
+        "default": 7,
         "minimum": 1
       },
       "herd_size_sell_threshold": {
@@ -290,7 +290,7 @@
         "do_not_breed_time": {
           "type": "number",
           "description": "Cow Do Not Breed Time (days) -- The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant",
-          "default": 185,
+          "default": 300,
           "minimum": 0
         },
         "cull_eligibility_minimum_days_in_milk": {
