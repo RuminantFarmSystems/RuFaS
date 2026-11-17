@@ -280,6 +280,7 @@ class HerdStatistics:
     average_age_at_weaning: float | None = None
     average_age_at_heiferII_graduation: float | None = None
     average_age_at_heiferIII_graduation: float | None = None
+    average_dcc_at_removal: float | None
 
     parity_culling_stats_range: dict[str, int]
 
@@ -469,6 +470,7 @@ class HerdStatistics:
         self.average_age_at_weaning = None
         self.average_age_at_heiferII_graduation = None
         self.average_age_at_heiferIII_graduation = None
+        self.average_dcc_at_removal = None
 
         self.acute_sale_cows_parity_1 = 0
         self.acute_sale_cows_parity_2 = 0
