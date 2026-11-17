@@ -337,10 +337,6 @@ class HerdStatistics:
     avg_heifer_culling_age = 0.0
     avg_cow_culling_age = 0.0
     avg_mature_body_weight = 0.0
-    average_age_at_weaning: float | None = None
-    average_age_at_heiferII_graduation: float | None = None
-    average_age_at_heiferIII_graduation: float | None = None
-    average_dcc_at_removal: float | None = None
 
     parity_culling_stats_range: dict[str, int]
 
@@ -386,13 +382,18 @@ class HerdStatistics:
     herd_milk_protein_percent = 0.0
     milk_production_at_removal_sum = 0.0
     milk_production_at_removal_count = 0
-    milk_production_at_low_production_sale_avg: float = 0.0
-    days_in_milk_at_low_production_sale_avg: float = 0.0
-    parity_at_low_production_sale_avg: float = 0.0
-    days_pregnant_at_low_production_sale_avg: float = 0.0
+    milk_production_at_low_production_sale_avg = 0.0
+    days_in_milk_at_low_production_sale_avg = 0.0
+    parity_at_low_production_sale_avg = 0.0
+    days_pregnant_at_low_production_sale_avg = 0.0
 
     heifer_average_daily_gain_by_pen: dict[str, float | None]
     heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
+
+    average_age_at_weaning: float | None = None
+    average_age_at_heiferII_graduation: float | None = None
+    average_age_at_heiferIII_graduation: float | None = None
+    average_dcc_at_removal: float | None = None
 
     def __init__(self) -> None:
         """
