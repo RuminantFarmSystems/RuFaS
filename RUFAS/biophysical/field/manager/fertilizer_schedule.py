@@ -101,13 +101,13 @@ class FertilizerSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
-        non_negative_parameters: list[tuple[str, list[Any]] | None] = [
+        non_negative_parameters: list[tuple[str, list[Any]]] = [
             ("nitrogen masses", self.nitrogen_masses),
             ("phosphorus masses", self.phosphorus_masses),
             ("potassium masses", self.potassium_masses),
             ("application depths", self.application_depths),
         ]
-        fraction_parameters: list[tuple[str, list[Any]] | None] = [
+        fraction_parameters: list[tuple[str, list[Any]]] = [
             ("surface remainder fractions", self.surface_remainder_fractions)
         ]
 

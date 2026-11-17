@@ -47,6 +47,18 @@ def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayC
     assert actual_result == expected_result
 
 
+def test_calc_snow_temp_without_previous_day_snow_temperature(mocker: MockerFixture) -> None:
+    """Test that an error is raised when the previous day's snow temperature is not set."""
+    soil_data = SoilData(snow_lag_factor=1.0, field_size=10)
+    current_day_conditions = CurrentDayConditions(
+        incoming_light=11.3, min_air_temperature=-9, mean_air_temperature=-3, max_air_temperature=6
+    )
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+    with pytest.raises(ValueError, match="previous_day_snow_temperature must be set"):
+        Snow._calc_snow_temp(soil_data=soil_data, current_day_conditions=current_day_conditions)
+    mock_add_error.assert_called_once()
+
+
 @pytest.mark.parametrize(
     "soil_data, current_day_conditions, day",
     [
@@ -118,6 +130,18 @@ def test_melt_snow(
     if expected_result > soil_data.snow_content:
         expected_result = soil_data.snow_content
     assert actual_result == expected_result
+
+
+def test_melt_snow_without_current_day_snow_temperature(mocker: MockerFixture) -> None:
+    """Test that an error is raised when the current day's snow temperature is not set."""
+    soil_data = SoilData(snow_content=20, snow_coverage_fraction=1.0, snow_melt_base_temperature=1.0, field_size=10)
+    current_day_conditions = CurrentDayConditions(
+        incoming_light=11.3, min_air_temperature=-9, mean_air_temperature=-3, max_air_temperature=6
+    )
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+    with pytest.raises(ValueError, match="current_day_snow_temperature must be set"):
+        Snow._melt_snow(soil_data=soil_data, current_day_conditions=current_day_conditions, day=25)
+    mock_add_error.assert_called_once()
 
 
 @pytest.mark.parametrize(

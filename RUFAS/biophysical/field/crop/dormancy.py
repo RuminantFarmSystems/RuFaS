@@ -8,17 +8,16 @@ class Dormancy:
 
     Parameters
     ----------
-    crop_data : CropData, optional
+    crop_data : CropData
        A ``CropData`` object containing specifications and attributes for a crop.
-       If not provided, a default ``CropData`` object is used.
-    minimum_lai_during_dormancy : float, optional, default 0.75
+    minimum_lai_during_dormancy : float, default 0.75
         Minimum leaf area index for plants (perennials and trees only).
 
     Attributes
     ----------
     data : CropData
         A reference to the ``crop_data`` object on which dormancy operations will be conducted.
-    minimum_lai_during_dormancy : float | None
+    minimum_lai_during_dormancy : float
         Minimum leaf area index for plants (perennials and trees only).
 
     Notes
@@ -33,10 +32,10 @@ class Dormancy:
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
-        minimum_lai_during_dormancy: float | None = 0.75,
+        crop_data: CropData,
+        minimum_lai_during_dormancy: float = 0.75,
     ) -> None:
-        self.data = crop_data or CropData
+        self.data = crop_data
         self.minimum_lai_during_dormancy = minimum_lai_during_dormancy
 
     def enter_dormancy(self, soil_data: SoilData) -> None:
