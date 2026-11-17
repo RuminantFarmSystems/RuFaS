@@ -1035,16 +1035,8 @@ class AnimalModuleReporter:
             herd_statistics.cow_deaths_parity_3_plus,
             sold_and_died_info_map,
         )
-        om.add_variable(
-            "fresh_cow_deaths",
-            herd_statistics.fresh_cow_deaths,
-            sold_and_died_info_map
-        )
-        om.add_variable(
-            "other_cow_deaths",
-            herd_statistics.other_cow_deaths,
-            sold_and_died_info_map
-        )
+        om.add_variable("fresh_cow_deaths", herd_statistics.fresh_cow_deaths, sold_and_died_info_map)
+        om.add_variable("other_cow_deaths", herd_statistics.other_cow_deaths, sold_and_died_info_map)
         om.add_variable(
             "milk_production_at_low_production_sale_avg",
             herd_statistics.milk_production_at_low_production_sale_avg,
@@ -1114,25 +1106,13 @@ class AnimalModuleReporter:
             herd_statistics.sold_cow_low_production_parity_3_plus,
             sold_and_died_info_map,
         )
-        om.add_variable(
-            "fresh_cow_acute_sales",
-            herd_statistics.fresh_cow_acute_sales,
-            sold_and_died_info_map
-        )
-        om.add_variable(
-            "other_cow_acute_sales",
-            herd_statistics.other_cow_acute_sales,
-            sold_and_died_info_map
-        )
+        om.add_variable("fresh_cow_acute_sales", herd_statistics.fresh_cow_acute_sales, sold_and_died_info_map)
+        om.add_variable("other_cow_acute_sales", herd_statistics.other_cow_acute_sales, sold_and_died_info_map)
         for removal_category in ("fresh", "other"):
             for parity in ("1", "2", "3_plus"):
                 variable_name = f"{removal_category}_cow_removals_parity_{parity}"
 
-                om.add_variable(
-                    variable_name,
-                    getattr(herd_statistics, variable_name),
-                    sold_and_died_info_map
-                )
+                om.add_variable(variable_name, getattr(herd_statistics, variable_name), sold_and_died_info_map)
         for death_category in ("fresh", "other"):
             for parity in ("1", "2", "3_plus"):
                 variable_name = f"{death_category}_cow_deaths_parity_{parity}"

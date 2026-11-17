@@ -786,9 +786,7 @@ class HerdManager:
                 )
             if animal_group_name == "heiferIs":
                 graduated_heifers = [
-                    heifer
-                    for heifer in group_graduated_animals
-                    if heifer.animal_type == AnimalType.HEIFER_II
+                    heifer for heifer in group_graduated_animals if heifer.animal_type == AnimalType.HEIFER_II
                 ]
 
                 self.herd_statistics.average_age_at_heiferII_graduation = (
@@ -798,9 +796,7 @@ class HerdManager:
                 )
             if animal_group_name == "heiferIIs":
                 graduated_heifers = [
-                    heifer
-                    for heifer in group_graduated_animals
-                    if heifer.animal_type == AnimalType.HEIFER_III
+                    heifer for heifer in group_graduated_animals if heifer.animal_type == AnimalType.HEIFER_III
                 ]
 
                 self.herd_statistics.average_age_at_heiferII_graduation = (
@@ -2472,12 +2468,8 @@ class HerdManager:
         self.herd_statistics.acute_sale_cows_parity_3_plus += sum(
             cow.reproduction.calves >= 3 for cow in acute_sale_cows
         )
-        self.herd_statistics.fresh_cow_acute_sales += sum(
-            0 < cow.days_in_milk < 50 for cow in acute_sale_cows
-        )
-        self.herd_statistics.other_cow_acute_sales += sum(
-            50 <= cow.days_in_milk for cow in acute_sale_cows
-        )
+        self.herd_statistics.fresh_cow_acute_sales += sum(0 < cow.days_in_milk < 50 for cow in acute_sale_cows)
+        self.herd_statistics.other_cow_acute_sales += sum(50 <= cow.days_in_milk for cow in acute_sale_cows)
 
         self.herd_statistics.total_cow_removals_parity_1 += sum(
             cow.reproduction.calves == 1 for cow in sold_and_died_cows
@@ -2518,11 +2510,7 @@ class HerdManager:
                 getattr(self.herd_statistics, attribute) + 1,
             )
 
-        removed_cows = [
-            cow
-            for cow in acute_sale_cows + dead_cows
-            if cow.days_in_milk > 0
-        ]
+        removed_cows = [cow for cow in acute_sale_cows + dead_cows if cow.days_in_milk > 0]
 
         for cow in removed_cows:
             removed_parity = cow.reproduction.calves
