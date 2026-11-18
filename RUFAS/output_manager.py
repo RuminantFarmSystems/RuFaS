@@ -3010,10 +3010,11 @@ class OutputManager(object):
         if filter_content.get("omit_none_values") is True:
             if not filter_content.get("vertical_aggregation") or filter_content.get("horizontal_aggregation"):
                 error_message = (
-                    "Reporting process may error or give innacurate aggregated results. "
-                    f"Filter '{filter_content.get('name')}' in {filter_name} specifies "
-                    "'omit_none_values': True, which requires 'vertical_aggregation' "
-                    "and does not support 'horizontal_aggregation'."
+                    f"Invalid configuration for report '{filter_content.get('name')}' "
+                    f"in filter file '{filter_name}'. "
+                    "The 'omit_none_values' option can only be enabled when "
+                    "'vertical_aggregation' is specified and 'horizontal_aggregation' is not. "
+                    "Please update the report filter configuration to avoid incorrect aggregation results."
                 )
                 self.add_error(
                     "Invalid report filter configuration",
