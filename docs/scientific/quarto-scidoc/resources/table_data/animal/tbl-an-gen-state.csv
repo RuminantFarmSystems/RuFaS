@@ -1,0 +1,7 @@
+﻿Symbol,Attribute in code,Definition,Unit,Changes during life?
+"TBV$_\text{F}$, TBV$_\text{P}$","TBV_fat, TBV_protein",True breeding value,kg,No
+"PE$_\text{F}$, PE$_\text{P}$","E_permanent_fat, E_permanent_protein",Permanent environmental effect,kg,No
+"TE$_\text{F}$, TE$_\text{P}$","E_temporary_fat, E_temporary_protein",Temporary environmental effect,kg,Redrawn at every calving
+"P$_\text{F}$, P$_\text{P}$","phenotype_fat, phenotype_protein",Phenotype,kg,Recomputed at every calving
+"EBV$_\text{F}$, EBV$_\text{P}$","EBV_fat, EBV_protein",Estimated breeding value,kg,Re-estimated at the first three calvings
+I,ranking_index,Ranking (selection) index,unitless,Recomputed with the EBVs
