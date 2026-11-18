@@ -2935,6 +2935,16 @@ class OutputManager(object):
             The report filter to validate.
         filter_name : str
             The name of the filter to validate.
+
+        Raises
+        ------
+        ValueError
+            - If user has selected both ``horizontal_aggregation`` and ``omit_none_values``.
+
+        Notes
+        -----
+        ``horizontal_aggregation`` and ``omit_none_values`` are not allowed in a single report filter
+        because they could result in errors in the reporting process or scientifically incorrect aggregations.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -2999,13 +3009,18 @@ class OutputManager(object):
 
         if filter_content.get("omit_none_values") is True:
             if not filter_content.get("vertical_aggregation") or filter_content.get("horizontal_aggregation"):
+                error_message = (
+                    "Reporting process may error or give innacurate aggregated results. "
+                    f"Filter '{filter_content.get('name')}' in {filter_name} specifies "
+                    "'omit_none_values': True, which requires 'vertical_aggregation' "
+                    "and does not support 'horizontal_aggregation'."
+                )
                 self.add_error(
                     "Invalid report filter configuration",
-                    f"Filter {filter_content.get('name')=} in {filter_name} specifies "
-                    "'omit_none_values': True, which requires 'vertical_aggregation' "
-                    "and does not support 'horizontal_aggregation'.",
+                    error_message,
                     info_map,
                 )
+                raise ValueError(error_message)
 
     def validate_filter_constant_content(self, filters_dir_path: Path) -> None:
         """
