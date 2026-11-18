@@ -1684,6 +1684,27 @@ def test_validate_general_manure_stream_proportions(
             ],
             "'stream1', 'stream2'",
         ),
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.5},
+                {"stream_name": "Stream1", "stream_proportion": 0.5},
+            ],
+            None,
+        ),
+        (
+            [
+                {"stream_name": "stream1", "stream_proportion": 0.5},
+                {"stream_name": "stream1 ", "stream_proportion": 0.5},
+            ],
+            "'stream1'",
+        ),
+        (
+            [
+                {"stream_name": " stream1", "stream_proportion": 0.5},
+                {"stream_name": "stream1\t", "stream_proportion": 0.5},
+            ],
+            "'stream1'",
+        ),
     ],
 )
 def test_validate_general_manure_stream_names(
@@ -1692,7 +1713,7 @@ def test_validate_general_manure_stream_names(
     pen: Pen,
     mocker: MockerFixture,
 ) -> None:
-    """Tests that general manure stream names must be unique within a pen."""
+    """Tests that general manure stream names must be unique within a pen, ignoring surrounding whitespace."""
     mock_module_om = mocker.patch("RUFAS.biophysical.animal.pen.om")
     pen.manure_streams = manure_streams
 
@@ -1711,10 +1732,20 @@ def test_validate_general_manure_stream_names(
     [
         ([{"stream_proportion": 1.0}], 1),
         ([{"stream_name": None, "stream_proportion": 1.0}], 1),
+        ([{"stream_name": "", "stream_proportion": 1.0}], 1),
+        ([{"stream_name": "   ", "stream_proportion": 1.0}], 1),
+        ([{"stream_name": 5.0, "stream_proportion": 1.0}], 1),
         (
             [
                 {"stream_proportion": 0.5},
                 {"stream_name": None, "stream_proportion": 0.5},
+            ],
+            2,
+        ),
+        (
+            [
+                {"stream_name": "", "stream_proportion": 0.5},
+                {"stream_name": "", "stream_proportion": 0.5},
             ],
             2,
         ),
@@ -1725,15 +1756,6 @@ def test_validate_general_manure_stream_names(
             ],
             1,
         ),
-        (
-            [
-                {"stream_name": "stream1", "stream_proportion": 0.25},
-                {"stream_proportion": 0.25},
-                {"stream_name": "stream1", "stream_proportion": 0.25},
-                {"stream_name": None, "stream_proportion": 0.25},
-            ],
-            2,
-        ),
     ],
 )
 def test_validate_general_manure_stream_names_missing_name(
@@ -1742,15 +1764,39 @@ def test_validate_general_manure_stream_names_missing_name(
     pen: Pen,
     mocker: MockerFixture,
 ) -> None:
-    """Tests that a general manure stream without a name is rejected with its own error."""
+    """Tests that a general manure stream with a missing or empty name is rejected with its own error."""
     mock_module_om = mocker.patch("RUFAS.biophysical.animal.pen.om")
     pen.manure_streams = manure_streams
 
-    expected_message = f"Missing manure stream name for {expected_unnamed_count} manure stream(s) in pen {pen.id}."
+    expected_message = (
+        f"Missing or empty manure stream name for {expected_unnamed_count} manure stream(s) in pen {pen.id}."
+    )
     with pytest.raises(ValueError, match=re.escape(expected_message)):
         pen._validate_general_manure_stream_names()
     mock_module_om.add_error.assert_called_once()
     assert mock_module_om.add_error.call_args.args[0] == "Missing pen manure stream names"
+
+
+def test_validate_general_manure_stream_names_missing_and_duplicate(pen: Pen, mocker: MockerFixture) -> None:
+    """Tests that missing and duplicate general manure stream names are reported together."""
+    mock_module_om = mocker.patch("RUFAS.biophysical.animal.pen.om")
+    pen.manure_streams = [
+        {"stream_name": "stream1", "stream_proportion": 0.25},
+        {"stream_proportion": 0.25},
+        {"stream_name": "stream1 ", "stream_proportion": 0.25},
+        {"stream_name": "", "stream_proportion": 0.25},
+    ]
+
+    expected_message = (
+        f"Missing or empty manure stream name for 2 manure stream(s) in pen {pen.id}. "
+        f"Duplicate manure stream name(s) 'stream1' in pen {pen.id}."
+    )
+    with pytest.raises(ValueError, match=re.escape(expected_message)):
+        pen._validate_general_manure_stream_names()
+    assert [call.args[0] for call in mock_module_om.add_error.call_args_list] == [
+        "Missing pen manure stream names",
+        "Duplicate pen manure stream names",
+    ]
 
 
 def test_pen_init_rejects_duplicate_manure_stream_names(mocker: MockerFixture) -> None:

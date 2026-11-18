@@ -973,8 +973,8 @@ class Pen:
         Raises
         ------
         ValueError
-            If a general manure stream in the pen has no ``stream_name``, or if more than one general manure stream
-            in the pen is configured with the same ``stream_name``.
+            If a general manure stream in the pen has a missing or empty ``stream_name``, if more than one general
+            manure stream in the pen is configured with the same ``stream_name``, or both.
 
         Notes
         -----
@@ -982,52 +982,44 @@ class Pen:
         shared a name, one would silently overwrite the other and the overwritten stream's first processor would
         never receive any manure, which only surfaces later as an unrelated error in the manure module.
 
-        A stream without a ``stream_name`` is reported with its own error, so that unnamed streams are not reported
-        as duplicates of each other.
+        A ``stream_name`` that is not a string, or that is empty once surrounding whitespace is removed, counts as
+        missing. Names are compared with surrounding whitespace removed, so names that differ only by surrounding
+        whitespace count as duplicates. Missing and duplicate names are each reported with their own error, and
+        both are reported before the ValueError is raised.
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_general_manure_stream_names.__name__,
+        }
         unique_stream_names: set[str] = set()
         duplicate_stream_names: set[str] = set()
         unnamed_stream_count = 0
         for stream_config in self.manure_streams:
             raw_stream_name = stream_config.get("stream_name")
-            if raw_stream_name is None:
+            stream_name = raw_stream_name.strip() if isinstance(raw_stream_name, str) else ""
+            if not stream_name:
                 unnamed_stream_count += 1
-                continue
-            stream_name = str(raw_stream_name)
-            if stream_name in unique_stream_names:
+            elif stream_name in unique_stream_names:
                 duplicate_stream_names.add(stream_name)
             else:
                 unique_stream_names.add(stream_name)
+
+        requirement = "Each manure stream defined for a pen must have a unique 'stream_name'."
+        problems: list[str] = []
         if unnamed_stream_count > 0:
-            message = (
-                f"Missing manure stream name for {unnamed_stream_count} manure stream(s) in pen {self.id}. "
-                "Each manure stream defined for a pen must have a unique 'stream_name'."
+            problem = (
+                f"Missing or empty manure stream name for {unnamed_stream_count} manure stream(s) in pen {self.id}."
             )
-            om.add_error(
-                "Missing pen manure stream names",
-                message,
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self._validate_general_manure_stream_names.__name__,
-                },
-            )
-            raise ValueError(message)
+            om.add_error("Missing pen manure stream names", f"{problem} {requirement}", info_map=info_map)
+            problems.append(problem)
         if duplicate_stream_names:
             duplicate_names = ", ".join(f"'{stream_name}'" for stream_name in sorted(duplicate_stream_names))
-            message = (
-                f"Duplicate manure stream name(s) {duplicate_names} in pen {self.id}. "
-                "Each manure stream defined for a pen must have a unique 'stream_name'."
-            )
-            om.add_error(
-                "Duplicate pen manure stream names",
-                message,
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self._validate_general_manure_stream_names.__name__,
-                },
-            )
-            raise ValueError(message)
+            problem = f"Duplicate manure stream name(s) {duplicate_names} in pen {self.id}."
+            om.add_error("Duplicate pen manure stream names", f"{problem} {requirement}", info_map=info_map)
+            problems.append(problem)
+        if problems:
+            raise ValueError(f"{' '.join(problems)} {requirement}")
 
     def _validate_general_manure_stream_proportions(self) -> None:
         """
