@@ -199,23 +199,24 @@ Pens are initiated from the Pen class by the `HerdManager` at the beginning of t
 
 #### Introduction
 
-On a real farm, feed intake and metabolism is a highly critical process, as animals convert feeds into productive outputs (frame growth, fetal growth, milk, etc.) and excretions (heat loss, enteric methane, manure, etc.). Because of the importance of nutrition and nutrient metabolism to farm productivity,  profitability, and sustainability, research and interest in this area are extensive. For similar reasons, a variety of options to model and study these processes and their outcomes are available in RuFaS. These range from highly-detailed replications of real-world feeding scenarios to exploratory "if, then"-type modeling that requires feedback mechanisms in the model that maximize responsiveness to user inputs. In support the widest possible range of use cases, the feed intake and metabolism processes in RuFaS are designed to be highly customizable, offering varied levels of control in several key areas:
+Feed intake and nutrient metabolism are essential processes within a dairy farm system through which animals convert feeds into productive outputs (frame growth, fetal growth, milk, etc.) and excretions (heat loss, enteric methane, manure, etc.). Further, research in dairy cattle nutrition and metabolism are active areas of research due to the significance of these fields to farm productivity, profitability, and sustainability and the subject's complexity. Because of this significance and the range of possible applications, RuFaS offers a variety of options to represent these processes and their outcomes. These range from detailed replications of user-specified feeding scenarios to exploratory "if, then"-type modeling that build on feedback mechanisms to maximize responsiveness to user inputs. Thus, the feed intake and metabolism processes in RuFaS are designed to be highly customizable, offering user control in several key areas:
  
 1. Prediction of animal requirements based on their attributes (age, weight, stage of lactation, etc.)
     * User-selectable nutrient supply model: @nrc_2001 or @nrc_2021 
 2. Diet and intake configuration
-    * Animal combination-level dry matter intake (DMI) configuration or prediction
-    * Optional user control of dietary ingredient proportion (%DM), nutritive composition, and cost, including fully least-cost formulation vs. strictly user-defined formulation
-3. Prediction of metabolizable nutrient amounts, and their relation to requirements
+    * Animal combination-level dry matter intake (DMI) specification or prediction
+    * Least-cost formulation of dietary ingredient proportion (%DM) or user-defined formulation
+    * Optional user specification of feed nutritive compositions and costs
+3. Prediction of metabolizable nutrient supplies and their relation to requirements
     * User-selectable NRC or NASEM nutrient requirements model
 4. Response to discrepancies in nutrient requirements vs. supply
-    * User-definable DMI changes or milk production penalties in response to inadequate nutrient supplies or other constraints
+    * User-defined DMI changes or milk production penalties in response to inadequate nutrient supplies or other constraints
  
-The various configuration options can be thought of as a spectrum of control, with the exact point along that spectrum (i.e., combination of user inputs) dependent user's objectives. High-control options allow the user to replicate a diet exactly, and remove or limit the role of nutritional models by overriding the connection between calculated nutrient supplies and productive outcomes. Low-control options allow users to explore "if, then"-type outcomes when diet or animal factors change, and observe modeled responses to these changes. Though complex, this system of configuration options is intended to support a broad range of use cases for this component of RuFaS.
+The configuration options should be thought of as a spectrum of control where the selected control point(s) reflects user's objectives. High-control options allow the user to replicate a diet exactly, and remove or limit the role of nutritional models by overriding the connection between calculated nutrient supplies and productive outcomes. Low-control options allow users to explore "if, then"-type outcomes when diet or animal factors change, and observe modeled responses to these changes. Though complex, this system of configuration options is intended to support a broad range of use cases for this component of RuFaS.
 
 
 #### Nutrient requirement and supply calculations
-The nutritional model utilized as the basis of nutrient requirement and supply calculations in RuFaS may be configured by the user in the configuration input file (`nutrient_standard` = `NASEM` or `NRC`). The calculations for each nutritional model are detailed below. Note that some calculations are shared between models. 
+The nutrition model utilized as the basis of nutrient requirement and supply calculations in RuFaS may be configured by the user in the configuration input file (`nutrient_standard` = `NASEM` or `NRC`). The calculations for each nutrition model are detailed below. Note that some calculations are shared between models. 
 
 ::: {.callout-note}
 Nutrient requirements are calculated for each animal then averaged within pen before being passed to the diet formulation components of RuFaS (see Feed Consumption section).
@@ -274,7 +275,7 @@ $$
 
 The maintenance requirement is calculated based on metabolic body weight (BW$^{0.75}$), body condition score, and the previous month's temperatures.
 
-First the body condition score must be translated to a 9 point scale (BSC9). The conceptus weight (CW) is calculated the same as for lactating and dry cows.
+First, the body condition score must be translated to a 9 point scale (BSC9). The conceptus weight (CW) is calculated according to the same method used for lactating and dry cows.
 
 :::{#eq-an-nrc-6}
 [[**AN.NRC.6**]]{.aside .content-visible when-format="html"}
@@ -340,6 +341,7 @@ $$
 **Growth** <br>
 
 * Lactating and Dry Cows
+
 Cows will continue to grow toward their mature body weight until the end of their second lactation. Their growth rate is estimated as a linear increase to reach the expected proportion of their mature bodyweight (MW) at the beginning of their next parity. 
 
 First the shrunk bodweight (SBW), the mature shrunk bodyweight (MSBW) and the equivalent shrunk bodyweight are calculated (EQSBW) to remove the effect of gut fill on bodyweight, the conceptus, and relate the animal's weight to the reference animal of 478 kg. 
@@ -1721,9 +1723,11 @@ $$
 #### Feed Consumption
 
 ##### Introduction
-Feed consumption in RuFaS consists of 3 key components, which are defined for each animal combination: the total DMI amount, the availability of feeds for dietary inclusion and their cost and nutritive composition, and the proportional inclusion of each ingredient in the diet. RuFaS provides several options for configuring these components in order to represent feed consumption through formulating and evaluating a diet. In the least-controlled formulation context, the user specifies only the list of feeds available to use for each animal combination, and allows a least-cost optimization procedure (@Li_2022) to formulate a ration that meets each pen’s nutrient requirements. Individual feed inclusions are unlimited, and DMI may increase by up to 30% from the initial value predicted by NASEM or NRC. If formulation of a diet that meets requirements is not possible with the given feeds and allowable DMI, milk production is penalized and the process is reattempted at a lower milk production. In the most-controlled context, the user specifies the exact DMI or DMI per unit of milk or gain, the exact inclusion rate of each feed, and prohibits any milk penalization. Various user input options detailed here allow the user to define the level of control exerted over various aspects of the ration, depending on their use case. 
+Feed consumption in RuFaS consists of 4 key components, which are defined for each animal combination: 1) the total DMI amount, 2) the feeds available, 3) the available feed costs and nutritive composition, and 4) the proportional inclusion of each ingredient in the diet. RuFaS provides several options for configuring these components in order to represent feed consumption. 
 
-Rations for each animal combination are formulated at the beginning of each user-defined formulation interval (the user-specified number of days between formulations). A formulation attempt will always occur at least once at the beginning of the interval. If the initial attempt fails, formulation will be reattempted as described in the Diet Formulation section. At this time, all feed inputs (aside from DMI, depending on the specific DMI input option selected) are fixed for the duration of the simulation; available feeds, nutritive composition, feed costs, etc. do not vary over time in RuFaS. However, at the beginning of each formulation interval, nutrient requirements are recalculated to reflect the updated population of animals in each pen. 
+In the least-controlled formulation context, the user specifies only the list of feeds available to use for each animal combination, and allows a least-cost optimization procedure (@Li_2022) to formulate a ration that meets each pen’s nutrient requirements. Individual feed inclusions are unlimited, and DMI may increase by up to 30% from the initial value predicted by NASEM or NRC. If formulation of a diet that meets requirements is not possible with the given feeds and allowable DMI, milk production is penalized and the process is reattempted at a lower milk production. In the most-controlled context, the user specifies the exact DMI or DMI per unit of milk or gain, the exact inclusion rate of each feed, and prohibits any milk penalization. The input options detailed in this section allow the user to define the level of control exerted over the intake amounts and composition of the ration, depending on their use case. 
+
+Rations for each animal combination are formulated at the beginning of each user-defined formulation interval (the user-specified number of days between formulations). A formulation attempt will always occur at least once at the beginning of the interval. If the initial attempt fails, formulation will be reattempted as described in the Diet Formulation section. Available feeds, nutritive composition, feed costs, etc. do not vary over time in RuFaS. However, at the beginning of each formulation interval, nutrient requirements are recalculated to reflect the updated population of animals in each pen. 
 
 ::: {.callout-note}
 Because intake and/or diet composition information is provided at the animal combination level, only one list of ingredients (and, optionally, ingredient inclusions) can be provided per animal combination. Ration inputs cannot be configured at the pen level. However, if multiple pens are defined within an animal combination, and intake and ingredient composition are not fixed, pen-level intake of DMI and individual feeds may vary due to differing nutrient requirements of pens.
