@@ -904,7 +904,7 @@ def test_report_herd_statistics_data(mocker: MockerFixture) -> None:
 
     AnimalModuleReporter.report_herd_statistics_data(hs, simulation_day)
 
-    assert mock_om_add_variable.call_count == 78
+    assert mock_om_add_variable.call_count == 104
 
     # Build lookup: variable_name → value from actual calls
     reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
@@ -1018,7 +1018,7 @@ def test_report_herd_statistics_data_with_pen_heifer_adg(mocker: MockerFixture) 
 
     AnimalModuleReporter.report_herd_statistics_data(hs, 1)
 
-    assert mock_om_add_variable.call_count == 80
+    assert mock_om_add_variable.call_count == 106
 
     reported = {c.args[0]: c.args[1] for c in mock_om_add_variable.call_args_list}
     assert reported["heifer_average_daily_gain_in_pen_3"] == pytest.approx(1.1)
