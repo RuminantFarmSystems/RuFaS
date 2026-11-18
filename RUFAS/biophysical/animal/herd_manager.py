@@ -2405,9 +2405,11 @@ class HerdManager:
         low_production_cow_count = len(low_production_cows)
         total_low_production_cow_count = self.herd_statistics.sold_cow_low_production_num
 
-        if low_production_cow_count > 0:
-            previous_count = total_low_production_cow_count - low_production_cow_count
+        low_production_cow_count = len(low_production_cows)
+        previous_count = self.herd_statistics.sold_cow_low_production_num
+        total_low_production_cow_count = previous_count + low_production_cow_count
 
+        if low_production_cow_count > 0:
             for attribute, values in (
                 (
                     "milk_production_at_low_production_sale_avg",
@@ -2430,7 +2432,7 @@ class HerdManager:
                 new_average = (previous_average * previous_count + sum(values)) / total_low_production_cow_count
                 setattr(self.herd_statistics, attribute, new_average)
 
-        self.herd_statistics.sold_cow_low_production_num += len(low_production_cows)
+        self.herd_statistics.sold_cow_low_production_num = total_low_production_cow_count
 
         self.herd_statistics.sold_cow_low_production_parity_1 += sum(
             cow.reproduction.calves == 1 for cow in low_production_cows
