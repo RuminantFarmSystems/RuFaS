@@ -2979,6 +2979,7 @@ class OutputManager(object):
             "use_verbose_report_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "expand_data_to_observed_range": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_fill_value_before_start": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "omit_none_values": partial(self.validate_type, expected=bool, type_label="a boolean"),
         }
 
         for key, value in filter_content.items():
@@ -2995,6 +2996,16 @@ class OutputManager(object):
             else:
                 validator = key_validators[key]
                 validator(value, key, filter_name)
+
+        if filter_content.get("omit_none_values") is True:
+            if not filter_content.get("vertical_aggregation") or filter_content.get("horizontal_aggregation"):
+                self.add_error(
+                    "Invalid report filter configuration",
+                    f"Filter {filter_content.get('name')=} in {filter_name} specifies "
+                    "'omit_none_values': True, which requires 'vertical_aggregation' "
+                    "and does not support 'horizontal_aggregation'.",
+                    info_map,
+                )
 
     def validate_filter_constant_content(self, filters_dir_path: Path) -> None:
         """
