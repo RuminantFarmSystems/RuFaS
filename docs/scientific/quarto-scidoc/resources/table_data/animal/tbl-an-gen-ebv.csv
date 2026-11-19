@@ -1,0 +1,5 @@
+﻿Life stage,"Reliability, REL","Accuracy, r","Error SD, fat (kg)","Error SD, protein (kg)"
+Calf or heifer,0.75,0.866,10.39,7.26
+"Cow, parity 1",0.8,0.894,9.6,6.71
+"Cow, parity 2",0.85,0.922,8.57,5.99
+"Cow, parity 3 and above",0.9,0.949,7.2,5.03

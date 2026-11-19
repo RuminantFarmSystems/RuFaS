@@ -3,81 +3,18 @@
 <!-- reuse code to import functions from "../scripts/": -->
 {{< include ../scripts/_import-from-scripts.qmd >}}
 
-Each version of the RuFaS model is designed to improve the accuracy and precision of the predictive power of the model. This section aims to outline the changes made ... 
+## v1.2.0
 
-## Animal Module
+In v1.2.0 the scientific documents were transfered into a new format (Quarto) and the following changes were made:
 
-### Changed Inputs
-Here you should include any 
-
-### Changed Methodology
-Text, equations, and references
-
-### Output Updates
-Expectations
-
-
-
-
-
-## Manure Module
-
-### Changed Inputs
-Here you should include any 
-
-### Changed Methodology
-Text, equations, and references
-
-### Output Updates
-Expectations
-
-
-
-
-
-## Feed Storage Module
-
-### Changed Inputs
-Here you should include any 
-
-### Changed Methodology
-Text, equations, and references
-
-### Output Updates
-Expectations
-
-
-
-
-
-## Crop and Soil Module
-
-### Changed Inputs
-Here you should include any 
-
-### Changed Methodology
-Text, equations, and references
-
-### Output Updates
-Expectations
-
-
-
-
-
-## Connections Documents
-
-### Changed Inputs
-Here you should include any 
-
-### Changed Methodology
-Text, equations, and references
-
-### Output Updates
-Expectations
-
-
-
-
-
-
+* **Animal module**:
+    * Addition of herd dynamics section
+    * Addition of genetics section
+    * Update of ration formulation section
+* **Manure module**:
+    * Connections sections were removed to create a new Connections chapter
+    * Corrections to MN.MET.6 and the methane yield unit and citation in the anaerobic digestion section
+* **New chapters**:
+    * Connections - covering the animal-manure and manure-soil and crop module connections
+    * Emissions - covering home grown and purchased feed emissions
+    * Highlighted updates - high level overview of changes made in each version update

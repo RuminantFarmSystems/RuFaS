@@ -1,0 +1,4 @@
+﻿Semen type,Conception rate,Probability of a male calf,Calf breed and fate
+Sexed dairy,Base rate × 0.85,0.1,Dairy; enters the calf retention decision
+Conventional dairy,Base rate,0.5,Dairy; enters the calf retention decision
+Beef,Base rate,0.5,Recorded as beef-on-dairy; always sold at birth
