@@ -9,6 +9,7 @@ from RUFAS.biophysical.field.field.field import Field
 from RUFAS.biophysical.field.field.field_data import FieldData
 from RUFAS.biophysical.field.field.tillage_application import TillageApplication
 from RUFAS.biophysical.field.soil.layer_data import LayerData
+from RUFAS.biophysical.field.soil.soil import Soil
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
@@ -49,7 +50,7 @@ def test_remove_amount_incorporated(
 ) -> None:
     """Tests that correct amount is removed and returned from the specified pool."""
     if container_type == "field":
-        data_container = FieldData()
+        data_container = FieldData(name="test")
     else:
         soil_data = SoilData(field_size=field_size)
         if container_type == "manure_pool":
@@ -71,7 +72,7 @@ def test_remove_amount_incorporated(
     [
         ([1, 2, 3], "<class 'list'>"),
         (
-            Field(),
+            Field(field_data=FieldData(name="test"), soil=Soil(SoilData(field_size=1.0))),
             "<class 'RUFAS.biophysical.field.field.field.Field'>",
         ),
     ],
@@ -172,7 +173,7 @@ def test_mix_soil_layers(
     """Tests that stuff is correctly redistributed between different pools in the soil layer."""
     soil_data = SoilData(field_size=field_size, soil_layers=layers)
     soil_data.set_vectorized_layer_attribute(pool_name, pool_values)
-    field_data = FieldData(field_size=field_size)
+    field_data = FieldData(name="test", field_size=field_size)
     tillage_app = TillageApplication(field_data, soil_data)
 
     tillage_app._mix_soil_layers(pool_name, till_depth, mix_frac, offset_top_layer)
@@ -200,7 +201,7 @@ def test_record_tillage(
     mocker: MockerFixture,
 ) -> None:
     field_data_1 = FieldData(name="field1", field_size=1.5)
-    till_app = TillageApplication(field_data=field_data_1)
+    till_app = TillageApplication(field_data=field_data_1, soil_data=SoilData(field_size=1.5))
 
     expected_clay_percent = 25.0
     expected_units = {
@@ -260,7 +261,7 @@ def test_till_soil(
     """Tests that soil is tilled correctly."""
     field_data_1 = FieldData(name="field1", field_size=1.5)
 
-    till_app = TillageApplication(field_data=field_data_1)
+    till_app = TillageApplication(field_data=field_data_1, soil_data=SoilData(field_size=1.5))
 
     till_app._remove_amount_incorporated = MagicMock(return_value=8)
     till_app.soil_data.soil_layers[0].add_to_labile_phosphorus = MagicMock()

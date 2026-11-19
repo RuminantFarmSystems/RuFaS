@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from RUFAS.biophysical.field.soil.soil import Soil
+from RUFAS.biophysical.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(
@@ -19,7 +20,7 @@ def test_daily_soil_routine(
     avg_annual_air_temp: float,
 ) -> None:
     """Tests that method calls are correct in daily soil routine method"""
-    soil = Soil(field_size=50)
+    soil = Soil(SoilData(field_size=50))
     soil.soil_temp.daily_soil_temperature_update = MagicMock()
     soil.daily_soil_routine(
         solar_radiation,
@@ -63,7 +64,7 @@ def test_daily_soil_water_routine(
     minimum_cover_management_factor: float,
     field_size: float,
 ) -> None:
-    soil = Soil(field_size=50)
+    soil = Soil(SoilData(field_size=50))
     soil.infiltration.infiltrate = MagicMock()
     soil.percolation.percolate = MagicMock()
     soil.percolation.percolate_infiltrated_water = MagicMock()

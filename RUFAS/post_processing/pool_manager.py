@@ -84,6 +84,7 @@ class PoolManager:
         self.file_manager = file_manager
         self.time: RufasTime | None = None
         self.exclude_info_maps: bool = False
+        self._logger = get_logger(self.__class__.__name__)
 
     def setup_pool_overflow_control(
         self,
@@ -345,7 +346,7 @@ class PoolManager:
                 self.save_chunk_threshold_call_count == 0 and self.current_pool_size >= self.maximum_pool_size
             )
             if is_save_chunk_threshold_reached or is_pool_size_at_maximum_capacity:
-                self._save_current_variable_pool()
+                self.save_current_variable_pool()
 
     def add_variable_bulk(
         self,
@@ -372,22 +373,50 @@ class PoolManager:
             name, value = list(variable.items())[0]
             self.add_variable(name, value, info_map, first_info_map_only, overwrite_simulation_day)
 
-    def _save_current_variable_pool(self) -> None:
+    def save_current_variable_pool(self) -> None:
         """
         Save the current ``variables_pool`` into a JSON file. Flush the ``variables_pool`` and reset the pool size.
+
+        Notes
+        -----
+        The chunk is saved in ``saved_pool_chunks_path`` as ``saved_pool_{saved_pool_chunks_num}``, so that
+        ``load_saved_pools()`` can restore the chunks in order.
+
+        Raises
+        ------
+        ValueError
+            If ``saved_pool_chunks_path`` has not been set by ``setup_pool_overflow_control()``.
         """
+        if self.saved_pool_chunks_path is None:
+            raise ValueError(
+                "Cannot save a variables pool chunk because 'saved_pool_chunks_path' is not set. "
+                "Call setup_pool_overflow_control() first."
+            )
         saved_pool_file_name = self.file_manager.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
-        saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
+        saved_pool_file_path = self.saved_pool_chunks_path / saved_pool_file_name
+        self.save_variable_pool_to_file(saved_pool_file_path)
+        self._set_variables_pool({})
+        self.saved_pool_chunks_num += 1
+
+    def save_variable_pool_to_file(self, saved_pool_file_path: Path) -> None:
+        """
+        Saves the current ``variables_pool`` into the JSON file at the provided path.
+
+        Parameters
+        ----------
+        saved_pool_file_path : Path
+            The path to the JSON file the ``variables_pool`` is saved to.
+        """
         self.file_manager.dict_to_file_json(
             data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=True
         )
-        logger.info(
-            "Saved the current variable pool to %s",
-            saved_pool_file_path,
-            extra={"rufas_log_name": "save_current_variable_pool"},
+        self._logger.info(
+            f"Saved the current variable pool to {saved_pool_file_path}",
+            extra={
+                "rufas_log_name": "save_current_variable_pool",
+                "rufas_metadata_prefix": self.file_manager.metadata_prefix,
+            },
         )
-        self._set_variables_pool({})
-        self.saved_pool_chunks_num += 1
 
     def _stringify_units(self, units: dict[str, Any] | MeasurementUnits) -> dict[str, Any] | str:
         """
@@ -527,48 +556,76 @@ class PoolManager:
         file_path : Path
             The path to the file to be loaded to the ``variables_pool``.
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.load_variables_pool_from_file.__name__,
-        }
-        loaded_pool = self.file_manager._read_variables_pool_file(file_path, info_map)
-        self._set_variables_pool(loaded_pool)
+        info_map = {"class": self.__class__.__name__, "function": self.load_variables_pool_from_file.__name__}
+        self._set_variables_pool(self.file_manager.read_variables_pool_file(file_path, info_map))
 
-    def load_multiple_variables_pools_from_files(self, pools: Sequence[tuple[str, Path] | dict[str, Any]]) -> None:
+    def load_multiple_variables_pools_from_files(
+        self, pools: Sequence[tuple[str | None, Path] | dict[str, Any]]
+    ) -> None:
         """
-        Loads multiple previously saved ``variable_pools``, namespacing each pool's entries.
+        Loads multiple previously saved ``variable_pools``, namespacing each pool's entries by its prefix.
 
         Parameters
         ----------
-        pools : Sequence[tuple[str, Path] | dict[str, Any]]
-            An iterable of pool descriptors. Each descriptor must provide a pool name and the
+        pools : Sequence[tuple[str | None, Path] | dict[str, Any]]
+            An iterable of pool descriptors. Each descriptor must provide a pool prefix and the
             path to the JSON file containing the pool to load. When dicts are provided they
-            must include ``"name"`` and ``"path"`` keys.
+            must include ``"prefix"`` and ``"path"`` keys.
 
+        Notes
+        -----
+        Pools sharing the same prefix are merged under that prefix. Pools with a ``None`` prefix are merged into
+        the top level of the ``variables_pool`` without namespacing.
         """
         info_map_base = {
             "class": self.__class__.__name__,
             "function": self.load_multiple_variables_pools_from_files.__name__,
         }
-
-        separated_pools: dict[str, POOL_ELEMENT_TYPE] = {}
-        normalized_pools: list[tuple[str, Path]] = []
-        for pool in pools:
-            if isinstance(pool, tuple):
-                pool_name, pool_path = pool
+        separated_pools: dict[str, Any] = {}
+        for pool_prefix, pool_path in self._normalize_pool_descriptors(pools):
+            loaded_pool = self.file_manager.read_variables_pool_file(
+                pool_path, {**info_map_base, "pool_name": pool_prefix}
+            )
+            if pool_prefix is None:
+                separated_pools = separated_pools | loaded_pool
             else:
-                pool_name = pool["name"]
-                pool_path = pool["path"]
-            if not isinstance(pool_path, Path):
-                pool_path = Path(pool_path)
-            normalized_pools.append((pool_name, pool_path))
-
-        for pool_name, pool_path in normalized_pools:
-            pool_info_map = {**info_map_base, "pool_name": pool_name}
-            loaded_pool = self.file_manager._read_variables_pool_file(pool_path, pool_info_map)
-            separated_pools[pool_name] = loaded_pool
-
+                separated_pools = separated_pools | {pool_prefix: separated_pools.get(pool_prefix, {}) | loaded_pool}
         self._set_variables_pool(separated_pools)
+
+    @staticmethod
+    def _normalize_pool_descriptors(
+        pools: Sequence[tuple[str | None, Path] | dict[str, Any]],
+    ) -> list[tuple[str | None, Path]]:
+        """
+        Converts saved pool descriptors into ``(prefix, path)`` tuples.
+
+        Parameters
+        ----------
+        pools : Sequence[tuple[str | None, Path] | dict[str, Any]]
+            Pool descriptors, either ``(prefix, path)`` tuples or dictionaries with ``"prefix"`` and ``"path"`` keys.
+            A missing ``"prefix"`` is treated as ``None``.
+
+        Returns
+        -------
+        list[tuple[str | None, Path]]
+            The ``(prefix, path)`` pair of each descriptor, with the path converted to a ``Path``.
+        """
+        normalized_pools: list[tuple[str | None, Path]] = []
+        for pool in pools:
+            pool_prefix, pool_path = pool if isinstance(pool, tuple) else (pool.get("prefix"), pool["path"])
+            normalized_pools.append((pool_prefix, Path(pool_path)))
+        return normalized_pools
+
+    def record_variables_usage(self, variable_names: list[str]) -> None:
+        """
+        Increments the filter usage count of each of the given variables.
+
+        Parameters
+        ----------
+        variable_names : list[str]
+            Names of the variables (or ``variable.subkey`` names) selected by a post-processing filter.
+        """
+        self._variables_usage_counter.update(variable_names)
 
     def report_variables_usage_counts(self, path: Path) -> None:
         """
@@ -596,23 +653,23 @@ class PoolManager:
         variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
         usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
         data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
-        self.file_manager._dict_to_file_csv(data_dict, file_path_csv)
+        self.file_manager.dict_to_file_csv(data_dict, file_path_csv)
 
         daily_filename = self.file_manager.generate_file_name("variables_reported_daily", "csv")
         daily_file_path_csv = path / daily_filename
         daily_data_dict = self._get_variables_reported_daily()
-        self.file_manager._dict_to_file_csv(daily_data_dict, daily_file_path_csv)
+        self.file_manager.dict_to_file_csv(daily_data_dict, daily_file_path_csv)
 
         non_daily_filename = self.file_manager.generate_file_name("variables_not_reported_daily", "csv")
         non_daily_file_path_csv = path / non_daily_filename
         non_daily_data_dict = self._get_variables_not_reported_daily()
-        self.file_manager._dict_to_file_csv(non_daily_data_dict, non_daily_file_path_csv)
+        self.file_manager.dict_to_file_csv(non_daily_data_dict, non_daily_file_path_csv)
 
     def _get_variables_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
         """Builds a CSV-ready dictionary listing variables treated as daily for reporting diagnostics."""
 
         variable_names: set[str] = set()
-        for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
+        for variable_name, variable_data in sorted(self.get_flat_variables_pool().items()):
             values = variable_data.get("values", [])
             if not isinstance(values, list):
                 continue
@@ -628,7 +685,7 @@ class PoolManager:
         """Builds a CSV-ready dictionary listing variables treated as non-daily for reporting diagnostics."""
         rows: set[tuple[str, int]] = set()
 
-        for variable_name, variable_data in sorted(self._get_flat_variables_pool().items()):
+        for variable_name, variable_data in sorted(self.get_flat_variables_pool().items()):
             values = variable_data.get("values", [])
             if not isinstance(values, list):
                 continue
@@ -713,7 +770,7 @@ class PoolManager:
         class_name.function_name.variable_name.info_maps: variable4_name
         """
         var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.{os.linesep}"]
-        for name, variable_data in self._get_flat_variables_pool().items():
+        for name, variable_data in self.get_flat_variables_pool().items():
             var_list.extend(self._format_variable_entry(name, variable_data, exclude_info_maps, format_option))
         file_path = path / self.file_manager.generate_file_name("variable_names", "txt")
         self.file_manager._list_to_file_txt(var_list, file_path)
@@ -821,7 +878,7 @@ class PoolManager:
 
         self.current_pool_size = sys.getsizeof(new_pool.__repr__())
 
-    def _get_flat_variables_pool(self) -> dict[str, Any]:
+    def get_flat_variables_pool(self) -> dict[str, Any]:
         """Returns a flattened mapping of variable names to data when multiple pools are loaded."""
 
         if not self.variables_pool:

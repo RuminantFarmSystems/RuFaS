@@ -3,6 +3,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.field.crop.crop_data import CropData
 from RUFAS.biophysical.field.crop.heat_units import HeatUnits
+from RUFAS.output_manager import OutputManager
 
 from tests.test_biophysical.test_crop_soil_field.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
@@ -87,6 +88,18 @@ def test_assign_current_heat_units(mock_crop_data: CropData, use_alt: bool, temp
         assert heat.new_heat_units == HeatUnits._determine_heat_unit_value(temp, 15)
 
 
+@pytest.mark.parametrize("use_alt,temp", [(True, 12), (True, None), (False, None)])
+def test_assign_current_heat_units_without_heat_unit_temperature(
+    mock_crop_data: CropData, use_alt: bool, temp: float | None, mocker: MockerFixture
+) -> None:
+    """Test that an error is raised when the heat unit temperature is needed but has not been set."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+    heat = HeatUnits(mock_crop_data, use_heat_unit_temperature=use_alt)
+    with pytest.raises(ValueError, match="heat_unit_temperature must be set when no air temperature is used"):
+        heat.assign_current_heat_units(temp)
+    mock_add_error.assert_called_once()
+
+
 @pytest.mark.parametrize("start,new", [(0, 0), (0, 1), (1, 1), (0, 135.6), (18.55, 1002.5)])
 def test_add_heat_units(mock_crop_data: CropData, start: float, new: float) -> None:
     """check that heat units are accumulated properly"""
@@ -150,3 +163,24 @@ def test_absorb_heat_units(
     assert expect_new_heat_units == mock_crop_data.accumulated_heat_units
     expect_heat_fraction = expect_new_heat_units / potential_heat_units
     assert expect_heat_fraction == mock_crop_data.heat_fraction
+
+
+@pytest.mark.parametrize("mint,maxt", [(None, 28), (21, None), (None, None)])
+def test_absorb_heat_units_without_min_or_max_temperature(
+    mock_crop_data: CropData, mint: float | None, maxt: float | None, mocker: MockerFixture
+) -> None:
+    """Test that an error is raised when the alternative method lacks the minimum or maximum air temperature."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+    heat = HeatUnits(mock_crop_data, use_heat_unit_temperature=True)
+    with pytest.raises(ValueError, match="min_air_temperature and max_air_temperature are required"):
+        heat.absorb_heat_units(25, mint, maxt)
+    mock_add_error.assert_called_once()
+
+
+def test_absorb_heat_units_without_any_temperature(mock_crop_data: CropData, mocker: MockerFixture) -> None:
+    """Test that an error is raised when neither a mean air temperature nor a heat unit temperature is available."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+    heat = HeatUnits(mock_crop_data)
+    with pytest.raises(ValueError, match="mean_air_temperature is required when heat_unit_temperature is not set"):
+        heat.absorb_heat_units()
+    mock_add_error.assert_called_once()

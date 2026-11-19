@@ -307,7 +307,7 @@ class FileManager:
         """
         pass
 
-    def _dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str | None = "portrait") -> None:
+    def dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str | None = "portrait") -> None:
         """
         Saves a dictionary to a csv file.
 
@@ -361,7 +361,7 @@ class FileManager:
         """
         pass
 
-    def _load_filter_file_content(self, path: Path) -> tuple[list[dict[str, Any]], str | None]:
+    def load_filter_file_content(self, path: Path) -> tuple[list[dict[str, Any]], str | None]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -405,7 +405,7 @@ class FileManager:
         """
         pass
 
-    def _save_to_json(
+    def save_to_json(
         self,
         filter_file: str,
         save_path: Path,
@@ -428,11 +428,11 @@ class FileManager:
         """
         pass
 
-    def _read_variables_pool_file(
+    def read_variables_pool_file(
         self,
         file_path: Path,
         info_map: dict[str, Any],
-    ) -> dict[str, list[Any]]:
+    ) -> dict[str, POOL_ELEMENT_TYPE]:
         """Reads a ``variables_pool`` JSON file and returns its contents."""
         pass
 
@@ -502,6 +502,7 @@ class FileManager:
         """
         pass
 
-    def _normalize_module_header(json_key: str) -> str:
+    @staticmethod
+    def normalize_module_header(json_key: str) -> str:
         """Normalizes the module header from a JSON key."""
         pass

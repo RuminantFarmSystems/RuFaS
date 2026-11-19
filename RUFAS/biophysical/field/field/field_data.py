@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.field.crop.dormancy import Dormancy
@@ -12,7 +12,7 @@ class FieldData:
 
     Attributes
     ----------
-    name : str, optional
+    name : str
         Name of this field for identification purposes.
     absolute_latitude : float, default=43.5
         The absolute latitude value (degrees above or below equator) where field is located (degrees).
@@ -20,7 +20,7 @@ class FieldData:
         The longitude value of where the field is located (degrees).
     minimum_daylength : float, default=6.33
         Shortest day of the year for this watershed (hours).
-    dormancy_threshold_daylength : float, optional
+    dormancy_threshold_daylength : float
         Threshold daylength to initiate dormancy in a plant (hours).
     current_residue : float, default=0.0
         Total amount of residue on the current day (kg per hectare).
@@ -34,11 +34,11 @@ class FieldData:
         Does the Hydrologic Response Unit containing this field have a seasonally high water table.
     field_size : float, default=1.0
         Size of the field (ha).
-    watering_amount_in_liters : float, optional
+    watering_amount_in_liters : float, default=0.0
         User-supplied amount of water to be applied to the field over a specified interval of days (liters).
     watering_amount_in_mm : float, default=0.0
         Amount of water to be applied to the field over a specified interval of days (mm).
-    watering_interval : int, optional
+    watering_interval : int, default=0
         Number of days between waterings of the field.
     days_into_watering_interval : int, default=0.0
         Number of days since the start of the current watering interval.
@@ -67,11 +67,11 @@ class FieldData:
         Converts an amount in liters to an amount in mm based on the area the liters are distributed over.
     """
 
-    name: str | None = None
+    name: str
     absolute_latitude: float = 43.5
     longitude: float = -88.6
     minimum_daylength: float = 6.33
-    dormancy_threshold_daylength: float | None = None
+    dormancy_threshold_daylength: float = field(init=False)
     current_residue: float = 0.0
 
     transpiration: float = 0.0
@@ -81,9 +81,9 @@ class FieldData:
     field_size: float = 1.0
 
     # --- Irrigation variables ---
-    watering_amount_in_liters: float | None = None
+    watering_amount_in_liters: float = 0.0
     watering_amount_in_mm: float = 0.0
-    watering_interval: int | None = None
+    watering_interval: int = 0
     days_into_watering_interval: int = 0
     current_water_deficit: float = 0.0
     watering_occurs: bool = True
@@ -112,12 +112,7 @@ class FieldData:
             self.minimum_daylength, self.dormancy_threshold
         )
 
-        should_water = (
-            self.watering_amount_in_liters is not None
-            and self.watering_interval is not None
-            and self.watering_amount_in_liters != 0.0
-            and self.watering_interval != 0
-        )
+        should_water = self.watering_amount_in_liters != 0.0 and self.watering_interval != 0
         if should_water:
             if self.watering_amount_in_liters < 0.0:
                 OutputManager().add_error(

@@ -55,6 +55,7 @@ def test_pool_manager_init(mock_file_manager: MagicMock) -> None:
     assert pool_manager.file_manager is mock_file_manager
     assert pool_manager.time is None
     assert pool_manager.exclude_info_maps is False
+    assert pool_manager._logger.name == "RUFAS.PoolManager"
 
 
 @pytest.mark.parametrize(
@@ -386,7 +387,7 @@ def test_add_variable(
     mocker.patch.object(pool_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(pool_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(pool_manager, "_add_to_pool")
-    patched_save_current_variable_pool = mocker.patch.object(pool_manager, "_save_current_variable_pool")
+    patched_save_current_variable_pool = mocker.patch.object(pool_manager, "save_current_variable_pool")
 
     if expected_exception:
         with pytest.raises(expected_exception):
@@ -536,7 +537,7 @@ def test_add_variable_chunkification(
     mocker.patch.object(pool_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(pool_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(pool_manager, "_add_to_pool")
-    patched_save_current_variable_pool = mocker.patch.object(pool_manager, "_save_current_variable_pool")
+    patched_save_current_variable_pool = mocker.patch.object(pool_manager, "save_current_variable_pool")
 
     pool_manager.add_variable(name, value, info_map, first_map)
 
@@ -659,8 +660,8 @@ def test_add_variable_bulk_info_map_simulation_day(
 def test_save_current_variable_pool(
     pool_manager: PoolManager, mock_file_manager: MagicMock, mocker: MockerFixture
 ) -> None:
-    """Unit test for the _save_current_variable_pool method of PoolManager."""
-    mock_logger = mocker.patch("RUFAS.post_processing.pool_manager.logger")
+    """Unit test for the save_current_variable_pool method of PoolManager."""
+    mock_logger = mocker.patch.object(pool_manager, "_logger")
     dummy_variable_pool: dict[str, POOL_ELEMENT_TYPE] = {
         "a": {"values": [1]},
         "b": {"values": ["B"]},
@@ -673,19 +674,35 @@ def test_save_current_variable_pool(
     mock_file_manager.generate_file_name.return_value = "dummy_file.json"
     dummy_file_path = Path("dummy_path", "dummy_file.json")
 
-    pool_manager._save_current_variable_pool()
+    pool_manager.save_current_variable_pool()
 
     mock_file_manager.generate_file_name.assert_called_once_with("saved_pool_0", "json")
     mock_file_manager.dict_to_file_json.assert_called_once_with(
         data_dict=dummy_variable_pool, path=dummy_file_path, minify_output_file=True
     )
-    assert_logged_once(
-        mock_logger.info, "save_current_variable_pool", f"Saved the current variable pool to {dummy_file_path}"
+    mock_logger.info.assert_called_once_with(
+        f"Saved the current variable pool to {dummy_file_path}",
+        extra={"rufas_log_name": "save_current_variable_pool", "rufas_metadata_prefix": "test_prefix"},
     )
     assert pool_manager.variables_pool == {}
     assert pool_manager.variables_pool is not dummy_variable_pool
     assert pool_manager.current_pool_size == sys.getsizeof({}.__repr__())
     assert pool_manager.saved_pool_chunks_num == 1
+
+
+def test_save_current_variable_pool_without_chunks_path_raises(
+    pool_manager: PoolManager, mock_file_manager: MagicMock
+) -> None:
+    """A chunk cannot be saved before ``setup_pool_overflow_control()`` sets ``saved_pool_chunks_path``."""
+    original_pool: dict[str, POOL_ELEMENT_TYPE] = {"a": {"values": [1]}}
+    pool_manager.variables_pool = original_pool
+
+    with pytest.raises(ValueError, match="'saved_pool_chunks_path' is not set"):
+        pool_manager.save_current_variable_pool()
+
+    mock_file_manager.dict_to_file_json.assert_not_called()
+    assert pool_manager.variables_pool is original_pool
+    assert pool_manager.saved_pool_chunks_num == 0
 
 
 @pytest.mark.parametrize(
@@ -878,11 +895,11 @@ def test_load_variables_pool_from_file(pool_manager: PoolManager, mock_file_mana
         "var1": {"values": [1, 2, 3], "info_maps": [{"units": "kg"}]},
         "var2": {"values": [{"a": 1, "b": 2}], "info_maps": []},
     }
-    mock_file_manager._read_variables_pool_file.return_value = dummy_data
+    mock_file_manager.read_variables_pool_file.return_value = dummy_data
 
     pool_manager.load_variables_pool_from_file(Path("path/to/file"))
 
-    mock_file_manager._read_variables_pool_file.assert_called_once_with(
+    mock_file_manager.read_variables_pool_file.assert_called_once_with(
         Path("path/to/file"), {"class": "PoolManager", "function": "load_variables_pool_from_file"}
     )
     assert pool_manager.variables_pool is dummy_data
@@ -900,7 +917,7 @@ def test_load_variables_pool_from_file_raises_exception(
     original_pool: dict[str, POOL_ELEMENT_TYPE] = {"var1": {"values": [1], "info_maps": [{"units": "kg"}]}}
     pool_manager.variables_pool = original_pool
     pool_manager.current_pool_size = 1024
-    mock_file_manager._read_variables_pool_file.side_effect = exception
+    mock_file_manager.read_variables_pool_file.side_effect = exception
 
     with pytest.raises(type(exception)):
         pool_manager.load_variables_pool_from_file(Path("bad/file/path"))
@@ -913,19 +930,19 @@ def test_load_multiple_variables_pools_from_files_mixed_descriptors(
     pool_manager: PoolManager, mock_file_manager: MagicMock, mocker: MockerFixture
 ) -> None:
     """Loads pools from a tuple(Path) and a dict(str path), passes correct info_map, and namespaces results."""
-    pools_input: Sequence[tuple[str, Path] | dict[str, Any]] = [
+    pools_input: Sequence[tuple[str | None, Path] | dict[str, Any]] = [
         ("poolA", Path("a.json")),
-        {"name": "poolB", "path": "b.json"},
+        {"prefix": "poolB", "path": "b.json"},
     ]
     loaded_pool_a: dict[str, POOL_ELEMENT_TYPE] = {"varA": {"values": [1], "info_maps": [{"units": "kg"}]}}
     loaded_pool_b: dict[str, POOL_ELEMENT_TYPE] = {"varB": {"values": [2], "info_maps": [{"units": "m"}]}}
-    mock_file_manager._read_variables_pool_file.side_effect = [loaded_pool_a, loaded_pool_b]
+    mock_file_manager.read_variables_pool_file.side_effect = [loaded_pool_a, loaded_pool_b]
     set_pool_mock = mocker.patch.object(pool_manager, "_set_variables_pool")
 
     pool_manager.load_multiple_variables_pools_from_files(pools_input)
 
     expected_info_map = {"class": "PoolManager", "function": "load_multiple_variables_pools_from_files"}
-    assert mock_file_manager._read_variables_pool_file.call_args_list == [
+    assert mock_file_manager.read_variables_pool_file.call_args_list == [
         mocker.call(Path("a.json"), {**expected_info_map, "pool_name": "poolA"}),
         mocker.call(Path("b.json"), {**expected_info_map, "pool_name": "poolB"}),
     ]
@@ -942,13 +959,13 @@ def test_load_multiple_variables_pools_from_files_only_tuples(
     ]
     loaded_x: dict[str, POOL_ELEMENT_TYPE] = {"vx": {"values": [10], "info_maps": [{"units": "kg"}]}}
     loaded_y: dict[str, POOL_ELEMENT_TYPE] = {"vy": {"values": [20], "info_maps": [{"units": "kg"}]}}
-    mock_file_manager._read_variables_pool_file.side_effect = [loaded_x, loaded_y]
+    mock_file_manager.read_variables_pool_file.side_effect = [loaded_x, loaded_y]
 
     pool_manager.load_multiple_variables_pools_from_files(pools_input)
 
-    assert mock_file_manager._read_variables_pool_file.call_count == 2
-    assert mock_file_manager._read_variables_pool_file.call_args_list[0].args[0] == Path("x.json")
-    assert mock_file_manager._read_variables_pool_file.call_args_list[1].args[0] == Path("y.json")
+    assert mock_file_manager.read_variables_pool_file.call_count == 2
+    assert mock_file_manager.read_variables_pool_file.call_args_list[0].args[0] == Path("x.json")
+    assert mock_file_manager.read_variables_pool_file.call_args_list[1].args[0] == Path("y.json")
     expected_pool = {"X": loaded_x, "Y": loaded_y}
     assert pool_manager.variables_pool == expected_pool
     assert pool_manager.current_pool_size == sys.getsizeof(expected_pool.__repr__())
@@ -962,8 +979,81 @@ def test_load_multiple_variables_pools_from_files_empty_input(
 
     pool_manager.load_multiple_variables_pools_from_files([])
 
-    mock_file_manager._read_variables_pool_file.assert_not_called()
+    mock_file_manager.read_variables_pool_file.assert_not_called()
     set_pool_mock.assert_called_once_with({})
+
+
+def test_load_multiple_variables_pools_from_files_same_prefix_merged(
+    pool_manager: PoolManager, mock_file_manager: MagicMock
+) -> None:
+    """Pools sharing a prefix are merged under that prefix, with later pools winning on duplicate variables."""
+    pools_input: Sequence[tuple[str | None, Path] | dict[str, Any]] = [
+        ("run", Path("a.json")),
+        {"prefix": "run", "path": "b.json"},
+    ]
+    loaded_a: dict[str, POOL_ELEMENT_TYPE] = {"v1": {"values": [1]}, "shared": {"values": ["a"]}}
+    loaded_b: dict[str, POOL_ELEMENT_TYPE] = {"v2": {"values": [2]}, "shared": {"values": ["b"]}}
+    mock_file_manager.read_variables_pool_file.side_effect = [loaded_a, loaded_b]
+
+    pool_manager.load_multiple_variables_pools_from_files(pools_input)
+
+    assert pool_manager.variables_pool == {
+        "run": {"v1": {"values": [1]}, "shared": {"values": ["b"]}, "v2": {"values": [2]}}
+    }
+
+
+def test_load_multiple_variables_pools_from_files_without_prefix_loaded_at_top_level(
+    pool_manager: PoolManager, mock_file_manager: MagicMock, mocker: MockerFixture
+) -> None:
+    """A ``None`` tuple prefix or a dict without ``"prefix"`` loads the pool at the top level, next to named pools."""
+    pools_input: Sequence[tuple[str | None, Path] | dict[str, Any]] = [
+        (None, Path("a.json")),
+        {"path": "b.json"},
+        ("named", Path("c.json")),
+    ]
+    loaded_a: dict[str, POOL_ELEMENT_TYPE] = {"v1": {"values": [1]}}
+    loaded_b: dict[str, POOL_ELEMENT_TYPE] = {"v2": {"values": [2]}}
+    loaded_c: dict[str, POOL_ELEMENT_TYPE] = {"v3": {"values": [3]}}
+    mock_file_manager.read_variables_pool_file.side_effect = [loaded_a, loaded_b, loaded_c]
+
+    pool_manager.load_multiple_variables_pools_from_files(pools_input)
+
+    expected_info_map = {"class": "PoolManager", "function": "load_multiple_variables_pools_from_files"}
+    assert mock_file_manager.read_variables_pool_file.call_args_list == [
+        mocker.call(Path("a.json"), {**expected_info_map, "pool_name": None}),
+        mocker.call(Path("b.json"), {**expected_info_map, "pool_name": None}),
+        mocker.call(Path("c.json"), {**expected_info_map, "pool_name": "named"}),
+    ]
+    assert pool_manager.variables_pool == {
+        "v1": {"values": [1]},
+        "v2": {"values": [2]},
+        "named": {"v3": {"values": [3]}},
+    }
+
+
+@pytest.mark.parametrize(
+    "pools, expected",
+    [
+        ([], []),
+        ([("p", "a.json")], [("p", Path("a.json"))]),
+        ([(None, Path("a.json"))], [(None, Path("a.json"))]),
+        ([{"prefix": "p", "path": "a.json"}], [("p", Path("a.json"))]),
+        ([{"path": Path("a.json")}], [(None, Path("a.json"))]),
+    ],
+)
+def test_normalize_pool_descriptors(pools: list[Any], expected: list[tuple[str | None, Path]]) -> None:
+    """Pool descriptors are converted to ``(prefix, Path)`` tuples, with a missing dict prefix treated as ``None``."""
+    assert PoolManager._normalize_pool_descriptors(pools) == expected
+
+
+def test_record_variables_usage(pool_manager: PoolManager) -> None:
+    """Each recorded name increments its usage count, including names already pre-seeded at 0."""
+    pool_manager._variables_usage_counter["var.sub"] = 0
+
+    pool_manager.record_variables_usage(["var.sub", "other", "var.sub"])
+    pool_manager.record_variables_usage([])
+
+    assert pool_manager._variables_usage_counter == Counter({"var.sub": 2, "other": 1})
 
 
 @pytest.mark.parametrize(
@@ -1001,7 +1091,7 @@ def test_report_variables_usage_counts(
         mocker.call("variables_reported_daily", "csv"),
         mocker.call("variables_not_reported_daily", "csv"),
     ]
-    assert mock_file_manager._dict_to_file_csv.call_args_list == [
+    assert mock_file_manager.dict_to_file_csv.call_args_list == [
         mocker.call(
             {"variable_name": {"values": expected_variable_names}, "usage_count": {"values": expected_usage_counts}},
             Path(path, "variables_usage_counts.csv"),
@@ -1321,7 +1411,7 @@ def test_dump_variable_names_and_contexts_no_values(
         "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
         "var1: **NO VARIABLES**" + os.linesep,
     ]
-    mocker.patch.object(pool_manager, "_get_flat_variables_pool", return_value=mock_flat_pool)
+    mocker.patch.object(pool_manager, "get_flat_variables_pool", return_value=mock_flat_pool)
     mock_file_manager.generate_file_name.return_value = "dummy_name"
 
     pool_manager.dump_variable_names_and_contexts(Path("dummy_path"), False, format_option="verbose")
@@ -1580,7 +1670,7 @@ def test_get_flat_variables_pool_empty_returns_empty(pool_manager: PoolManager) 
     """Returns {} when variables_pool is empty/falsy."""
     pool_manager.variables_pool = {}
 
-    result = pool_manager._get_flat_variables_pool()
+    result = pool_manager.get_flat_variables_pool()
 
     assert result == {}
 
@@ -1593,7 +1683,7 @@ def test_get_flat_variables_pool_already_flat_returns_self(pool_manager: PoolMan
     }
     pool_manager.variables_pool = flat_pool
 
-    result = pool_manager._get_flat_variables_pool()
+    result = pool_manager.get_flat_variables_pool()
 
     assert result is flat_pool
 
@@ -1614,7 +1704,7 @@ def test_get_flat_variables_pool_nested_is_flattened_and_non_dict_skipped(pool_m
         },
     )
 
-    result = pool_manager._get_flat_variables_pool()
+    result = pool_manager.get_flat_variables_pool()
 
     assert result == {
         "poolA.var1": {"values": [1], "info_maps": [{"units": "kg"}]},
