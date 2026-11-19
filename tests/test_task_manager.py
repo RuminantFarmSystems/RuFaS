@@ -9,12 +9,12 @@ import pytest
 from pytest_mock import MockerFixture
 from packaging.version import Version
 
-from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.task_manager import MINIMUM_PYTHON_VERSION, TaskManager, TaskType
+from RUFAS.task_manager import EXCLUSIVE_TASK_TYPES, MINIMUM_PYTHON_VERSION, TaskManager, TaskType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
+from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 
 
 @pytest.fixture
@@ -28,6 +28,30 @@ def task_manager(mock_output_manager: MagicMock) -> TaskManager:
     tm = TaskManager()
     tm.output_manager = mock_output_manager
     return tm
+
+
+@pytest.fixture
+def e2e_comparison_args() -> dict[str, Any]:
+    """Provide arguments for processing an E2E result group."""
+    return {
+        "e2e_group": "freestall_e2e",
+        "task_id": "E2E comparison 1/1",
+        "e2e_runs": [
+            {
+                "output_prefix": "freestall_e2e_run_1",
+                "log_verbosity": LogVerbosity.ERRORS.value,
+                "exclude_info_maps": False,
+                "chunkification": False,
+                "maximum_memory_usage_percent": 80,
+                "maximum_memory_usage": 1000,
+                "save_chunk_threshold_call_count": 100,
+                "convert_variable_table_path": Path("/fake/conversion.json"),
+                "filters_directory": Path("/fake/filters"),
+                "use_accepted_ranges": False,
+                "logs_directory": Path("/fake/logs"),
+            }
+        ],
+    }
 
 
 @pytest.mark.parametrize(
@@ -177,7 +201,9 @@ def test_task_manager_start(
     elif is_update_end_to_end_test_task:
         update_e2e_task = {
             "task_type": TaskType.UPDATE_E2E_TEST_RESULTS,
-            "output_prefix": "update_prefix",
+            "output_prefix": "update_prefix_run_1",
+            "e2e_group": "update_prefix",
+            "random_seed": 42,
             "json_output_directory": Path("out/update_e2e"),
         }
 
@@ -208,9 +234,22 @@ def test_task_manager_start(
         tm,
         "_run_tasks",
     )
-    mock_run_e2e_comparisons = mocker.patch.object(
+    expected_results_random_seeds = (
+        {
+            "test_group": {
+                "Animal": [42, 51],
+                "CropAndSoil": [42, 51],
+                "Manure": [42, 51],
+                "Feed": [42, 51],
+            },
+        }
+        if is_end_to_end_test_task
+        else {}
+    )
+    mock_process_e2e_results = mocker.patch.object(
         tm,
-        "_run_end_to_end_testing_comparisons",
+        "_process_e2e_results",
+        return_value=(True, expected_results_random_seeds),
     )
     mock_summarize = mocker.patch.object(mock_output_manager, "summarize_e2e_test_results")
 
@@ -302,7 +341,7 @@ def test_task_manager_start(
             verbosity,
         )
 
-        mock_run_e2e_comparisons.assert_not_called()
+        mock_process_e2e_results.assert_not_called()
         mock_summarize.assert_not_called()
 
     elif is_end_to_end_test_task:
@@ -316,7 +355,7 @@ def test_task_manager_start(
         assert args[3] == workers
         assert args[4] == Path("metadata/path")
 
-        mock_run_e2e_comparisons.assert_called_once_with(
+        mock_process_e2e_results.assert_called_once_with(
             comparison_args=[
                 {
                     "e2e_group": "test_group",
@@ -347,10 +386,11 @@ def test_task_manager_start(
         )
 
         mock_summarize.assert_called_once_with(
-            Path("out/e2e"),
-            ["test_group"],
-            {"test_group": [42]},
-            [],
+            json_output_directory=Path("out/e2e"),
+            output_prefixes=["test_group"],
+            e2e_random_seeds={"test_group": [42]},
+            failed_e2e_groups=[],
+            expected_results_random_seeds=expected_results_random_seeds,
         )
 
     else:
@@ -364,7 +404,29 @@ def test_task_manager_start(
         assert args[3] == workers
         assert args[4] == Path("metadata/path")
 
-        mock_run_e2e_comparisons.assert_not_called()
+        mock_process_e2e_results.assert_called_once_with(
+            comparison_args=[
+                {
+                    "e2e_group": "update_prefix",
+                    "e2e_runs": [
+                        {
+                            "task_type": TaskType.UPDATE_E2E_TEST_RESULTS,
+                            "output_prefix": "update_prefix_run_1",
+                            "e2e_group": "update_prefix",
+                            "random_seed": 42,
+                            "json_output_directory": Path("out/update_e2e"),
+                            "task_id": "1/1",
+                        }
+                    ],
+                    "task_id": "E2E comparison 1/1",
+                }
+            ],
+            produce_graphics=produce_graphics,
+            metadata_depth_limit=metadata_depth_limit,
+            workers=workers,
+            output_directory=Path("output/directory"),
+            verbosity=verbosity,
+        )
         mock_summarize.assert_not_called()
 
         captured = capsys.readouterr()
@@ -530,60 +592,349 @@ def test_set_random_seed_with_parameters(
     )
 
 
-def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> None:
-    """Unit test for TaskManager._parse_input_tasks()"""
-    task_data = {
+@pytest.fixture
+def sample_task() -> dict[str, Any]:
+    """Create a valid task configuration for testing."""
+    return {
+        "task_type": "SIMULATION_SINGLE_RUN",
+        "metadata_file_path": "/path/to/sim",
+        "output_directory": "/output",
+        "filters_directory": "/output/filters",
+        "csv_output_directory": "/output/CSV",
+        "json_output_directory": "/output/JSON",
+        "report_directory": "/output/reports",
+        "graphics_directory": "/output/graphics",
+        "output_pool_path": "/output",
+        "save_animals_directory": "/output/herd",
+        "logs_directory": "/output/logs",
+        "suppress_log_files": False,
+        "properties_file_path": "path/to/properties",
+        "comparison_properties_file_path": "path/to/comparison/properties",
+        "convert_variable_table_path": "dummy.csv",
+    }
+
+
+@pytest.fixture
+def sample_task_config(sample_task: dict[str, Any]) -> dict[str, Any]:
+    """Create a valid TaskManager task input configuration."""
+    return {
         "export_input_data_to_csv": False,
         "input_data_csv_export_path": "",
         "input_data_csv_import_path": "",
-        "tasks": [
-            {
-                "task_type": "Herd Initialization",
-                "metadata_file_path": "/path/to/herd",
-                "output_directory": "/output",
-                "filters_directory": "/output/filters",
-                "csv_output_directory": "/output/CSV",
-                "json_output_directory": "/output/JSON",
-                "report_directory": "/output/reports",
-                "graphics_directory": "/output/graphics",
-                "output_pool_path": "/output",
-                "save_animals_directory": "/output/herd",
-                "logs_directory": "/output/logs",
-                "suppress_log_files": True,
-                "properties_file_path": "path/to/properties",
-                "comparison_properties_file_path": "path/to/comparison/properties",
-                "convert_variable_table_path": "dummy.csv",
-            },
-            {
-                "task_type": "SIMULATION_MULTI_RUN",
-                "metadata_file_path": "/path/to/sim",
-                "output_directory": "/output",
-                "filters_directory": "/output/filters",
-                "csv_output_directory": "/output/CSV",
-                "json_output_directory": "/output/JSON",
-                "report_directory": "/output/reports",
-                "graphics_directory": "/output/graphics",
-                "output_pool_path": "/output",
-                "save_animals_directory": "/output/herd",
-                "logs_directory": "/output/logs",
-                "suppress_log_files": False,
-                "properties_file_path": "path/to/properties",
-                "comparison_properties_file_path": "path/to/comparison/properties",
-                "convert_variable_table_path": "dummy.csv",
-            },
-        ],
+        "tasks": [sample_task],
     }
-    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=task_data)
-    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
+
+@pytest.fixture
+def mock_task_input_manager(
+    task_manager: TaskManager,
+    sample_task_config: dict[str, Any],
+    mocker: MockerFixture,
+) -> MagicMock:
+    """Configure a mocked InputManager for task parsing tests."""
+    mock_input_manager: MagicMock = mocker.MagicMock(spec=InputManager)
+    mock_input_manager.get_data.return_value = sample_task_config
+    mock_input_manager.get_metadata.return_value = {"test_property": "test_value"}
+
     task_manager.input_manager = mock_input_manager
+    return mock_input_manager
+
+
+def test_parse_input_tasks(
+    task_manager: TaskManager,
+    sample_task_config: dict[str, Any],
+    mock_task_input_manager: MagicMock,
+) -> None:
+    """Test successful parsing and normalization of single-run and multi-run tasks."""
+    single_task = sample_task_config["tasks"][0]
+    single_task["task_type"] = "Herd Initialization"
+
+    multi_task = {
+        **single_task,
+        "task_type": "SIMULATION_MULTI_RUN",
+        "random_seeds": [1, 2, 3],
+        "saved_output_pools": [{"name": "previous_pool", "path": "/output/previous_pool.json"}],
+    }
+    sample_task_config["tasks"].append(multi_task)
 
     single, multi = task_manager._parse_input_tasks()
+
     assert len(single) == 1
     assert len(multi) == 1
+
     assert single[0]["task_type"] == TaskType.HERD_INITIALIZATION
     assert multi[0]["task_type"] == TaskType.SIMULATION_MULTI_RUN
-    mock_get_data.assert_called_once_with("tasks")
+
+    # Single-run tasks use one random seed.
+    assert single[0]["random_seed"] == 0
+    assert "random_seeds" not in single[0]
+
+    # Multi-run tasks retain the random seed list.
+    assert multi[0]["random_seeds"] == [1, 2, 3]
+    assert "random_seed" not in multi[0]
+
+    # Verify shared configuration.
+    for task in single + multi:
+        assert task["input_patch"] is None
+        assert task["export_input_data_to_csv"] is False
+        assert task["input_data_csv_export_path"] == Path("")
+        assert task["input_data_csv_import_path"] == Path("")
+        assert task["task_manager_metadata_properties"] == {"test_property": "test_value"}
+
+        assert task["metadata_file_path"] == Path("/path/to/sim")
+        assert task["properties_file_path"] == Path("path/to/properties")
+        assert task["comparison_properties_file_path"] == Path("path/to/comparison/properties")
+        assert task["convert_variable_table_path"] == Path("dummy.csv")
+        assert task["logs_directory"] == Path("/output/logs")
+        assert task["save_animals_directory"] == Path("/output/herd")
+        assert task["filters_directory"] == Path("/output/filters")
+        assert task["csv_output_directory"] == Path("/output/CSV")
+        assert task["json_output_directory"] == Path("/output/JSON")
+        assert task["report_directory"] == Path("/output/reports")
+        assert task["graphics_directory"] == Path("/output/graphics")
+        assert task["output_pool_path"] == Path("/output")
+        assert task["suppress_log_files"] is False
+
+    assert single[0]["saved_output_pools"] == []
+    assert multi[0]["saved_output_pools"] == [{"name": "previous_pool", "path": Path("/output/previous_pool.json")}]
+
+    mock_task_input_manager.get_data.assert_called_once_with("tasks")
+    mock_task_input_manager.get_metadata.assert_called_once_with("properties")
+
+
+@pytest.mark.parametrize(
+    "tasks",
+    [None, []],
+)
+def test_parse_input_tasks_no_tasks(
+    task_manager: TaskManager,
+    sample_task_config: dict[str, Any],
+    mock_task_input_manager: MagicMock,
+    mocker: MockerFixture,
+    tasks: list[dict[str, Any]] | None,
+) -> None:
+    """Test that missing or empty task lists raise and log a ValueError."""
+    if tasks is None:
+        sample_task_config.pop("tasks")
+    else:
+        sample_task_config["tasks"] = tasks
+
+    mock_add_error = mocker.patch.object(task_manager.output_manager, "add_error")
+
+    with pytest.raises(ValueError, match="No tasks found in task input config."):
+        task_manager._parse_input_tasks()
+
+    mock_add_error.assert_called_once_with(
+        "TaskManager Task Config Error",
+        "No tasks found in task input config.",
+        info_map={
+            "class": TaskManager.__name__,
+            "function": "_parse_input_tasks",
+        },
+    )
+
+    mock_task_input_manager.get_metadata.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "task_types",
+    [
+        ["END_TO_END_TESTING", "SIMULATION_SINGLE_RUN"],
+        ["UPDATE_E2E_TEST_RESULTS", "SIMULATION_MULTI_RUN"],
+        ["END_TO_END_TESTING", "UPDATE_E2E_TEST_RESULTS"],
+        [
+            "END_TO_END_TESTING",
+            "SIMULATION_SINGLE_RUN",
+            "SIMULATION_MULTI_RUN",
+        ],
+    ],
+)
+def test_parse_input_tasks_exclusive_task_conflict(
+    task_manager: TaskManager,
+    sample_task_config: dict[str, Any],
+    mock_task_input_manager: MagicMock,
+    mocker: MockerFixture,
+    task_types: list[str],
+) -> None:
+    """Test that exclusive task types cannot be mixed with other task types."""
+    base_task = sample_task_config["tasks"][0]
+
+    sample_task_config["tasks"] = [{**base_task, "task_type": task_type} for task_type in task_types]
+
+    mock_add_error = mocker.patch.object(task_manager.output_manager, "add_error")
+
+    with pytest.raises(ValueError) as exc_info:
+        task_manager._parse_input_tasks()
+
+    error_message = str(exc_info.value)
+
+    assert "tasks cannot be run with other task types" in error_message
+    assert "Conflicting task types:" in error_message
+
+    # At least one exclusive type must be identified as the rejected task.
+    exclusive_names = {task_type.name for task_type in EXCLUSIVE_TASK_TYPES}
+    reported_exclusive = next(
+        name for name in exclusive_names if error_message.startswith(f"{name} tasks cannot be run")
+    )
+
+    expected_conflicts = sorted(
+        TaskType.from_string(task_type).name
+        for task_type in task_types
+        if TaskType.from_string(task_type).name != reported_exclusive
+    )
+
+    assert f"Conflicting task types: {', '.join(expected_conflicts)}." in error_message
+
+    mock_add_error.assert_called_once_with(
+        "Task Type Conflict",
+        error_message,
+        info_map={
+            "class": TaskManager.__name__,
+            "function": "_parse_input_tasks",
+        },
+    )
+
+    mock_task_input_manager.get_metadata.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "task_type",
+    [
+        "END_TO_END_TESTING",
+        "UPDATE_E2E_TEST_RESULTS",
+    ],
+)
+def test_parse_input_tasks_exclusive_task_alone(
+    task_manager: TaskManager,
+    sample_task_config: dict[str, Any],
+    mock_task_input_manager: MagicMock,
+    mocker: MockerFixture,
+    task_type: str,
+) -> None:
+    """Test that an exclusive task type is accepted when used alone."""
+    sample_task_config["tasks"][0]["task_type"] = task_type
+
+    mock_add_error = mocker.patch.object(task_manager.output_manager, "add_error")
+
+    single, multi = task_manager._parse_input_tasks()
+
+    parsed_tasks = single + multi
+
+    assert len(parsed_tasks) == 1
+    assert parsed_tasks[0]["task_type"] == TaskType.from_string(task_type)
+    mock_add_error.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "random_seeds",
+    [
+        [],
+        None,
+        42,
+        "42",
+        (1, 2),
+    ],
+)
+def test_parse_input_tasks_invalid_random_seeds(
+    task_manager: TaskManager,
+    sample_task_config: dict[str, Any],
+    mock_task_input_manager: MagicMock,
+    mocker: MockerFixture,
+    random_seeds: Any,
+) -> None:
+    """Test that random seeds must be provided as a non-empty list."""
+    sample_task_config["tasks"][0]["random_seeds"] = random_seeds
+
+    mock_add_error = mocker.patch.object(task_manager.output_manager, "add_error")
+
+    with pytest.raises(ValueError, match="Random seeds must be a non-empty list."):
+        task_manager._parse_input_tasks()
+
+    mock_add_error.assert_called_once_with(
+        "Invalid Random Seeds",
+        "Random seeds must be provided as a non-empty list, or omitted to use the default seed [0].",
+        info_map={
+            "class": TaskManager.__name__,
+            "function": "_parse_input_tasks",
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "random_seeds",
+    [
+        [1, 2],
+        [1, 2, 3],
+    ],
+)
+def test_parse_input_tasks_single_run_multiple_seeds(
+    task_manager: TaskManager,
+    sample_task_config: dict[str, Any],
+    mock_task_input_manager: MagicMock,
+    mocker: MockerFixture,
+    random_seeds: list[int],
+) -> None:
+    """Test that single-run simulations reject multiple random seeds."""
+    sample_task_config["tasks"][0]["task_type"] = "SIMULATION_SINGLE_RUN"
+    sample_task_config["tasks"][0]["random_seeds"] = random_seeds
+
+    mock_add_error = mocker.patch.object(task_manager.output_manager, "add_error")
+
+    with pytest.raises(
+        ValueError,
+        match="SIMULATION_SINGLE_RUN task type selected but multiple random seeds specified",
+    ):
+        task_manager._parse_input_tasks()
+
+    mock_add_error.assert_called_once_with(
+        "Single Run Random Seed Error",
+        "SIMULATION_SINGLE_RUN task type requires exactly one random seed, but the specified "
+        f"random seeds list contains {len(random_seeds)} seeds. Check task input specifications "
+        "and confirm the task type and random seeds selected.",
+        info_map={
+            "class": TaskManager.__name__,
+            "function": "_parse_input_tasks",
+        },
+    )
+
+
+def test_parse_input_tasks_optional_fields(
+    task_manager: TaskManager,
+    sample_task_config: dict[str, Any],
+    mock_task_input_manager: MagicMock,
+) -> None:
+    """Test optional paths, saved pools, and shared configuration propagation."""
+    task = sample_task_config["tasks"][0]
+
+    task.pop("convert_variable_table_path")
+    task["saved_output_pools"] = [
+        {"name": "pool_1", "path": "/output/pool_1.json"},
+        {"name": "pool_2", "path": "/output/pool_2.json"},
+    ]
+    task["random_seeds"] = [42]
+
+    sample_task_config["export_input_data_to_csv"] = True
+    sample_task_config["input_data_csv_export_path"] = "/export"
+    sample_task_config["input_data_csv_import_path"] = "/import"
+
+    single, multi = task_manager._parse_input_tasks()
+
+    assert len(single) == 1
+    assert multi == []
+
+    parsed_task = single[0]
+
+    assert parsed_task["convert_variable_table_path"] is None
+    assert parsed_task["random_seed"] == 42
+
+    assert parsed_task["saved_output_pools"] == [
+        {"name": "pool_1", "path": Path("/output/pool_1.json")},
+        {"name": "pool_2", "path": Path("/output/pool_2.json")},
+    ]
+
+    assert parsed_task["export_input_data_to_csv"] is True
+    assert parsed_task["input_data_csv_export_path"] == Path("/export")
+    assert parsed_task["input_data_csv_import_path"] == Path("/import")
 
 
 def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
@@ -682,7 +1033,7 @@ def test_handle_post_processing_export_input_tocsv(
     )
 
 
-def test_run_end_to_end_testing_simulation(
+def test_run_e2e_simulation(
     mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
 ) -> None:
     """Test that end-to-end testing is executed correctly."""
@@ -699,9 +1050,7 @@ def test_run_end_to_end_testing_simulation(
     call_order = mocker.MagicMock()
     call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
-    task_manager._run_end_to_end_testing_simulation(
-        args, mock_input_manager, mock_output_manager, "test_task", True, True
-    )
+    task_manager._run_e2e_simulation(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
     assert [name for name, _, _ in call_order.mock_calls] == ["sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
@@ -723,22 +1072,18 @@ def test_handle_update_e2e_test_results(
 
     # Arrange
     sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
-    update_test_results = mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
-    validate_configuration = mocker.patch.object(E2ETestResultsHandler, "validate_update_configuration")
     add_log = mocker.patch.object(mock_output_manager, "add_log")
     call_order = mocker.MagicMock()
-    call_order.attach_mock(validate_configuration, "validate_configuration")
     call_order.attach_mock(sim_engine_run_tasks, "sim_engine_run_tasks")
 
     mock_input_manager = MagicMock()
     args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix", "filters_directory": Path("filters")}
 
     # Act
-    task_manager._handle_update_e2e_test_results(args, mock_input_manager, mock_output_manager, "test_task", True, True)
+    task_manager._run_e2e_simulation(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
     # Assert
-    validate_configuration.assert_called_once_with(args["output_prefix"], args["filters_directory"])
-    assert [name for name, _, _ in call_order.mock_calls] == ["validate_configuration", "sim_engine_run_tasks"]
+    assert [name for name, _, _ in call_order.mock_calls] == ["sim_engine_run_tasks"]
     sim_engine_run_tasks.assert_called_once_with(
         args=args,
         input_manager=mock_input_manager,
@@ -748,37 +1093,309 @@ def test_handle_update_e2e_test_results(
         should_flush_im_pool=True,
     )
 
-    update_test_results.assert_called_once_with(args["json_output_directory"], args["output_prefix"])
-
     assert add_log.call_count == 2
-    add_log.assert_any_call(
-        "End-to-end testing",
-        "Generating new set of end-to-end expected test results.",
-        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
-    )
-    add_log.assert_any_call(
-        "End-to-end testing",
-        "Completed generation of new set of end-to-end expected test results",
-        {"class": "TaskManager", "function": "_handle_update_e2e_test_results"},
-    )
 
 
-def test_handle_update_e2e_test_results_invalid_configuration(
-    mock_output_manager: OutputManager, task_manager: TaskManager, mocker: MockerFixture
+@pytest.mark.parametrize(
+    "task_type",
+    [
+        TaskType.END_TO_END_TESTING,
+        TaskType.UPDATE_E2E_TEST_RESULTS,
+    ],
+)
+def test_process_e2e_group_results(
+    task_manager: TaskManager,
+    mock_output_manager: OutputManager,
+    mocker: MockerFixture,
+    task_type: TaskType,
 ) -> None:
-    """Test that an invalid update configuration stops the expected results update before the simulation runs."""
-    sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
-    update_test_results = mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
-    mocker.patch.object(
-        E2ETestResultsHandler, "validate_update_configuration", side_effect=ValueError("invalid configuration")
+    """Test successful E2E result comparison and expected-results update processing."""
+    e2e_group = "freestall_e2e"
+    averaged_results_path = Path("/fake/averaged/results.json")
+    output_directory = Path("/fake/output")
+
+    e2e_runs = [
+        {
+            "output_prefix": "freestall_e2e_run_1",
+            "random_seed": 42,
+            "log_verbosity": LogVerbosity.ERRORS.value,
+            "exclude_info_maps": False,
+            "chunkification": False,
+            "maximum_memory_usage_percent": 80,
+            "maximum_memory_usage": 1000,
+            "save_chunk_threshold_call_count": 100,
+            "convert_variable_table_path": Path("/fake/conversion.json"),
+            "filters_directory": Path("/fake/filters"),
+            "use_accepted_ranges": False,
+            "logs_directory": Path("/fake/logs"),
+            "task_type": task_type,
+        }
+    ]
+    comparison_args = {
+        "e2e_group": e2e_group,
+        "e2e_runs": e2e_runs,
+        "task_id": "E2E comparison 1/1",
+    }
+
+    mock_input_manager = mocker.Mock(spec=InputManager)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
+
+    mock_input_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
+    mock_averaging = mocker.patch.object(
+        E2ETestResultsHandler,
+        "process_test_result_averaging",
+        return_value=averaged_results_path,
     )
-    args = {"json_output_directory": "json_path", "output_prefix": "dummy_prefix", "filters_directory": Path("filters")}
+    expected_results_random_seeds = {
+        "Animal": [42, 51],
+        "CropAndSoil": [42, 51],
+        "Manure": [42, 51],
+        "Feed": [42, 51],
+    }
 
-    with pytest.raises(ValueError, match="invalid configuration"):
-        task_manager._handle_update_e2e_test_results(args, MagicMock(), mock_output_manager, "test_task", True, True)
+    mock_validate_comparison = mocker.patch.object(
+        E2ETestResultsHandler,
+        "validate_comparison_configuration",
+        return_value=(
+            False,
+            {},
+            expected_results_random_seeds,
+        ),
+    )
+    mock_compare = mocker.patch.object(
+        E2ETestResultsHandler,
+        "compare_actual_and_expected_test_results",
+    )
+    mock_update = mocker.patch.object(
+        E2ETestResultsHandler,
+        "update_expected_test_results",
+    )
+    mock_post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
 
-    sim_engine_run_tasks.assert_not_called()
-    update_test_results.assert_not_called()
+    result = task_manager._process_e2e_group_results(
+        comparison_args=comparison_args,
+        produce_graphics=False,
+        metadata_depth_limit=10,
+        workers=2,
+        output_directory=output_directory,
+        verbosity=LogVerbosity.ERRORS,
+    )
+
+    if task_type == TaskType.END_TO_END_TESTING:
+        assert result == (None, expected_results_random_seeds)
+    else:
+        assert result == (None, None)
+
+    mock_input_audit.assert_called_once_with(
+        e2e_runs[0],
+        mock_input_manager,
+        mock_output_manager,
+        True,
+    )
+    mock_averaging.assert_called_once_with(
+        e2e_group=e2e_group,
+        e2e_runs=e2e_runs,
+    )
+    assert mock_output_manager.is_first_post_processing is False
+
+    if task_type == TaskType.END_TO_END_TESTING:
+        mock_validate_comparison.assert_called_once_with(
+            e2e_group,
+            e2e_runs[0]["convert_variable_table_path"],
+            e2e_runs[0]["filters_directory"],
+            e2e_runs[0]["use_accepted_ranges"],
+        )
+        mock_compare.assert_called_once_with(
+            json_output_path=averaged_results_path,
+            convert_variable_table_path=e2e_runs[0]["convert_variable_table_path"],
+            output_prefix=e2e_group,
+            must_change_variables=False,
+            accepted_ranges={},
+        )
+        mock_post_processing.assert_called_once_with(
+            args={**e2e_runs[0], "output_prefix": e2e_group},
+            input_manager=mock_input_manager,
+            output_manager=mock_output_manager,
+            task_id="E2E comparison 1/1",
+            should_flush_im_pool=True,
+            produce_graphics=False,
+            save_results=True,
+        )
+        mock_update.assert_not_called()
+
+    else:
+        mock_update.assert_called_once_with(averaged_results_path, e2e_group, [42])
+        mock_validate_comparison.assert_not_called()
+        mock_compare.assert_not_called()
+        mock_post_processing.assert_not_called()
+        mock_add_log.assert_called_once_with(
+            "End-to-end testing",
+            "Completed generation of new set of end-to-end expected test results",
+            info_map={
+                "class": TaskManager.__name__,
+                "function": TaskManager._process_e2e_group_results.__name__,
+                "units": MeasurementUnits.UNITLESS,
+            },
+        )
+
+
+def test_process_e2e_group_results_invalid_input(
+    task_manager: TaskManager,
+    mock_output_manager: OutputManager,
+    mocker: MockerFixture,
+    e2e_comparison_args: dict[str, Any],
+) -> None:
+    """Test that invalid input prevents E2E result averaging."""
+    mock_input_manager = mocker.Mock(spec=InputManager)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
+    for run in e2e_comparison_args["e2e_runs"]:
+        run["task_type"] = TaskType.END_TO_END_TESTING
+
+    mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=False)
+    mock_averaging = mocker.patch.object(E2ETestResultsHandler, "process_test_result_averaging")
+    mock_post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+
+    result = task_manager._process_e2e_group_results(
+        comparison_args=e2e_comparison_args,
+        produce_graphics=False,
+        metadata_depth_limit=10,
+        workers=2,
+        output_directory=Path("/fake/output"),
+        verbosity=LogVerbosity.ERRORS,
+    )
+
+    assert result == (e2e_comparison_args["e2e_group"], None)
+    mock_averaging.assert_not_called()
+    mock_post_processing.assert_called_once_with(
+        e2e_comparison_args,
+        mock_input_manager,
+        mock_output_manager,
+        e2e_comparison_args["task_id"],
+        False,
+    )
+
+
+@pytest.mark.parametrize(
+    "failing_method, task_type",
+    [
+        ("process_test_result_averaging", TaskType.END_TO_END_TESTING),
+        ("validate_comparison_configuration", TaskType.END_TO_END_TESTING),
+        ("compare_actual_and_expected_test_results", TaskType.END_TO_END_TESTING),
+        ("update_expected_test_results", TaskType.UPDATE_E2E_TEST_RESULTS),
+    ],
+)
+def test_process_e2e_group_results_exception(
+    task_manager: TaskManager,
+    mock_output_manager: OutputManager,
+    mocker: MockerFixture,
+    e2e_comparison_args: dict[str, Any],
+    failing_method: str,
+    task_type: TaskType,
+) -> None:
+    """Test that E2E processing failures are logged and reported."""
+    mock_input_manager = mocker.Mock(spec=InputManager)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
+
+    for run in e2e_comparison_args["e2e_runs"]:
+        run["task_type"] = task_type
+        run["random_seed"] = 42
+
+    mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "process_test_result_averaging",
+        return_value=Path("/fake/averaged/results.json"),
+    )
+    mocker.patch.object(
+        E2ETestResultsHandler,
+        "validate_comparison_configuration",
+        return_value=(
+            False,
+            {},
+            {
+                "Animal": [42, 51],
+                "CropAndSoil": [42, 51],
+                "Manure": [42, 51],
+                "Feed": [42, 51],
+            },
+        ),
+    )
+    mocker.patch.object(E2ETestResultsHandler, "compare_actual_and_expected_test_results")
+    mocker.patch.object(E2ETestResultsHandler, "update_expected_test_results")
+    mocker.patch.object(TaskManager, "handle_post_processing")
+
+    mock_failing_method = mocker.patch.object(
+        E2ETestResultsHandler,
+        failing_method,
+        side_effect=ValueError("Test processing failure"),
+    )
+    mock_dump_pools = mocker.patch.object(mock_output_manager, "dump_all_nondata_pools")
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
+
+    result = task_manager._process_e2e_group_results(
+        comparison_args=e2e_comparison_args,
+        produce_graphics=False,
+        metadata_depth_limit=10,
+        workers=2,
+        output_directory=Path("/fake/output"),
+        verbosity=LogVerbosity.ERRORS,
+    )
+
+    assert result == (e2e_comparison_args["e2e_group"], None)
+    mock_failing_method.assert_called_once()
+    mock_add_error.assert_called_once()
+    assert "Test processing failure" in mock_add_error.call_args.args[1]
+    mock_dump_pools.assert_called_once_with(
+        e2e_comparison_args["e2e_runs"][0]["logs_directory"],
+        e2e_comparison_args["e2e_runs"][0]["exclude_info_maps"],
+        "block",
+    )
+
+
+@pytest.mark.parametrize(
+    "random_seeds",
+    [
+        [42],
+        [42, 51],
+        [42, 51, 60, 70],
+        [],
+    ],
+)
+def test_expand_end_to_end_testing_args(
+    task_manager: TaskManager,
+    random_seeds: list[int],
+) -> None:
+    """Test that E2E arguments are expanded into one run per random seed."""
+    e2e_args = {
+        "output_prefix": "freestall_e2e",
+        "random_seeds": random_seeds,
+        "task_type": TaskType.END_TO_END_TESTING,
+        "log_verbosity": LogVerbosity.ERRORS.value,
+    }
+
+    expanded_args = task_manager._expand_end_to_end_testing_args(e2e_args)
+
+    assert len(expanded_args) == len(random_seeds)
+
+    for run_number, (random_seed, run_args) in enumerate(zip(random_seeds, expanded_args), start=1):
+        assert run_args == {
+            "output_prefix": f"freestall_e2e_run_{run_number}",
+            "random_seed": random_seed,
+            "e2e_group": "freestall_e2e",
+            "e2e_run_number": run_number,
+            "task_type": TaskType.END_TO_END_TESTING,
+            "log_verbosity": LogVerbosity.ERRORS.value,
+        }
+
+    assert e2e_args["output_prefix"] == "freestall_e2e"
+    assert e2e_args["random_seeds"] == random_seeds
+    assert "random_seed" not in e2e_args
+    assert "e2e_group" not in e2e_args
+    assert "e2e_run_number" not in e2e_args
 
 
 def test_handle_post_processing_load_pool(

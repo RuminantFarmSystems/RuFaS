@@ -45,6 +45,21 @@ def reset_animal_config_state() -> Generator[None, None, None]:
         setattr(AnimalConfig, name, value)
 
 
+def _make_genetics() -> dict[str, Any]:
+    """Builds the ``genetics`` blob that ``AnimalConfig.initialize_animal_config()`` reads."""
+    return {
+        "tbv_fat_variance": 25.8,
+        "tbv_protein_variance": 13.4,
+        "tbv_correlation": 0.59,
+        "permanent_environment_fat_variance": 38.8,
+        "permanent_environment_protein_variance": 20.1,
+        "permanent_environment_correlation": 0.95,
+        "temporary_environment_fat_variance": 64.5,
+        "temporary_environment_protein_variance": 33.4,
+        "temporary_environment_correlation": 0.78,
+    }
+
+
 def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) -> dict[str, Any]:
     """Builds the ``animal_config`` blob that ``AnimalConfig.initialize_animal_config()`` reads."""
     return {
@@ -65,9 +80,8 @@ def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) 
         },
         "farm_level": {
             "calf": {
-                "male_calf_rate_sexed_semen": 0.1,
-                "male_calf_rate_conventional_semen": 0.53,
-                "keep_female_calf_rate": 1,
+                "user_defined_male_calf_rate": 0.1,
+                "keep_dairy_female_rate": 1,
                 "calf_retention_method": "rate",
                 "annual_keep_female_calf_num": 0,
                 "wean_day": 60,
@@ -83,6 +97,12 @@ def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) 
                 "std_gestation_len": 6,
                 "prefresh_day": 21,
                 "calving_interval": 400,
+                "selective_repro_strategy": True,
+                "ranking_method": "genetic",
+                "genetic_selection_index_weights": {
+                    "fat": 0.318,
+                    "protein": 0.13,
+                },
                 "heifers": {
                     "estrus_detection_rate": 0.9,
                     "estrus_conception_rate": 0.6,
@@ -90,6 +110,11 @@ def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) 
                     "repro_sub_properties": {
                         "conception_rate": 0.6,
                         "estrus_detection_rate": 0.9,
+                    },
+                    "semen_allocation_proportions": {
+                        "sexed_dairy": 0.5,
+                        "conventional_dairy": 0.5,
+                        "beef": 0.0,
                     },
                 },
                 "cows": {
@@ -101,6 +126,11 @@ def _make_base_animal_config(repro_sub_protocol: str, heifer_repro_method: str) 
                     "ovsynch_program_start_day": 64,
                     "ovsynch_program_conception_rate": 0.6,
                     "resynch_program": "TAIafterPD",
+                    "semen_allocation_proportions": {
+                        "sexed_dairy": 0.2,
+                        "conventional_dairy": 0.5,
+                        "beef": 0.3,
+                    },
                 },
             },
             "bodyweight": {
@@ -171,6 +201,7 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
             "methane_mitigation_method": "None",
         },
         "herd_information": {"simulate_genetics": False},
+        "genetics": _make_genetics(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -190,9 +221,22 @@ def test_initialize_animal_config_heifer_subprogram_and_core_fields(
 
     assert AnimalConfig.wean_day == 60
     assert AnimalConfig.wean_length == 7
-    assert AnimalConfig.semen_type == "conventional"
     assert AnimalConfig.milk_fat_percent == 4
     assert AnimalConfig.milk_reduction_maximum == 1.23
+
+    assert AnimalConfig.selective_repro_strategy is True
+    assert AnimalConfig.ranking_method == "genetic"
+    assert AnimalConfig.genetic_selection_index_weights == {"fat": 0.318, "protein": 0.13}
+    assert AnimalConfig.heiferII_semen_allocation_proportions == {
+        "sexed_dairy": 0.5,
+        "conventional_dairy": 0.5,
+        "beef": 0.0,
+    }
+    assert AnimalConfig.cow_semen_allocation_proportions == {
+        "sexed_dairy": 0.2,
+        "conventional_dairy": 0.5,
+        "beef": 0.3,
+    }
 
     assert AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol(heifer_method)
     assert isinstance(AnimalConfig.heifer_reproduction_sub_program, expected_subprogram_type)
@@ -253,6 +297,7 @@ def test_initialize_animal_config_selects_dose_of_chosen_mitigation_method(
             "seaweed_additive_amount": 55,
         },
         "herd_information": {"simulate_genetics": False},
+        "genetics": _make_genetics(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -288,6 +333,7 @@ def test_initialize_animal_config_warns_when_selected_mitigation_dose_field_is_m
         # "3-NOP" is selected, but "3-NOP_additive_amount" is absent from the blob.
         "methane_mitigation": {"methane_mitigation_method": "3-NOP"},
         "herd_information": {"simulate_genetics": False},
+        "genetics": _make_genetics(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -338,9 +384,8 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
         },
         "farm_level": {
             "calf": {
-                "male_calf_rate_sexed_semen": 0.1,
-                "male_calf_rate_conventional_semen": 0.53,
-                "keep_female_calf_rate": 1,
+                "user_defined_male_calf_rate": 0.1,
+                "keep_dairy_female_rate": 1,
                 "calf_retention_method": "rate",
                 "annual_keep_female_calf_num": 0,
                 "wean_day": 60,
@@ -356,11 +401,22 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                 "std_gestation_len": 6,
                 "prefresh_day": 21,
                 "calving_interval": 400,
+                "selective_repro_strategy": True,
+                "ranking_method": "genetic",
+                "genetic_selection_index_weights": {
+                    "fat": 0.318,
+                    "protein": 0.13,
+                },
                 "heifers": {
                     "estrus_detection_rate": 0.9,
                     "estrus_conception_rate": 0.6,
                     "repro_sub_protocol": "2P",
                     "repro_sub_properties": {"conception_rate": 0.6, "estrus_detection_rate": 0.9},
+                    "semen_allocation_proportions": {
+                        "sexed_dairy": 0.5,
+                        "conventional_dairy": 0.5,
+                        "beef": 0.0,
+                    },
                 },
                 "cows": {
                     "estrus_detection_rate": 0.6,
@@ -371,6 +427,11 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
                     "ovsynch_program_start_day": 64,
                     "ovsynch_program_conception_rate": 0.6,
                     "resynch_program": "TAIafterPD",
+                    "semen_allocation_proportions": {
+                        "sexed_dairy": 0.2,
+                        "conventional_dairy": 0.5,
+                        "beef": 0.3,
+                    },
                 },
             },
             "bodyweight": {
@@ -417,6 +478,7 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
             "methane_mitigation_method": "None",
         },
         "herd_information": {"simulate_genetics": False},
+        "genetics": _make_genetics(),
     }
 
     def get_data_side_effect(key: str) -> Any:
@@ -440,3 +502,53 @@ def test_initialize_animal_config_adds_warning_when_third_check_after_or_on_dryo
     warning_args, warning_kwargs = mock_om.add_warning.call_args
 
     assert "3rd pregnancy check day >=" in warning_args[0]
+
+
+def test_initialize_animal_config_reads_genetics_inputs(mocker: pytest_mock.MockerFixture) -> None:
+    """The farm-specific genetic distribution inputs in the ``genetics`` section are read into ``AnimalConfig``."""
+    mock_im_cls = mocker.patch("RUFAS.biophysical.animal.animal_config.InputManager")
+    mocker.patch("RUFAS.biophysical.animal.animal_config.OutputManager")
+
+    mock_im = mock_im_cls.return_value
+
+    animal_data = {
+        "animal_config": _make_base_animal_config("5dCG2P", "TAI"),
+        "methane_model": {"dummy": "model"},
+        "methane_mitigation": {"methane_mitigation_method": "None"},
+        "herd_information": {"simulate_genetics": True},
+        "genetics": {
+            "tbv_fat_variance": 1.1,
+            "tbv_protein_variance": 2.2,
+            "tbv_correlation": 0.3,
+            "permanent_environment_fat_variance": 4.4,
+            "permanent_environment_protein_variance": 5.5,
+            "permanent_environment_correlation": 0.6,
+            "temporary_environment_fat_variance": 7.7,
+            "temporary_environment_protein_variance": 8.8,
+            "temporary_environment_correlation": 0.9,
+        },
+    }
+
+    def get_data_side_effect(key: str) -> Any:
+        if key == "animal":
+            return animal_data
+        if key == "feed.ration_formulation_parameters.milk_reduction_maximum":
+            return 1.23
+        if key in ("animal_mean_phenotype", "animal_top_listing_semen"):
+            return {}
+        raise KeyError(key)
+
+    mock_im.get_data.side_effect = get_data_side_effect
+
+    AnimalConfig.initialize_animal_config()
+
+    assert AnimalConfig.simulate_genetics is True
+    assert AnimalConfig.tbv_fat_variance == 1.1
+    assert AnimalConfig.tbv_protein_variance == 2.2
+    assert AnimalConfig.tbv_correlation == 0.3
+    assert AnimalConfig.permanent_environment_fat_variance == 4.4
+    assert AnimalConfig.permanent_environment_protein_variance == 5.5
+    assert AnimalConfig.permanent_environment_correlation == 0.6
+    assert AnimalConfig.temporary_environment_fat_variance == 7.7
+    assert AnimalConfig.temporary_environment_protein_variance == 8.8
+    assert AnimalConfig.temporary_environment_correlation == 0.9

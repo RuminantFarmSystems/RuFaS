@@ -136,14 +136,10 @@ def test_add_matter_nutrient_request_results(
     dry_matter_two = dry_frac_two * mass_two
 
     first_request = NutrientRequestResults(
-        total_manure_mass=mass_one,
-        dry_matter_fraction=dry_frac_one,
-        dry_matter=dry_matter_one
+        total_manure_mass=mass_one, dry_matter_fraction=dry_frac_one, dry_matter=dry_matter_one
     )
     second_request = NutrientRequestResults(
-        total_manure_mass=mass_two,
-        dry_matter_fraction=dry_frac_two,
-        dry_matter=dry_matter_two
+        total_manure_mass=mass_two, dry_matter_fraction=dry_frac_two, dry_matter=dry_matter_two
     )
 
     # Act
@@ -491,3 +487,41 @@ def test_reset_values() -> None:
     assert reset == ManureNutrients(
         manure_type=ManureType.LIQUID, nitrogen=0, phosphorus=0, potassium=0, dry_matter=0, total_manure_mass=0
     )
+
+
+def test_volatile_solids_and_lignin_compositions() -> None:
+    """Test that volatile solids and lignin compositions are fractions of the total manure mass."""
+    nutrients = ManureNutrients(
+        manure_type=ManureType.LIQUID,
+        nitrogen=10.0,
+        total_manure_mass=200.0,
+        volatile_solids=50.0,
+        lignin=8.0,
+    )
+
+    assert nutrients.volatile_solids_composition == approx(0.25)
+    assert nutrients.lignin_composition == approx(0.04)
+
+
+def test_volatile_solids_and_lignin_compositions_with_no_mass() -> None:
+    """Test that volatile solids and lignin compositions are zero when there is no manure."""
+    nutrients = ManureNutrients(manure_type=ManureType.LIQUID)
+
+    assert nutrients.volatile_solids_composition == 0.0
+    assert nutrients.lignin_composition == 0.0
+
+
+def test_reset_values_zeroes_volatile_solids_and_lignin() -> None:
+    """Test that reset_values() also zeroes the volatile solids and lignin."""
+    nutrients = ManureNutrients(
+        manure_type=ManureType.LIQUID,
+        nitrogen=134,
+        total_manure_mass=131,
+        volatile_solids=55.0,
+        lignin=6.0,
+    )
+
+    reset = nutrients.reset_values()
+
+    assert reset.volatile_solids == 0.0
+    assert reset.lignin == 0.0

@@ -9,14 +9,13 @@ class NutrientUptake(ABC):
 
     Parameters
     ----------
-    crop_data : CropData, optional
+    crop_data : CropData
         An instance of ``CropData`` containing crop specifications and attributes.
-        Defaults to a new instance of ``CropData`` if not provided.
 
     """
 
-    def __init__(self, crop_data: CropData | None):
-        self.crop_data = crop_data or CropData()
+    def __init__(self, crop_data: CropData):
+        self.crop_data = crop_data
 
     @abstractmethod
     def uptake(self, soil_data: SoilData) -> None:

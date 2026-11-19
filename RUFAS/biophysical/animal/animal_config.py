@@ -38,18 +38,14 @@ class AnimalConfig:
         Maximum day at which a heifer is culled if not pregnant, (simulation day).
     do_not_breed_time : int
         The duration after which breeding is stopped, (simulation day).
-    semen_type : str
-        Types of semen used for reproduction, e.g., "conventional", (unitless).
-    male_calf_rate_conventional_semen : float
-        Proportion of male calves when conventional semen is used, (unitless).
-    male_calf_rate_sexed_semen : float
-        Proportion of male calves when sexed semen is used, (unitless).
-    keep_female_calf_rate : float
-        Rate at which female calves are kept, used when ``calf_retention_method`` is
+    user_defined_male_calf_rate : float
+        Proportion of male calves, (unitless).
+    keep_dairy_female_rate : float
+        Rate at which dairy female calves are kept, used when ``calf_retention_method`` is
         ``"rate"`` (unitless).
     calf_retention_method : str
         Method used to decide female-calf retention: ``"rate"`` (keep each live female
-        calf with probability ``keep_female_calf_rate``) or ``"count"`` (keep a target
+        calf with probability ``keep_dairy_female_rate``) or ``"count"`` (keep a target
         number of female calves per year, ``annual_keep_female_calf_num``).
     annual_keep_female_calf_num : int
         Target number of female calves to keep per year, used when
@@ -169,6 +165,33 @@ class AnimalConfig:
         Semen sire information used for genetic simulations and breeding selection.
     simulate_genetics : bool
         Whether genetic simulation functionality is enabled.
+    tbv_fat_variance : float
+        Variance of the true breeding value (TBV) for fat yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    tbv_protein_variance : float
+        Variance of the true breeding value (TBV) for protein yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    tbv_correlation : float
+        Correlation between the fat and protein true breeding values, (unitless). Defaults to the CDCB
+        national average.
+    permanent_environment_fat_variance : float
+        Variance of the permanent environmental effect on fat yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    permanent_environment_protein_variance : float
+        Variance of the permanent environmental effect on protein yield in the herd, (kg^2). Defaults to the
+        CDCB national average.
+    permanent_environment_correlation : float
+        Correlation between the fat and protein permanent environmental effects, (unitless). Defaults to the
+        CDCB national average.
+    temporary_environment_fat_variance : float
+        Variance of the temporary environmental effect on fat yield in the herd, (kg^2). Defaults to the CDCB
+        national average.
+    temporary_environment_protein_variance : float
+        Variance of the temporary environmental effect on protein yield in the herd, (kg^2). Defaults to the
+        CDCB national average.
+    temporary_environment_correlation : float
+        Correlation between the fat and protein temporary environmental effects, (unitless). Defaults to the
+        CDCB national average.
 
     """
 
@@ -184,10 +207,24 @@ class AnimalConfig:
     calf_mortality_rate: float = 0.0
     heifer_mortality_rate: float = 0.0
 
-    semen_type: str = "conventional"
-    male_calf_rate_conventional_semen: float = 0.53
-    male_calf_rate_sexed_semen: float = 0.10
-    keep_female_calf_rate: float = 1
+    user_defined_male_calf_rate: float = 0.1
+    selective_repro_strategy: bool = False
+    ranking_method: str = "genetic"
+    genetic_selection_index_weights: dict[str, float] = {
+        "fat": 0.318,
+        "protein": 0.13,
+    }
+    heiferII_semen_allocation_proportions: dict[str, float] = {
+        "sexed_dairy": 0.5,
+        "conventional_dairy": 0.5,
+        "beef": 0.0,
+    }
+    cow_semen_allocation_proportions: dict[str, float] = {
+        "sexed_dairy": 0.2,
+        "conventional_dairy": 0.5,
+        "beef": 0.3,
+    }
+    keep_dairy_female_rate: float = 1
     calf_retention_method: str = "rate"
     annual_keep_female_calf_num: int = 0
     still_birth_rate: float = 0.065
@@ -281,6 +318,15 @@ class AnimalConfig:
     average_phenotype: dict[str, dict[int, float]] = {}
     top_listing_semen: dict[str, dict[str, float]] = {}
     simulate_genetics: bool = False
+    tbv_fat_variance: float = 25.8
+    tbv_protein_variance: float = 13.4
+    tbv_correlation: float = 0.59
+    permanent_environment_fat_variance: float = 38.8
+    permanent_environment_protein_variance: float = 20.1
+    permanent_environment_correlation: float = 0.95
+    temporary_environment_fat_variance: float = 64.5
+    temporary_environment_protein_variance: float = 33.4
+    temporary_environment_correlation: float = 0.78
 
     @classmethod
     def initialize_animal_config(cls) -> None:
@@ -301,12 +347,34 @@ class AnimalConfig:
         cls.calf_mortality_rate = animal_config_data["management_decisions"]["calf_mortality_rate"]
         cls.heifer_mortality_rate = animal_config_data["management_decisions"]["heifer_mortality_rate"]
 
-        cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
-        cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
-            "male_calf_rate_conventional_semen"
-        ]
-        cls.male_calf_rate_sexed_semen = animal_config_data["farm_level"]["calf"]["male_calf_rate_sexed_semen"]
-        cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
+        cls.user_defined_male_calf_rate = animal_config_data["farm_level"]["calf"]["user_defined_male_calf_rate"]
+        cls.selective_repro_strategy = animal_config_data["farm_level"]["repro"]["selective_repro_strategy"]
+        cls.ranking_method = animal_config_data["farm_level"]["repro"]["ranking_method"]
+        cls.genetic_selection_index_weights["fat"] = animal_config_data["farm_level"]["repro"][
+            "genetic_selection_index_weights"
+        ]["fat"]
+        cls.genetic_selection_index_weights["protein"] = animal_config_data["farm_level"]["repro"][
+            "genetic_selection_index_weights"
+        ]["protein"]
+        cls.heiferII_semen_allocation_proportions["sexed_dairy"] = animal_config_data["farm_level"]["repro"]["heifers"][
+            "semen_allocation_proportions"
+        ]["sexed_dairy"]
+        cls.heiferII_semen_allocation_proportions["conventional_dairy"] = animal_config_data["farm_level"]["repro"][
+            "heifers"
+        ]["semen_allocation_proportions"]["conventional_dairy"]
+        cls.heiferII_semen_allocation_proportions["beef"] = animal_config_data["farm_level"]["repro"]["heifers"][
+            "semen_allocation_proportions"
+        ]["beef"]
+        cls.cow_semen_allocation_proportions["sexed_dairy"] = animal_config_data["farm_level"]["repro"]["cows"][
+            "semen_allocation_proportions"
+        ]["sexed_dairy"]
+        cls.cow_semen_allocation_proportions["conventional_dairy"] = animal_config_data["farm_level"]["repro"]["cows"][
+            "semen_allocation_proportions"
+        ]["conventional_dairy"]
+        cls.cow_semen_allocation_proportions["beef"] = animal_config_data["farm_level"]["repro"]["cows"][
+            "semen_allocation_proportions"
+        ]["beef"]
+        cls.keep_dairy_female_rate = animal_config_data["farm_level"]["calf"]["keep_dairy_female_rate"]
         cls.calf_retention_method = animal_config_data["farm_level"]["calf"].get("calf_retention_method", "rate")
         cls.annual_keep_female_calf_num = int(
             animal_config_data["farm_level"]["calf"].get("annual_keep_female_calf_num", 0)
@@ -452,3 +520,14 @@ class AnimalConfig:
             if trait != "year_month"
         }
         cls.simulate_genetics = animal_data["herd_information"]["simulate_genetics"]
+
+        genetics_data = animal_data["genetics"]
+        cls.tbv_fat_variance = genetics_data["tbv_fat_variance"]
+        cls.tbv_protein_variance = genetics_data["tbv_protein_variance"]
+        cls.tbv_correlation = genetics_data["tbv_correlation"]
+        cls.permanent_environment_fat_variance = genetics_data["permanent_environment_fat_variance"]
+        cls.permanent_environment_protein_variance = genetics_data["permanent_environment_protein_variance"]
+        cls.permanent_environment_correlation = genetics_data["permanent_environment_correlation"]
+        cls.temporary_environment_fat_variance = genetics_data["temporary_environment_fat_variance"]
+        cls.temporary_environment_protein_variance = genetics_data["temporary_environment_protein_variance"]
+        cls.temporary_environment_correlation = genetics_data["temporary_environment_correlation"]

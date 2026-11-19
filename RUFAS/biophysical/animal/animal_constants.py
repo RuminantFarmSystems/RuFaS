@@ -130,3 +130,13 @@ MITS_PARAMETER_B = 0
 """
 The parameter 'b' in the Mitscherlich Model 3 (Mills et al., 2003).
 """
+
+# male calf rates
+CONVENTIONAL_DAIRY_MALE_CALF_RATE = 0.5
+SEXED_DAIRY_MALE_CALF_RATE = 0.1
+BEEF_MALE_CALF_RATE = 0.5
+
+SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER = 0.85
+"""
+Conception rate of sexed dairy semen relative to conventional semen, (unitless).
+"""
