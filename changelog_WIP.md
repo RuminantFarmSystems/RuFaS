@@ -154,3 +154,4 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3362](https://github.com/RuminantFarmSystems/RuFaS/pull/3362) - [minor change] [Crop and Soil] [NoInputChange] [OutputChange] Removes the `None` type hints from the Crop and Soil module data objects and data fields that are never optional, and defaults the crop working values to zero.
 - [3316](https://github.com/RuminantFarmSystems/RuFaS/pull/3316) - [minor change] [Animal] [NoInputChange] [OutputChange] Corrects the NASEM growth energy equation and adds the body reserve tissue term to the NASEM protein requirement.
 - [3380](https://github.com/RuminantFarmSystems/RuFaS/pull/3380) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Adds more calculated herd outputs to OutputManager.
+- [3385](https://github.com/RuminantFarmSystems/RuFaS/pull/3385) - [minor change] [ReportGenerator] [NoInputChange] [NoOutputChange] Adds `omit_none_values` report filtering option.
