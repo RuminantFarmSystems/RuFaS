@@ -302,7 +302,7 @@ class ReportGenerator:
 
     def _perform_aggregations(
         self,
-        filtered_pool: dict[str, Any],
+        filtered_pool: dict[str, dict[str, list[Any]]],
         filter_content: dict[str, Any],
     ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]], bool]:
         """
@@ -310,7 +310,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        filtered_pool : dict[str, Any]
+        filtered_pool : dict[str, dict[str, list[Any]]]
             The data pool from which the report is to be generated, structured as a dictionary.
         filter_content : dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
@@ -1022,18 +1022,18 @@ class ReportGenerator:
         return re.sub(r"[\s_]", "", name).lower()
 
     @staticmethod
-    def _add_var_units(report_data: dict[str, list[Any]]) -> dict[str, list[Any]]:
+    def _add_var_units(report_data: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
         """
         Adds variable units to variable name.
 
         Parameters
         ----------
-        report_data : dict[str, list[Any]]
+        report_data : dict[str, dict[str, list[Any]]]
             The data to be reported.
 
         Returns
         -------
-        dict[str, list[Any]]
+        dict[str, dict[str, list[Any]]]
             The updated data with units added.
         """
         updated_data: dict[str, dict[str, list[Any]]] = {}
