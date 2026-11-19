@@ -1981,9 +1981,9 @@ Failure of a ration to be formulated successfully indicates that the requirement
 
 **Non-lactating animals**: if the ration was successfully formulated in the prior ration formulation interval, the previous ration will be used. Otherwise, the simulation will halt.
 
-**Lactating animals**: an attempt to reduce milk yield may be made if the lower limit of pen-average milk production has not been reached, and the value in the feed input file allows for a reduction in lactation (@tbl-an-ration-input-feed). Milk yield reduction occurs in 0.5 kg increments. Every time a reduction occurs, the formulation process begins again at the step where individual animal requirements are calculated. The process continues from there using the newly reduced requirements, making a successful formulation more likely. Note that because milk energy output is a component of the equations to estimate DMI, when requirements are recalculated after a milk reduction occurs, DMI will decrease. The DMI reduction amount is capped at 30% of the initial DMI estimate (i.e., before milk yield reductions were attempted).
+**Lactating animals**: an attempt to reduce milk yield may be made if the lower limit of pen-average milk production has not been reached, and the value in the feed input file allows for a reduction in lactation (@tbl-an-ration-input-feed). Milk yield reduction occurs by reducing the milk production of every individual by 0.25 kg/d, regardless of production level, thereby reducing the pen average in 0.25 kg/d increments. Every time a reduction occurs, the formulation process begins again at the step where individual animal requirements are calculated. The process continues from there using the newly reduced requirements, making a successful formulation more likely. Note that because milk energy output is a component of the equations to estimate DMI, when requirements are recalculated after a milk reduction occurs, DMI will decrease. The DMI reduction amount is capped at 30% of the initial DMI estimate (i.e., before milk yield reductions were attempted).
 
-* The milk yield reduction process repeats until either: A. successful ration formulation, or B. further reduction in milk is precluded (reaching either the minimum pen-level production, or the user-defined maximum level of milk yield reduction), whereupon the simulation is halted.
+* The milk yield reduction process repeats until either: A. successful ration formulation, or B. further reduction in milk is precluded (reaching either the minimum pen-level production of 15 kg/cow/d, or the user-defined per-animal maximum level of milk yield reduction is reached cumulatively within a ration formulation interval), whereupon the simulation is halted.
 
 
 ##### Ration formulation failure: user-defined methodology
@@ -2787,7 +2787,7 @@ reduction values are used.
 **User Inputs and Constants**
 
 * `Milk_reduction_maximum`: Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements 
-* Tolerance: Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently 
+* `Tolerance`: Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently 
 has no effect due to no implementation of automatic ration optimizer. 
 * `Milk_reduction_kg` is set to 0.25 kg: Milk reduction amount for each failed ration attempt, kg. 
 * `Minimum_avg_pen_milk` is set to 15 kg: Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal
