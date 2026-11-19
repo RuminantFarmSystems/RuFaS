@@ -862,10 +862,7 @@ class ReportGenerator:
         dict[str, list[Any]]
             A new dictionary containing the report data with None values removed.
         """
-        return {
-            key: [value for value in values if value is not None]
-            for key, values in report_data.items()
-        }
+        return {key: [value for value in values if value is not None] for key, values in report_data.items()}
 
     def _add_constants_to_report_data(
         self, report_data: dict[str, list[Any]], filter_content: dict[str, Any]
