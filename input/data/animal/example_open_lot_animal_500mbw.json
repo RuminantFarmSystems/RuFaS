@@ -34,7 +34,7 @@
     "temporary_environment_correlation": 0.78
   },
   "herd_initialization": {
-    "initial_animal_num": 10000,
+    "initial_animal_num": 1500,
     "simulation_days": 5000
   },
   "animal_config": {
