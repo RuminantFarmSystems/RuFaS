@@ -64,7 +64,7 @@ class SoilData:
         Amount of rainfall discharged as runoff on the current day (mm).
     infiltrated_water : float, default 0.0
         Amount of water that infiltrated the soil profile on the day (mm).
-    vadose_zone_layer : LayerData | None
+    vadose_zone_layer : LayerData
         LayerData object that represents the vadose zone layer, where the top depth is set equal to the bottom depth of
         the lowest soil layer and the bottom depth is arbitrary, starting with no water.
     time_step : float, default 24
@@ -103,7 +103,7 @@ class SoilData:
         Manning roughness coefficient for this subbasin (unitless).
     eroded_sediment : float, default 0
         Cumulative amount of sediment that has been eroded off of the field in a day (metric tons).
-    surface_runoff_volume : float, optional, default None
+    surface_runoff_volume : float, default 0.0
         Volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1.
     cover_type : str, default "BARE"
         The cover type of the soil surface, which can be bare, residue covered, or grassed.
@@ -155,16 +155,31 @@ class SoilData:
         Plant residue fraction that is metabolic (unitless).
     crop_yield_nitrogen : float, default 0
         Nitrogen contained in the harvested yield (kg/ha).
+    manure_residue_lignin : float, default 0.0
+        Lignin in applied manure that is awaiting partitioning into the litter pools (kg/ha).
+    manure_residue_nitrogen : float, default 0.0
+        Nitrogen in applied manure that is awaiting partitioning into the litter pools (kg/ha).
+    manure_lignin_nitrogen_ratio : float, default 0.0
+        Manure lignin to nitrogen ratio of the most recently partitioned manure carbon residue (unitless).
+    manure_residue_metabolic_fraction : float, default 0.0
+        Fraction of the most recently partitioned manure carbon residue that is metabolic (unitless).
+    annual_manure_carbon_applied_total : float, default 0.0
+        Cumulative total of manure carbon added to the soil profile by manure applications this year (kg/ha).
     machine_manure : ManurePool
         A ManurePool instance holding data for machine-applied manure.
     grazing_manure : ManurePool
         A ManurePool instance holding data for grazing-applied manure
+
+    Notes
+    -----
+    ``manure_residue_lignin`` and ``manure_residue_nitrogen`` are accumulated at each manure application and
+    reset when the manure carbon residue pools are partitioned.
     """
 
     # ID variables
-    name: str | None = "generic soil configuration"
+    name: str = "generic soil configuration"
 
-    soil_layers: List[LayerData] | None = None
+    soil_layers: List[LayerData] = field(default_factory=list)
     field_size: InitVar[float] = None
 
     # Track annual soil profile totals
@@ -202,7 +217,7 @@ class SoilData:
     infiltrated_water: float = 0.0
 
     # ---- percolation
-    vadose_zone_layer: LayerData | None = None
+    vadose_zone_layer: LayerData = field(init=False)
     time_step: float = 24
 
     # ---- temperature
@@ -226,7 +241,7 @@ class SoilData:
     slope_length: float = 3
     manning: float = 0.4
     eroded_sediment: float = 0
-    surface_runoff_volume: float | None = None
+    surface_runoff_volume: float = 0.0
 
     # ---- Fertilizer (Phosphorus Cycling)
     cover_type: str = "BARE"
@@ -259,6 +274,13 @@ class SoilData:
     plant_lignin_nitrogen_ratio: float = 0
     plant_residue_metabolic_fraction: float = 0
     crop_yield_nitrogen: float = 0
+
+    # ---- Manure carbon residue partition (Carbon Cycling)
+    manure_residue_lignin: float = 0.0
+    manure_residue_nitrogen: float = 0.0
+    manure_lignin_nitrogen_ratio: float = 0.0
+    manure_residue_metabolic_fraction: float = 0.0
+    annual_manure_carbon_applied_total: float = 0.0
 
     @property
     def total_residue(self) -> float:
@@ -307,7 +329,7 @@ class SoilData:
             )
             raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
 
-        if self.soil_layers is None:
+        if not self.soil_layers:
             self.soil_layers = [
                 LayerData(
                     top_depth=0,
@@ -333,18 +355,17 @@ class SoilData:
         elif self.soil_layers[0].bottom_depth > 20:
             self._subdivide_top_layer(field_size)
 
-        if self.vadose_zone_layer is None:
-            self.vadose_zone_layer = LayerData(
-                top_depth=self.soil_layers[-1].bottom_depth,
-                bottom_depth=10000000,
-                soil_water_concentration=0,
-                saturation_point_water_concentration=inf,
-                initial_labile_inorganic_phosphorus_concentration=0,
-                initial_soil_nitrate_concentration=0,
-                field_size=field_size,
-            )
-            self.vadose_zone_layer.active_organic_nitrogen_content = 0
-            self.vadose_zone_layer.stable_organic_nitrogen_content = 0
+        self.vadose_zone_layer = LayerData(
+            top_depth=self.soil_layers[-1].bottom_depth,
+            bottom_depth=10000000,
+            soil_water_concentration=0,
+            saturation_point_water_concentration=inf,
+            initial_labile_inorganic_phosphorus_concentration=0,
+            initial_soil_nitrate_concentration=0,
+            field_size=field_size,
+        )
+        self.vadose_zone_layer.active_organic_nitrogen_content = 0
+        self.vadose_zone_layer.stable_organic_nitrogen_content = 0
 
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
@@ -452,6 +473,8 @@ class SoilData:
         self.annual_eroded_fresh_organic_nitrogen_total = 0
         self.annual_eroded_stable_organic_nitrogen_total = 0
         self.annual_eroded_active_organic_nitrogen_total = 0
+
+        self.annual_manure_carbon_applied_total = 0.0
 
         # Reset carbon cycle
         for layer in self.soil_layers:

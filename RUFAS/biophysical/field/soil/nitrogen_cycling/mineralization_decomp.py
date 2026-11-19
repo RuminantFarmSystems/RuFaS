@@ -9,11 +9,8 @@ class MineralizationDecomposition:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        The SoilData object used by this module to track nitrogen mineralization and decomposition, creates new one
-        if one is not provided.
-    field_size : float, optional
-        Size of the field (ha).
+    soil_data : SoilData
+        The SoilData object used by this module to track nitrogen mineralization and decomposition.
 
     Attributes
     ----------
@@ -22,8 +19,8 @@ class MineralizationDecomposition:
 
     """
 
-    def __init__(self, soil_data: SoilData | None = None, field_size: float | None = None):
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
     def mineralize_and_decompose_nitrogen(self) -> None:
         """

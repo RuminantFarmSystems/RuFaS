@@ -110,6 +110,7 @@ def mock_manure_stream() -> ManureStream:
         methane_production_potential=0.24,
         pen_manure_data=None,
         bedding_non_degradable_volatile_solids=10,
+        lignin=16.0,
     )
 
 
@@ -142,6 +143,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert solid.potassium == mock_manure_stream.potassium * mock_separator.potassium_efficiency
     assert solid.ash == mock_manure_stream.ash * mock_separator.ash_efficiency
     assert solid.volume == (solid.water + solid.total_solids) / ManureConstants.SOLID_MANURE_DENSITY
+    assert solid.lignin == mock_manure_stream.lignin * mock_separator.total_solids_efficiency
 
     liquid = result["liquid"]
     assert liquid.water == mock_manure_stream.water - solid.water
@@ -154,6 +156,7 @@ def test_process_manure(mock_separator: Separator, mocker: MockerFixture, mock_m
     assert liquid.potassium == mock_manure_stream.potassium * (1 - mock_separator.potassium_efficiency)
     assert liquid.ash == mock_manure_stream.ash * (1 - mock_separator.ash_efficiency)
     assert liquid.volume == (liquid.water + liquid.total_solids) / ManureConstants.LIQUID_MANURE_DENSITY
+    assert liquid.lignin == mock_manure_stream.lignin * (1 - mock_separator.total_solids_efficiency)
 
     assert mock_separator.held_manure is None
     assert mock_report_manure_stream.call_count == 2

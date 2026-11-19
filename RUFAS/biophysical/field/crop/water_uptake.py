@@ -12,9 +12,8 @@ class WaterUptake(NutrientUptake):
 
     Parameters
     ----------
-    crop_data : CropData, optional
-        An instance of ``CropData`` containing specific crop parameters and states. If not provided, a default
-        instance with generic crop parameters is created.
+    crop_data : CropData
+        An instance of ``CropData`` containing specific crop parameters and states.
     water_distro_parameter : float, default 10
         Water-use distribution parameter governing water-uptake from the soil (unitless).
     potential_water_uptakes : list[float], optional
@@ -54,7 +53,7 @@ class WaterUptake(NutrientUptake):
 
     def __init__(
         self,
-        crop_data: CropData | None = None,
+        crop_data: CropData,
         water_distro_parameter: float = 10,
         potential_water_uptakes: list[float] | None = None,
         water_compensation_factor: float = 0.01,
@@ -127,6 +126,8 @@ class WaterUptake(NutrientUptake):
 
         Raises
         ------
+        ValueError
+            If ``self.actual_water_uptakes`` has not been calculated.
         Exception
             If the lengths of ``soil_data.soil_layers`` and ``self.actual_water_uptakes`` aren't equal.
 
@@ -137,6 +138,14 @@ class WaterUptake(NutrientUptake):
         layers in the SoilData object.
 
         """
+        if self.actual_water_uptakes is None:
+            OutputManager().add_error(
+                "Soil water extraction error",
+                "actual_water_uptakes has not been calculated, so no water can be extracted from the soil. Calculate "
+                "the water uptakes with the uptake method first.",
+                info_map={"class": self.__class__.__name__, "function": self.extract_water_from_soil.__name__},
+            )
+            raise ValueError("actual_water_uptakes must be calculated before water is extracted from the soil")
         if len(soil_data.soil_layers) != len(self.actual_water_uptakes):
             OutputManager().add_error(
                 "Soil water extraction error",
