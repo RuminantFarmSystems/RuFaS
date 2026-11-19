@@ -245,3 +245,38 @@ def test_calculate_total_sensible_heat_generated(dry_matter_percentage: float, d
     actual = crop._calculate_total_sensible_heat_generated()
 
     assert pytest.approx(actual) == expected
+
+
+@pytest.mark.unit
+def test_initial_temperature_alfalfa() -> None:
+    """Alfalfa crops initialize at 18.0 C (Silostg.for:259)."""
+    crop = HarvestedCrop(**{**sample_crop_data, "config_name": "alfalfa_data"})
+    assert crop.temperature == 18.0
+
+
+@pytest.mark.unit
+def test_initial_temperature_non_alfalfa() -> None:
+    """Non-alfalfa crops initialize at 8.0 C (Buckmaster et al. 1989, p.1149)."""
+    crop = HarvestedCrop(**{**sample_crop_data, "config_name": "corn_silage"})
+    assert crop.temperature == 8.0
+
+
+@pytest.mark.unit
+def test_preseal_not_finalized_on_creation() -> None:
+    """A newly created crop always starts with preseal_finalized False."""
+    crop = HarvestedCrop(**sample_crop_data)
+    assert crop.preseal_finalized is False
+
+
+@pytest.mark.unit
+def test_infiltration_cumulative_loss_starts_at_zero() -> None:
+    """A newly created crop starts with zero accumulated infiltration loss."""
+    crop = HarvestedCrop(**sample_crop_data)
+    assert crop.infiltration_cumulative_loss_kg == 0.0
+
+
+@pytest.mark.unit
+def test_infiltration_max_loss_kg_starts_as_none() -> None:
+    """A newly created crop has no fixed infiltration ceiling until Infiltration first runs."""
+    crop = HarvestedCrop(**sample_crop_data)
+    assert crop.infiltration_max_loss_kg is None

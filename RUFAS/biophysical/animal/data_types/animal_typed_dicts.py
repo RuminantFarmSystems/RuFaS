@@ -176,6 +176,24 @@ class CowValuesTypedDict(TypedDict):
     calving_interval: NotRequired[int]
 
 
+class BeefCowCalfValuesTypedDict(TypedDict):
+    """List of expected keys for beef cow-calf animal values dictionary (persistence path)."""
+
+    id: int
+    breed: str
+    animal_type: str
+    days_born: int
+    birth_weight: float
+    body_weight: float
+    mature_body_weight: float
+    sex: str
+    times_calved: NotRequired[int]
+    is_open: NotRequired[bool]
+    days_since_calving: NotRequired[int]
+    days_in_pregnancy: NotRequired[int]
+    events: NotRequired[str]
+
+
 class SoldAnimalTypedDict(TypedDict):
     """List of expected keys for sold and died animals values dictionary."""
 

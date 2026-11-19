@@ -13,6 +13,7 @@ from RUFAS.biophysical.field.field.field_data import FieldData
 from RUFAS.biophysical.field.soil.soil import Soil
 from RUFAS.biophysical.field.soil.soil_data import SoilData
 from RUFAS.rufas_time import RufasTime
+from RUFAS.weather import Weather
 
 from tests.test_biophysical.test_crop_soil_field.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
@@ -241,10 +242,13 @@ def test_manage_crop_harvest(mocker: MockerFixture, mock_crop_data: CropData) ->
     mock_soil_data = mocker.Mock(spec=SoilData)
     mock_crop_harvest = mocker.Mock(spec=HarvestedCrop)
     manage_harvest_mock = mocker.patch.object(crop._crop_management, "manage_harvest", return_value=mock_crop_harvest)
+    weather = mocker.Mock(spec=Weather)
 
-    actual = crop.manage_crop_harvest(mock_harvest_op, field_name, field_size, mock_time, mock_soil_data)
+    actual = crop.manage_crop_harvest(mock_harvest_op, field_name, field_size, mock_time, mock_soil_data, weather)
 
-    manage_harvest_mock.assert_called_once_with(mock_harvest_op, field_name, field_size, mock_time, mock_soil_data)
+    manage_harvest_mock.assert_called_once_with(
+        mock_harvest_op, field_name, field_size, mock_time, mock_soil_data, weather
+    )
     assert actual == mock_crop_harvest
 
 

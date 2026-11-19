@@ -182,6 +182,10 @@ def test_reset_daily_stats(herd_statistics: HerdStatistics) -> None:
         AnimalType.HEIFER_III,
         AnimalType.LAC_COW,
         AnimalType.DRY_COW,
+        AnimalType.BEEF_COW,
+        AnimalType.BEEF_HEIFER_REPLACEMENT,
+        AnimalType.BEEF_CALF,
+        AnimalType.BEEF_BULL,
     }
 
     # --- cow status percentages ---

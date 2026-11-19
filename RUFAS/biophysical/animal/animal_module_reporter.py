@@ -1,8 +1,17 @@
+from __future__ import annotations
+
 import sys
 from dataclasses import asdict
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from RUFAS.biophysical.animal.animal import Animal
+    from RUFAS.biophysical.animal.herd_manager import HerdManager
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import UNITS as genetics_units
+from RUFAS.biophysical.animal.data_types.animal_enums import FinishingSystem
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulationStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict, StillbornCalfTypedDict
@@ -15,6 +24,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionEvaluationResults,
 )
 from RUFAS.biophysical.animal.data_types.reproduction import HerdReproductionStatistics
+from RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator import EntericMethaneCalculator
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
@@ -25,6 +35,9 @@ from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
 
 om = OutputManager()
+
+MIN_CALVINGS_FOR_INTERVAL: int = 2
+"""Calvings a cow needs before she contributes an interval to the herd mean."""
 
 
 class AnimalModuleReporter:
@@ -1664,3 +1677,259 @@ class AnimalModuleReporter:
     def report_income_losses(cls) -> None:
         """Reports losses in income due to disease to Output Manager."""
         pass
+
+    @classmethod
+    def report_feedlot_performance(
+        cls,
+        animal: Animal,
+        simulation_day: int,
+    ) -> None:
+        """
+        Log key feedlot performance metrics to OutputManager when an animal exits the pen.
+
+        Parameters
+        ----------
+        animal : Animal
+            A feedlot animal that has reached slaughter weight or max days on feed.
+        simulation_day : int
+            Current simulation day.
+
+        """
+        info_map: dict[str, Any] = {
+            "class": cls.__name__,
+            "function": cls.report_feedlot_performance.__name__,
+            "simulation_day": simulation_day,
+        }
+        dof: int = animal.days_on_feed
+        total_gain: float = animal.body_weight - animal.entry_weight
+        adg: float = total_gain / dof if dof > 0 else 0.0
+        fcr: float = animal.cumulative_dmi / total_gain if total_gain > 0.0 else 0.0
+        hcw: float = animal.body_weight * AnimalModuleConstants.FEEDLOT_HCW_DRESSING_PERCENTAGE
+
+        # The grass-fed equation has a non-zero intercept, so a zero-day phase
+        # must short-circuit rather than evaluate the equation at zero intake.
+        if dof > 0:
+            mean_daily_dmi: float = animal.cumulative_dmi / dof
+            if AnimalConfig.finishing_system is FinishingSystem.GRASS_FED:
+                ch4 = EntericMethaneCalculator.calculate_beef_grass_fed_methane(mean_daily_dmi)
+            else:
+                ch4 = EntericMethaneCalculator.calculate_beef_grain_fed_methane(mean_daily_dmi)
+        else:
+            ch4 = 0.0
+
+        om.add_variable("feedlot_days_on_feed", dof, dict(info_map, units=MeasurementUnits.DAYS))
+        om.add_variable("feedlot_total_gain_kg", total_gain, dict(info_map, units=MeasurementUnits.KILOGRAMS))
+        om.add_variable("feedlot_adg_kg_d", adg, dict(info_map, units=MeasurementUnits.KILOGRAMS_PER_DAY))
+        om.add_variable("feedlot_fcr", fcr, dict(info_map, units=MeasurementUnits.FRACTION))
+        om.add_variable("feedlot_hot_carcass_weight_kg", hcw, dict(info_map, units=MeasurementUnits.KILOGRAMS))
+        om.add_variable(
+            "feedlot_mean_daily_enteric_ch4_g_d",
+            ch4,
+            dict(info_map, units=MeasurementUnits.GRAMS_PER_DAY),
+        )
+
+    @classmethod
+    def get_beef_herd_summary(cls, herd_manager: HerdManager) -> dict[str, float]:
+        """Return a beef herd summary for scenario comparison.
+
+        Parameters
+        ----------
+        herd_manager : HerdManager
+            The live herd, read for its beef cow and replacement heifer cohorts.
+
+        Returns
+        -------
+        dict[str, float]
+            Keys: calf_crop_pct, mean_calving_interval_days,
+            replacement_rate_pct, mean_cow_bcs. An empty herd returns 0.0 for
+            every metric rather than raising.
+
+        Notes
+        -----
+        Four further metrics named in the module plan are deliberately absent
+        rather than returned as 0.0, because a zero would be indistinguishable
+        from a real measurement: mean stocker and feedlot average daily gain,
+        feedlot days on feed, and total enteric methane. The first three need a
+        herd-level accumulator that does not exist — exit performance is written
+        to the output manager and then discarded — and the fourth needs per-day
+        beef methane, which the digestion model does not produce. See the module
+        README for the full scope boundaries.
+
+        Calf crop is computed against cows currently in the herd, not cows
+        exposed during the breeding season. Cows culled, sold or died
+        mid-season have already left beef_cows, so the denominator counts
+        survivors only and the result is biased upward. HerdStatistics
+        retains exited cows but cumulatively across the whole run and without
+        times_calved, so an unbiased denominator is not recoverable from
+        current state.
+
+        """
+        cows: list[Animal] = herd_manager.beef_cows
+        heifers: list[Animal] = herd_manager.beef_replacement_heifers
+        cow_count: int = len(cows)
+
+        if cow_count == 0:
+            return {
+                "calf_crop_pct": 0.0,
+                "mean_calving_interval_days": 0.0,
+                "replacement_rate_pct": 0.0,
+                "mean_cow_bcs": 0.0,
+            }
+
+        total_calvings: int = sum(cow.times_calved for cow in cows)
+        total_bcs: float = sum(cow.body_condition_score_9 for cow in cows)
+
+        return {
+            "calf_crop_pct": total_calvings / cow_count * GeneralConstants.FRACTION_TO_PERCENTAGE,
+            "mean_calving_interval_days": cls._mean_beef_calving_interval(cows),
+            "replacement_rate_pct": len(heifers) / cow_count * GeneralConstants.FRACTION_TO_PERCENTAGE,
+            "mean_cow_bcs": total_bcs / cow_count,
+        }
+
+    @staticmethod
+    def _mean_beef_calving_interval(cows: list[Animal]) -> float:
+        """Return the mean interval between consecutive calvings, pooled across cows.
+
+        Parameters
+        ----------
+        cows : list[Animal]
+            Beef cows to scan. Cows with fewer than two recorded calvings
+            contribute no interval and are skipped.
+
+        Returns
+        -------
+        float
+            Mean days between consecutive calvings, or 0.0 when no cow has
+            calved at least twice.
+
+        Notes
+        -----
+        AnimalEvents is keyed by the animal's age in days rather than by
+        simulation day. Within a single animal the two differ by a constant
+        birth offset, so the difference between consecutive calving ages equals
+        the difference between the corresponding simulation days. Intervals are
+        therefore correct even though the absolute dates are ages.
+
+        Intervals are pooled across the herd rather than averaged per cow first,
+        so a cow with more calvings contributes proportionally more intervals.
+
+        """
+        intervals: list[int] = []
+        for cow in cows:
+            if cow.times_calved < MIN_CALVINGS_FOR_INTERVAL:
+                continue
+            calving_ages = sorted(
+                age for age, descriptions in cow.events.events.items() if animal_constants.BEEF_CALVING in descriptions
+            )
+            intervals.extend(later - earlier for earlier, later in zip(calving_ages, calving_ages[1:], strict=False))
+        if not intervals:
+            return 0.0
+        return sum(intervals) / len(intervals)
+
+    @classmethod
+    def report_cow_calf_performance(cls, animal: Animal, simulation_day: int) -> None:
+        """
+        Report beef cow-calf herd performance metrics for a single animal.
+
+        Parameters
+        ----------
+        animal : Animal
+            The beef cow-calf animal whose metrics are reported.
+        simulation_day : int
+            The current simulation day.
+
+        Notes
+        -----
+        Reported metrics: days_in_pregnancy, lactation_day, body_condition_score_9,
+        times_calved (parity), and calf weaning weight when applicable.
+        Called from HerdManager._process_daily_herd_updates, not from animal.py
+        (animal.py sits at a lower layer than the reporter).
+
+        """
+        info_map: dict[str, Any] = {
+            "class": cls.__name__,
+            "function": cls.report_cow_calf_performance.__name__,
+            "id": animal.id,
+            "animal_type": animal.animal_type.value,
+            "simulation_day": simulation_day,
+        }
+        om.add_variable(
+            "beef_days_in_pregnancy",
+            animal.days_in_pregnancy,
+            dict(info_map, units=MeasurementUnits.DAYS),
+        )
+        om.add_variable(
+            "beef_lactation_day",
+            animal.lactation_day,
+            dict(info_map, units=MeasurementUnits.DAYS),
+        )
+        om.add_variable(
+            "beef_body_condition_score_9",
+            animal.body_condition_score_9,
+            dict(info_map, units=MeasurementUnits.UNITLESS),
+        )
+        om.add_variable(
+            "beef_times_calved",
+            animal.times_calved,
+            dict(info_map, units=MeasurementUnits.UNITLESS),
+        )
+        wean_weight: float = animal.wean_weight if animal.wean_weight is not None else 0.0
+        om.add_variable(
+            "beef_wean_weight_kg",
+            wean_weight,
+            dict(info_map, units=MeasurementUnits.KILOGRAMS),
+        )
+
+    @classmethod
+    def report_stocker_performance(cls, animal: Animal, simulation_day: int) -> None:
+        """
+        Report stocker exit performance metrics for a single animal.
+
+        Parameters
+        ----------
+        animal : Animal
+            Stocker animal that has exited (sold or transferred to feedlot).
+        simulation_day : int
+            Day the animal exited.
+
+        Notes
+        -----
+        Reported metrics: stocker_days_in_phase, stocker_total_gain_kg, stocker_adg_kg_d,
+        stocker_fcr, stocker_exit_weight_kg, stocker_cumulative_dmi_kg.
+        Called from HerdManager._process_daily_herd_updates, not from animal.py
+        (animal.py sits at a lower layer than the reporter).
+
+        """
+        info_map: dict[str, Any] = {
+            "class": cls.__name__,
+            "function": cls.report_stocker_performance.__name__,
+            "simulation_day": simulation_day,
+        }
+        dof: int = animal.days_in_stocker
+        total_gain: float = animal.body_weight - animal.stocker_entry_weight
+        adg: float = total_gain / dof if dof > 0 else 0.0
+        fcr: float = animal.stocker_cumulative_dmi / total_gain if total_gain > 0 else 0.0
+
+        om.add_variable("stocker_days_in_phase", dof, dict(info_map, units=MeasurementUnits.DAYS))
+        om.add_variable("stocker_total_gain_kg", total_gain, dict(info_map, units=MeasurementUnits.KILOGRAMS))
+        om.add_variable("stocker_adg_kg_d", adg, dict(info_map, units=MeasurementUnits.KILOGRAMS_PER_DAY))
+        om.add_variable("stocker_fcr", fcr, dict(info_map, units=MeasurementUnits.UNITLESS))
+        om.add_variable("stocker_exit_weight_kg", animal.body_weight, dict(info_map, units=MeasurementUnits.KILOGRAMS))
+        om.add_variable(
+            "stocker_cumulative_dmi_kg",
+            animal.stocker_cumulative_dmi,
+            dict(info_map, units=MeasurementUnits.KILOGRAMS),
+        )
+
+        # The forage CH4 equation has a non-zero intercept, so a zero-day phase
+        # must short-circuit rather than evaluate the equation at zero intake.
+        if dof > 0:
+            mean_daily_dmi: float = animal.stocker_cumulative_dmi / dof
+            ch4 = EntericMethaneCalculator.calculate_beef_stocker_methane(mean_daily_dmi)
+        else:
+            ch4 = 0.0
+        om.add_variable(
+            "stocker_mean_daily_enteric_ch4_g_d",
+            ch4,
+            dict(info_map, units=MeasurementUnits.GRAMS_PER_DAY),
+        )

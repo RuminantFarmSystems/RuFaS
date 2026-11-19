@@ -385,6 +385,80 @@ The percentage of NPN is calculated with the equation:
 
 \textbf{Where we know that}: \\ DM\_lost is the amount of dry matter mass in the ensiled crop after accounting for dry matter lost to effluent, and DM\_initial is the amount of dry matter mass in the ensiled crop before accounting for dry matter lost to effluent.
 
+\subsection{Feed-out}
+The final ensiling phase is feed-out — dry matter loss due to aerobic respiration at the exposed
+silage face during active removal, plus a fixed loss while feed sits in the feed bunk before
+consumption. Both terms are floored/ceilinged the same way as Infiltration: the total is clipped at
+whatever respirable substrate (non-fiber, non-protein, non-ash dry matter) remains.
+\vspace{0.2cm}
+
+        \begin{center}
+        \(DML_{4} = min(RS,\ DML_{4A} + DML_{4B})\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[FS.SIL.16]}\par}
+        \vspace{0.5cm}
+
+\textbf{Where we know that}: \\ \(RS\) is the fraction of dry matter that is still respirable
+substrate, floored at 0 (\(max(0,\ 1 - NDF_{frac} - CP_{frac} - ash_{frac})\)); \(DML_{4A}\) is the
+diffusion-driven loss at the exposed feedout face; and \(DML_{4B}\) is a fixed feed-bunk exposure loss,
+computed unconditionally regardless of \(DML_{4A}\). Both terms depend on a respiration-rate term that
+is itself a function of dry-matter content, water activity, and a fixed feeding-time temperature
+(18\(\circ C\)). \(DML_{4A}\) also has its own separate porosity gate that zeroes it at very high
+packed density — in RuFaS this gate is never actually reached given the model's other fixed inputs, so
+in practice \(DML_{4A}\) is always computed; it is kept only for literal parity with the source. RuFaS
+also does not scale the exposed face area by a packing factor the way the source does for
+\texttt{Bunker}/\texttt{Pile} storage (see the note after \textbf{[FS.SIL.18]} below) — this
+overstates \(DML_{4A}\) by roughly 5-43\% for those storage types, depending on the unmodeled packing
+factor's true value. See \texttt{RUFAS/biophysical/feed\_storage/silage.py}'s
+\texttt{calculate\_feed\_out\_loss} for the full term-by-term translation, cited to
+\texttt{Silostg.for:1029-1104} (\texttt{FEEDOUT}).
+\vspace{0.2cm}
+
+This storage's Feed-out rate is a static per-storage average, matching IFSM's own \(FDRTE\):
+\vspace{0.2cm}
+
+        \begin{center}
+        \(FDRTE = \frac{DM_{total\_stored}}{365}\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[FS.SIL.17]}\par}
+        \vspace{0.5cm}
+
+\textbf{Where we know that}: \\ \(DM_{total\_stored}\) is the total dry matter mass currently held in
+this storage (kg). Computed once, the first time Feed-out runs for a storage, and held fixed
+thereafter — not recomputed daily and not derived from any daily feed-removal amount.
+\vspace{0.2cm}
+
+For \texttt{Bunker}/\texttt{Pile} storage, currently-stored crops are grouped into vertical sections
+before Feed-out is computed, since a bunker or pile is not fed out one crop at a time:
+\vspace{0.2cm}
+
+        \begin{center}
+        \(NVS = max(1,\ \lfloor \frac{DM_{total\_stored}}{10 \cdot FDRTE} \rfloor)\ tag\)
+    \end{center}
+        \vspace{0.5cm}
+
+            {\raggedleft \textbf{[FS.SIL.18]}\par}
+        \vspace{0.5cm}
+
+\textbf{Where we know that}: \\ \(NVS\) is the number of vertical sections, each representing roughly
+10 days' worth of feed-out at the storage's current rate. Each section's NDF, crude protein, and ash
+are the mass-weighted average of the crops grouped into it; its dry-matter fraction is instead the
+section's total dry matter divided by the section's total \emph{fresh} (wet) mass — the same two
+quantities only coincide when every crop in the section happens to share the same dry-matter fraction.
+Each section's crop-type flag matches its own first crop's (not necessarily the whole storage's very
+first crop). One Feed-out loss fraction (\(DML_4\), \textbf{[FS.SIL.16]}) is computed per section and
+applied uniformly to every crop within it.
+\vspace{0.2cm}
+
+\texttt{Bunker}/\texttt{Pile}'s exposed feedout face area is this storage's configured width times
+height, unscaled. This is a known simplification relative to the source, which instead scales the
+height by a packing factor RuFaS does not model for any storage type — see the note after
+\textbf{[FS.SIL.16]} above for the resulting bias.
+
 \subsection{Baleage}
 Baleage is an ensiled forage with a DM content between 50-65\% that is baled and wrapped to allow ensiling. The higher DM content of baleage lowers the amount of acid needed to achieve effective preservation and allows it to be consolidated into a bale. Fermentation DM losses for baleage are calculated by \textbf{[FS.SIL.1]} and \textbf{[FS.SIL.2]} with fractional nutrient loss coefficients from Table 3. Baleage does not experience effluent losses.
 

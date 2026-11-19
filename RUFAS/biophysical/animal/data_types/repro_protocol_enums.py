@@ -154,6 +154,14 @@ class CowReSynchSubProtocol(Enum):
     NONE = None
 
 
+class BeefReproductionProtocol(Enum):
+    """Reproduction protocols available for beef cow-calf herds."""
+
+    NATURAL_SERVICE_SEASONAL = "natural_service_seasonal"
+    AI_SEASONAL = "ai_seasonal"
+    AI_CONTROLLED_BREEDING = "ai_controlled_breeding"
+
+
 class ReproStateEnum(Enum):
     """
     This enum class lists the options for different reproduction states.

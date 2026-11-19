@@ -1,0 +1,7 @@
+# Auto-merge concurrent additions to the changelog instead of conflicting.
+# In a high-merge-volume repo every PR appends an entry at the same anchor, so
+# without this, parallel PRs collide on changelog.md on every merge. The "union"
+# driver keeps both sides' added lines (no conflict). Trade-off: line order is
+# not guaranteed and identical lines may duplicate — acceptable for an
+# append-only changelog, and far cheaper than hand-resolving every conflict.
+changelog.md merge=union

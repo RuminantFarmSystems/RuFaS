@@ -29,6 +29,49 @@ class AnimalGroupingScenario(Enum):
         AnimalCombination.LAC_COW: [AnimalType.LAC_COW],
     }
 
+    FEEDLOT_ONLY = {
+        AnimalCombination.FEEDLOT_FINISHING: [
+            AnimalType.FEEDLOT_STEER,
+            AnimalType.FEEDLOT_HEIFER,
+        ]
+    }
+
+    BEEF_COW_CALF_HERD = {
+        AnimalCombination.BEEF_COW_CALF_PAIR: [AnimalType.BEEF_COW, AnimalType.BEEF_CALF],
+        AnimalCombination.BEEF_GESTATING: [AnimalType.BEEF_COW],
+        AnimalCombination.BEEF_REPLACEMENT: [AnimalType.BEEF_HEIFER_REPLACEMENT],
+        AnimalCombination.BEEF_BULL_BATTERY: [AnimalType.BEEF_BULL],
+    }
+
+    BEEF_STOCKER_ONLY = {
+        AnimalCombination.BEEF_STOCKER: [
+            AnimalType.BEEF_STOCKER_STEER,
+            AnimalType.BEEF_STOCKER_HEIFER,
+        ],
+    }
+
+    COW_CALF_STOCKER_FEEDLOT = {
+        AnimalCombination.BEEF_COW_CALF_PAIR: [
+            AnimalType.BEEF_COW,
+            AnimalType.BEEF_CALF,
+        ],
+        AnimalCombination.BEEF_GESTATING: [AnimalType.BEEF_COW],
+        AnimalCombination.BEEF_REPLACEMENT: [AnimalType.BEEF_HEIFER_REPLACEMENT],
+        AnimalCombination.BEEF_BULL_BATTERY: [AnimalType.BEEF_BULL],
+        AnimalCombination.BEEF_STOCKER: [
+            AnimalType.BEEF_STOCKER_STEER,
+            AnimalType.BEEF_STOCKER_HEIFER,
+        ],
+        AnimalCombination.FEEDLOT_FINISHING: [
+            AnimalType.FEEDLOT_STEER,
+            AnimalType.FEEDLOT_HEIFER,
+        ],
+    }
+    # BEEF_COW appears in both BEEF_COW_CALF_PAIR and BEEF_GESTATING.
+    # The static _animal_combination_by_animal_type dict will map BEEF_COW to BEEF_GESTATING
+    # (last write wins). Pen assignment at runtime must use each cow's live reproduction
+    # state, not this static lookup — Step 7 wires the runtime dispatch.
+
     def __init__(self, value: dict[AnimalCombination, list[str]]):
         """
         Initialize the AnimalGroupingScenario.
@@ -145,6 +188,23 @@ class AnimalGroupingScenario(Enum):
         }
         return cow_subtype_by_scenario[self]
 
+    def _get_feedlot_type(self, feedlot_animal: Animal) -> AnimalType:
+        """
+        Get the animal type of a feedlot finishing animal.
+
+        Parameters
+        ----------
+        feedlot_animal : Animal
+            The feedlot animal to get the type of.
+
+        Returns
+        -------
+        AnimalType
+            The animal type of the feedlot animal.
+
+        """
+        return feedlot_animal.animal_type
+
     def get_animal_type(self, animal: Animal) -> AnimalType:
         """
         Get the animal type of the given animal.
@@ -180,4 +240,12 @@ class AnimalGroupingScenario(Enum):
         """
 
         animal_type = self.get_animal_type(animal)
+        if animal_type is AnimalType.BEEF_COW and self in (
+            AnimalGroupingScenario.BEEF_COW_CALF_HERD,
+            AnimalGroupingScenario.COW_CALF_STOCKER_FEEDLOT,
+        ):
+            raise NotImplementedError(
+                "BEEF_COW combination requires runtime reproduction-state "
+                "dispatch (cow-calf pair vs gestating). Wired in Step 7."
+            )
         return self._animal_combination_by_animal_type[animal_type]

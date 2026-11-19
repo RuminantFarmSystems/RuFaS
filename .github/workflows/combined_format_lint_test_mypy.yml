@@ -2,10 +2,14 @@ name: Format, Lint, Test, Coverage, and Type Checking
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ dev, dev-msf ]
   pull_request:
-    branches: [ dev ]
+    branches: [ dev, dev-msf ]
   workflow_dispatch:
+
+permissions:
+  contents: write        # format_code pushes Black formatting; lint job updates README badges
+  pull-requests: write   # posts coverage / mypy / status comments on the PR
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -350,7 +354,7 @@ jobs:
           MESSAGE=""
           CURRENT_BRANCH="${GITHUB_REF##*/}"
           echo "Current branch: $CURRENT_BRANCH"
-          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "dev" ] && [ "$CURRENT_BRANCH" != "main" ]; then
+          if [ "${{ needs.format_code.outputs.changelog_updated }}" = "false" ] && [ "$CURRENT_BRANCH" != "dev" ] && [ "$CURRENT_BRANCH" != "main" ] && [ "${{ github.actor }}" != "dependabot[bot]" ]; then
             MESSAGE="🚨 Please update the changelog. This PR cannot be merged until \`changelog_WIP.md\` is updated."
           fi
           if [ "${{ needs.format_code.outputs.unauthorized_files }}" = "true" ]; then

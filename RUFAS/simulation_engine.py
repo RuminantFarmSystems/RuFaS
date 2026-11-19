@@ -408,6 +408,8 @@ class SimulationEngine:
 
     def _post_simulation_reporting(self) -> None:
         """Runs end-of-simulation reporting for all active modules."""
+        if self.simulate_feed:
+            self.feed_manager.report_undelivered_crops(self.time)
         if self.simulate_animals:
             AnimalModuleReporter.report_end_of_simulation(
                 self.herd_manager.herd_statistics,
@@ -608,9 +610,14 @@ class SimulationEngine:
         return manure_applications
 
     def _receive_daily_harvested_crops(self, harvested_crops: list[HarvestedCrop]) -> None:
-        """Receives and stores the crops harvested."""
+        """Delivers curing crops that are due today, then receives the crops harvested today. A crop whose
+        ``storage_time`` is still in the future (field curing) is held by the feed manager until that date."""
+        self.feed_manager.release_crops_in_transit(self.time)
         for crop in harvested_crops:
-            self.feed_manager.receive_crop(crop, self.time.simulation_day)
+            if crop.storage_time > self.time.current_date.date():
+                self.feed_manager.hold_crop_until_storage_date(crop)
+            else:
+                self.feed_manager.receive_crop(crop, self.time.simulation_day)
 
         if self._should_recalculate_feed_planning:
             harvest_schedule_crops = set(crop.config_name for crop in harvested_crops)

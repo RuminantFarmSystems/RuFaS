@@ -1,5 +1,7 @@
 from typing import Any, TypedDict
 
+from typing_extensions import NotRequired
+
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 
@@ -48,6 +50,9 @@ class CropConfiguration(TypedDict):
     ash_at_harvest: float
     yield_nitrogen_fraction: float
     yield_phosphorus_fraction: float
+    wilt_days: NotRequired[int]
+    swath_density: NotRequired[float]
+    soil_moisture_at_mowing: NotRequired[float]
 
 
 class CropDataFactory:
@@ -115,15 +120,53 @@ class CropDataFactory:
         Raises
         ------
         ValueError
-            If the crop type is not valid for the crop category.
+            If the crop type is not valid for the crop category, or ``wilt_days`` is not a non-negative integer.
 
         """
         plant_category = PlantCategory(config["plant_category"])
 
         config["plant_category"] = plant_category
+        cls._validate_wilt_days(config)
 
         new_config: CropConfiguration = CropConfiguration(**config)
         return new_config
+
+    @classmethod
+    def _validate_wilt_days(cls, config: dict[str, Any]) -> None:
+        """
+        Checks that a crop configuration's optional ``wilt_days`` is a non-negative integer.
+
+        Parameters
+        ----------
+        config : dict[str, Any]
+            A dictionary containing the configuration attributes for a single crop.
+
+        Raises
+        ------
+        ValueError
+            If ``wilt_days`` is present and is not a non-negative integer (a float such as 3.0 or 2.5 is rejected).
+
+        Notes
+        -----
+        The input schema has no integer type, so ``wilt_days`` passes schema validation as a ``number``. It is used as
+        a day count in ``range()`` and ``timedelta`` downstream, which need a whole number of days.
+
+        """
+        wilt_days = config.get("wilt_days", 0)
+        if isinstance(wilt_days, int) and not isinstance(wilt_days, bool) and wilt_days >= 0:
+            return
+        info_map = {
+            "class": cls.__name__,
+            "function": cls._validate_wilt_days.__name__,
+            "name": config.get("name"),
+        }
+        err_name = "Invalid wilt_days."
+        err_msg = (
+            f"Crop configuration '{config.get('name')}' has wilt_days={wilt_days!r}, "
+            "but wilt_days must be a non-negative integer number of days."
+        )
+        cls._om.add_error(err_name, err_msg, info_map)
+        raise ValueError(f"{err_name} {err_msg}")
 
     @classmethod
     def get_available_crop_configurations(cls) -> list[str]:

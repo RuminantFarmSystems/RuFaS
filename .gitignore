@@ -5,6 +5,9 @@
 *.txt#
 *.doc
 *.docx
+# Beef module planning documents are tracked deliberately — the
+# module READMEs reference them as source provenance.
+!docs/beef_module/**/*.docx
 !constraints-release.txt
 
 # ignore log files
@@ -70,3 +73,11 @@ DataCollectionApp/schema/*
 !DataCollectionApp/schema/.keep
 
 docs/_build/
+
+# graphify — commit only the human-readable report; ignore heavy artifacts
+graphify-out/graph.json
+graphify-out/graph.html
+graphify-out/cache/
+graphify-out/exports/
+graphify-out/memory/
+graphify-out/.graphify_root

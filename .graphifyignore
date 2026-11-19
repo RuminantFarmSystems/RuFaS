@@ -1,0 +1,37 @@
+# Graphify scope — RuFaS model code only (RUFAS/ + main.py)
+# Syntax: gitignore. Everything listed here is excluded from the graph.
+
+# Tests — unidirectional edges, add noise without architectural value
+tests/
+
+# Input/output data — JSON fixtures and run artifacts, not source logic
+input/
+output/
+
+# Separate static JS/HTML app — not part of the Python model
+DataCollectionApp/
+
+# Docs (Sphinx) and helper scripts — not core model logic
+docs/
+helpful_scripts/
+
+# Claude Code workflow artifacts — not source code
+CLAUDE.md
+.claude/
+RUFAS/CLAUDE.md
+RUFAS/**/CLAUDE.md
+tests/CLAUDE.md
+
+# Repo meta / non-source
+changelog.md
+*.txt
+*.bat
+*.sh
+
+# Build / cache artifacts
+build/
+dist/
+*.egg-info/
+__pycache__/
+.mypy_cache/
+.pytest_cache/

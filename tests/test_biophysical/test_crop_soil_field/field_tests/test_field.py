@@ -39,6 +39,7 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.weather import Weather
 
 from tests.test_biophysical.test_crop_soil_field.sample_crop_configuration import SAMPLE_CROP_CONFIGURATION
 
@@ -128,9 +129,10 @@ def test_manage_field(mocker: MockerFixture) -> None:
     manure_application_mock.supplement_method = ManureSupplementMethod.NONE
 
     mock_manure_applications = [manure_application_mock]
+    weather = mocker.Mock(spec=Weather)
 
     # Act
-    field.manage_field(mocked_time, mocked_weather, mock_manure_applications)
+    field.manage_field(mocked_time, mocked_weather, mock_manure_applications, weather)
 
     # Assert
     mock_check_fert_app_sched.assert_called_once_with(mocked_time)
@@ -150,7 +152,7 @@ def test_manage_field(mocker: MockerFixture) -> None:
     mock_execute_daily_processes.assert_called_once_with(mocked_weather, mocked_time)
     mock_assess_dormancy.assert_called_once_with(12, 3.0)
     mock_check_crop_planting_sched.assert_called_once_with(mocked_time)
-    mock_check_crop_harvest_sched.assert_called_once_with(mocked_time, mocked_weather)
+    mock_check_crop_harvest_sched.assert_called_once_with(mocked_time, mocked_weather, weather)
     mock_remove_dead_crops.assert_called_once()
     mock_reset_crop_field_coverage_fractions.assert_called_once()
 
@@ -669,13 +671,14 @@ def test_check_crop_harvest_schedule(
     )
     harvest_crop = mocker.patch.object(field, "_harvest_crop", return_value=[mock_harvested_crop])
     harvest_heat_scheduled = mocker.patch.object(field, "_harvest_heat_scheduled_crops")
+    weather = mocker.Mock(spec=Weather)
 
     harvest_crop_calls = []
     for event in current_harvest_events:
-        new_call = call(event.crop_reference, event.operation, mocked_time, mock_conditions)
+        new_call = call(event.crop_reference, event.operation, mocked_time, mock_conditions, weather)
         harvest_crop_calls.append(new_call)
 
-    actual = field._check_crop_harvest_schedule(mocked_time, mock_conditions)
+    actual = field._check_crop_harvest_schedule(mocked_time, mock_conditions, weather)
 
     filter_events.assert_called_once_with(all_harvest_events, mocked_time)
     harvest_crop.assert_has_calls(harvest_crop_calls)
@@ -713,12 +716,13 @@ def test_harvest_heat_scheduled_crops(
         field_data=mock_field_data,
     )
     field.crops = crops
+    weather = mocker.Mock(spec=Weather)
     with patch.object(
         field.soil.carbon_cycling.residue_partition,
         "add_residue_to_pools",
         new_callable=MagicMock,
     ) as add_residue:
-        field._harvest_heat_scheduled_crops(10.0, mock_time)
+        field._harvest_heat_scheduled_crops(10.0, mock_time, weather)
 
     actual_harvest_count = 0
     for index, crop in enumerate(crops):
@@ -729,6 +733,7 @@ def test_harvest_heat_scheduled_crops(
                 mock_field_data.field_size,
                 mock_time,
                 field.soil.data,
+                weather,
             )
             actual_harvest_count += 1
         else:
@@ -1001,8 +1006,9 @@ def test_harvest_crop(
         field.soil.carbon_cycling.residue_partition,
         "add_residue_to_pools",
     )
+    weather = mocker.Mock(spec=Weather)
 
-    field._harvest_crop(crop_reference, harvest_op, mock_time, mock_conditions)
+    field._harvest_crop(crop_reference, harvest_op, mock_time, mock_conditions, weather)
 
     for crop, manage_mock in zip(field.crops, manage_crop_harvest_mocks):
         if crop.data.id == "not this crop":
@@ -1014,6 +1020,7 @@ def test_harvest_crop(
                 mock_field_data.field_size,
                 mock_time,
                 field.soil.data,
+                weather,
             )
 
     add_residue.assert_called_once()
@@ -1055,13 +1062,14 @@ def test_harvest_crop_warnings(
         mocked_timestamp.return_value = timestamp
         mock_conditions = MagicMock(CurrentDayConditions)
         mock_conditions.rainfall = 11.0
+        weather = mocker.Mock(spec=Weather)
 
         with patch.object(
             field.soil.carbon_cycling.residue_partition,
             "add_residue_to_pools",
             new_callable=MagicMock,
         ) as add_residue:
-            field._harvest_crop("test", HarvestOperation.HARVEST_KILL, mock_time, mock_conditions)
+            field._harvest_crop("test", HarvestOperation.HARVEST_KILL, mock_time, mock_conditions, weather)
 
         for crop in crops:
             mock_manage.assert_called_once_with(
@@ -1070,6 +1078,7 @@ def test_harvest_crop_warnings(
                 mock_field_data.field_size,
                 mock_time,
                 field.soil.data,
+                weather,
             )
         assert add_residue.call_count == len(crops)
         actual = field.om.warnings_pool[f"Field._harvest_crop.harvest_warning.field='{mock_field_data.name}'"]

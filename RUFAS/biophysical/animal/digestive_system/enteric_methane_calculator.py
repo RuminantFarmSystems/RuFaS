@@ -1,7 +1,9 @@
+import math
 from typing import Any
 
 from numpy import exp
 
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator import MethaneMitigationCalculator
 from RUFAS.general_constants import GeneralConstants
@@ -157,6 +159,147 @@ class EntericMethaneCalculator:
             unmitigated_methane = methane_emission
 
         return methane_emission, unmitigated_methane
+
+    @staticmethod
+    def calculate_beef_grass_fed_methane(dry_matter_intake: float) -> float:
+        """
+        Calculates enteric methane for a grass-finished beef animal from dry matter intake.
+
+        Parameters
+        ----------
+        dry_matter_intake : float
+            Dry matter intake (kg DM/day). Must be finite and non-negative.
+
+        Returns
+        -------
+        float
+            Enteric methane emission (g CH4/day).
+
+        Raises
+        ------
+        ValueError
+            If ``dry_matter_intake`` is negative or not finite.
+
+        Notes
+        -----
+        Linear form ``CH4 = intercept + slope * DMI`` using
+        BEEF_CH4_GRASS_FED_INTERCEPT and BEEF_CH4_GRASS_FED_SLOPE. See those
+        constants for the open question about the equation's provenance — no
+        NRC 2016 equation number has been identified for it, and it is unrelated
+        to the Mitscherlich Model 3 used elsewhere in the animal module.
+
+        Beef animals do not go through ``DigestiveSystem``, so this value is
+        reported at feedlot exit and does not enter the pen enteric methane
+        totals.
+
+        """
+        EntericMethaneCalculator._validate_beef_dry_matter_intake(dry_matter_intake)
+        return (
+            AnimalModuleConstants.BEEF_CH4_GRASS_FED_INTERCEPT
+            + AnimalModuleConstants.BEEF_CH4_GRASS_FED_SLOPE * dry_matter_intake
+        )
+
+    @staticmethod
+    def calculate_beef_grain_fed_methane(dry_matter_intake: float) -> float:
+        """
+        Calculates enteric methane for a grain-finished feedlot animal from dry matter intake.
+
+        Parameters
+        ----------
+        dry_matter_intake : float
+            Dry matter intake (kg DM/day). Must be finite and non-negative.
+
+        Returns
+        -------
+        float
+            Enteric methane emission (g CH4/day).
+
+        Raises
+        ------
+        ValueError
+            If ``dry_matter_intake`` is negative or not finite.
+
+        Notes
+        -----
+        IPCC Tier 2 with Ym = 3.0% of gross energy intake, offered by
+        NRC 2016 Table 16-2 for cases where diet composition is not
+        available at the call site. Unlike ``_calculate_IPCC_methane``, gross
+        energy comes from a default concentration rather than the ration
+        composition, which the feedlot exit reporter cannot reach.
+
+        NRC 2016 Eq. 16-9 is the preferred primary equation but requires
+        body weight, DMI, fat, crude protein, NDF and starch, so it is deferred.
+
+        Beef animals do not go through ``DigestiveSystem``, so this value is
+        reported at feedlot exit and does not enter the pen enteric methane
+        totals.
+
+        """
+        EntericMethaneCalculator._validate_beef_dry_matter_intake(dry_matter_intake)
+        gross_energy_intake_MJ = dry_matter_intake * AnimalModuleConstants.BEEF_GROSS_ENERGY_MJ_PER_KG_DM
+        methane_emission_MJ = gross_energy_intake_MJ * AnimalModuleConstants.BEEF_CH4_YM_FRACTION
+        return methane_emission_MJ / GeneralConstants.G_CH4_TO_MJ_CH4
+
+    @staticmethod
+    def calculate_beef_stocker_methane(dry_matter_intake: float) -> float:
+        """
+        Calculates enteric methane for a stocker animal on a forage diet from dry matter intake.
+
+        Parameters
+        ----------
+        dry_matter_intake : float
+            Dry matter intake (kg DM/day). Must be finite and non-negative.
+
+        Returns
+        -------
+        float
+            Enteric methane emission (g CH4/day).
+
+        Raises
+        ------
+        ValueError
+            If ``dry_matter_intake`` is negative or not finite.
+
+        Notes
+        -----
+        Linear form ``CH4 = intercept + slope * DMI`` using
+        BEEF_CH4_STOCKER_FORAGE_INTERCEPT and BEEF_CH4_STOCKER_FORAGE_SLOPE. See
+        those constants for the open question about provenance — no NRC/NASEM
+        2016 equation number has been identified for the coefficients.
+
+        The intercept is non-zero, so this returns 10.04 g/d at zero intake.
+        Callers representing a phase an animal never entered must short-circuit
+        rather than pass a zero DMI.
+
+        Beef animals do not go through ``DigestiveSystem``, so this value is
+        reported at stocker exit and does not enter the pen enteric methane
+        totals.
+
+        """
+        EntericMethaneCalculator._validate_beef_dry_matter_intake(dry_matter_intake)
+        return (
+            AnimalModuleConstants.BEEF_CH4_STOCKER_FORAGE_INTERCEPT
+            + AnimalModuleConstants.BEEF_CH4_STOCKER_FORAGE_SLOPE * dry_matter_intake
+        )
+
+    @staticmethod
+    def _validate_beef_dry_matter_intake(dry_matter_intake: float) -> None:
+        """
+        Raises ValueError for a negative or non-finite beef dry matter intake.
+
+        Parameters
+        ----------
+        dry_matter_intake : float
+            Dry matter intake to check (kg DM/day).
+
+        Raises
+        ------
+        ValueError
+            If ``dry_matter_intake`` is negative or not finite.
+
+        """
+        if not math.isfinite(dry_matter_intake) or dry_matter_intake < 0.0:
+            raise ValueError(f"dmi must be non-negative and finite, got {dry_matter_intake}")
 
     @staticmethod
     def _calculate_lactating_cow_enteric_methane(

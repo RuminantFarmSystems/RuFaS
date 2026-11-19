@@ -104,7 +104,10 @@ class FieldManager:
                 application for application in manure_applications if application.field_name == field.field_data.name
             ]
             newly_harvested_crops = field.manage_field(
-                time, current_conditions=current_conditions, manure_applications=manure_applications_for_field
+                time,
+                current_conditions=current_conditions,
+                manure_applications=manure_applications_for_field,
+                weather=weather,
             )
             harvested_crops.extend(newly_harvested_crops)
         self.output_gatherer.send_daily_variables(time)

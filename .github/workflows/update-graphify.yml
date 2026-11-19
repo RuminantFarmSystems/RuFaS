@@ -1,0 +1,89 @@
+# .github/workflows/update-graphify.yml
+# Rebuilds the graphify dependency-graph report when model code changes.
+# AST pass only — no LLM, no API tokens. Commits graphify-out/GRAPH_REPORT.md.
+name: Update Graphify Graph
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev-msf]
+    paths:
+      - 'RUFAS/**'
+      - 'main.py'
+      - '.graphifyignore'
+
+concurrency:
+  group: graphify-update-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update-graph:
+    name: Update dependency graph
+    runs-on: ubuntu-latest
+    # Skip commits made by the bot itself — prevents infinite loops.
+    if: github.actor != 'github-actions[bot]'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install graphify
+        run: uv tool install graphifyy
+
+      - name: Restore graph.json cache
+        uses: actions/cache/restore@v4
+        with:
+          path: graphify-out/graph.json
+          key: graphify-graph-${{ github.sha }}
+          restore-keys: |
+            graphify-graph-
+
+      - name: Update graph (AST pass — no API cost)
+        # GRAPHIFY_NO_TIPS=1 + `|| true`: graphify writes the graph, then a
+        # buggy "tips" print raises NameError and exits non-zero. The report is
+        # already on disk at that point, so tolerate the non-zero exit.
+        # --force bypasses the "fewer nodes than cached graph" abort after a
+        # refactor that deletes files (cache restore is a prefix match).
+        run: GRAPHIFY_NO_TIPS=1 graphify update . --force || true
+
+      - name: Save graph.json cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: graphify-out/graph.json
+          key: graphify-graph-${{ github.sha }}
+
+      - name: Check for changes in GRAPH_REPORT.md
+        id: diff
+        run: |
+          if git diff --quiet graphify-out/GRAPH_REPORT.md; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "GRAPH_REPORT.md already up to date — nothing to commit"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "GRAPH_REPORT.md changed — will commit"
+          fi
+
+      - name: Commit and push updated report
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add graphify-out/GRAPH_REPORT.md
+          git commit --no-verify -m "chore: update graphify graph report [skip ci]"
+          git pull --rebase origin "${{ github.ref_name }}" || {
+            git rebase --abort
+            echo "::warning::Rebase conflict — graph report commit skipped. Retries on next push."
+            exit 0
+          }
+          git push
+          echo "Graph report updated and pushed."

@@ -29,6 +29,7 @@ class MeasurementUnits(Enum):
     DAYS_PER_LEAP_YEAR = "day/leap year"
     DAYS_PER_YEAR = "day/year"
     DEGREES_CELSIUS = "°C"
+    DEGREES_FAHRENHEIT = "°F"
     DRY_KILOGRAMS = "dry kg"
     DRY_KILOGRAMS_PER_HECTARE = "dry kg/ha"
     DOLLARS = "$"

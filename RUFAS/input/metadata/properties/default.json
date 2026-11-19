@@ -2865,6 +2865,24 @@
           "description": "Fraction of phosphorus in yield (unitless).",
           "minimum": 0.0,
           "maximum": 1.0
+        },
+        "wilt_days": {
+          "type": "number",
+          "description": "Number of days between cutting and storage during which the opt-in pre-harvest field-curing calculation is applied (days). Must be a whole number (e.g. 3, not 2.5 or 3.0). 0 (default) disables field curing.",
+          "default": 0,
+          "minimum": 0.0
+        },
+        "swath_density": {
+          "type": "number",
+          "description": "Swath density used by the opt-in field-curing drying-rate calculation (g/m^2). Only used when wilt_days > 0.",
+          "default": 700.0,
+          "minimum": 0.0
+        },
+        "soil_moisture_at_mowing": {
+          "type": "number",
+          "description": "Soil moisture at mowing used by the opt-in field-curing drying-rate calculation (% dry basis). Only used when wilt_days > 0.",
+          "default": 17.0,
+          "minimum": 0.0
         }
       }
     }
@@ -6750,11 +6768,29 @@
           "description": "RuFaS Feed ID which harvests from the crop stored in this unit can be fed to animals as. Must be selected from the \"rufas_id\" of the feed library used.",
           "minimum": 1
         },
-        "size": {
+        "width_m": {
           "type": "number",
-          "description": "Size of the silage storage (tons).",
+          "description": "Width of the Bunker/Pile silage storage structure (meters). Optional: used with height_m and dry_matter_density_kg_per_m3 to derive Preseal exposed-surface-area geometry for Bunker/Pile storage types. If omitted (on any of the four Preseal fields), Preseal dry-matter loss is skipped for that storage instance and all other behavior is unchanged.",
           "minimum": 0.0,
-          "default": 0.0
+          "nullable": true
+        },
+        "height_m": {
+          "type": "number",
+          "description": "Height of the Bunker/Pile silage storage structure (meters). Optional: used with width_m and dry_matter_density_kg_per_m3 to derive Preseal exposed-surface-area geometry for Bunker/Pile storage types. If omitted (on any of the four Preseal fields), Preseal dry-matter loss is skipped for that storage instance and all other behavior is unchanged.",
+          "minimum": 0.0,
+          "nullable": true
+        },
+        "diameter_m": {
+          "type": "number",
+          "description": "Diameter of the Bag silage storage structure (meters). Optional: used with dry_matter_density_kg_per_m3 to derive Preseal exposed-surface-area geometry for the Bag storage type. If omitted (on either of the two Preseal fields Bag uses), Preseal dry-matter loss is skipped for that storage instance and all other behavior is unchanged.",
+          "minimum": 0.0,
+          "nullable": true
+        },
+        "dry_matter_density_kg_per_m3": {
+          "type": "number",
+          "description": "Packed dry-matter density of the silage storage structure (kg per cubic meter). Optional: used to derive Preseal exposed-surface-area geometry for Bunker, Pile, and Bag storage types. If omitted, Preseal dry-matter loss is skipped for that storage instance and all other behavior is unchanged.",
+          "minimum": 0.0,
+          "nullable": true
         },
         "capacity": {
           "type": "number",

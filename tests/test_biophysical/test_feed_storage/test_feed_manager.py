@@ -1,3 +1,4 @@
+import copy
 from typing import Any, cast
 from unittest.mock import MagicMock, call
 
@@ -197,6 +198,7 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> Fee
     mocker.patch.object(FeedManager, "__init__", return_value=None)
     feed_manager = FeedManager.__new__(FeedManager)
     feed_manager._available_feeds = mock_available_feeds
+    feed_manager._crops_in_transit = []
     feed_manager._cumulative_feed_requests = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
     feed_manager._cumulative_purchased_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
     feed_manager._cumulative_farmgrown_feeds_fed = {feed.rufas_id: 0.0 for feed in mock_available_feeds}
@@ -207,7 +209,9 @@ def feed_manager(mocker: MockerFixture, mock_available_feeds: list[Feed]) -> Fee
         "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
-        "size": 1000.0,
+        "width_m": 10.0,
+        "height_m": 3.0,
+        "dry_matter_density_kg_per_m3": 180.0,
         "capacity": 1_000_000.0,
     }
 
@@ -344,7 +348,9 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 500.0,
+                        "width_m": 10.0,
+                        "height_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     },
                 ],
                 "Bag": [
@@ -356,7 +362,8 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F2"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 200.0,
+                        "diameter_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     },
                 ],
             },
@@ -377,7 +384,9 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 500.0,
+                        "width_m": 10.0,
+                        "height_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     },
                 ],
                 "Bag": [
@@ -389,7 +398,8 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F2"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 200.0,
+                        "diameter_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     },
                 ],
             },
@@ -410,7 +420,9 @@ def test_feed_manager_init(mocker: MockerFixture, storage: Storage) -> None:
                         "field_names": ["F1"],
                         "initial_storage_dry_matter": 0.0,
                         "capacity": 1_000.0,
-                        "size": 500.0,
+                        "width_m": 10.0,
+                        "height_m": 3.0,
+                        "dry_matter_density_kg_per_m3": 180.0,
                     }
                 ]
             },
@@ -623,6 +635,13 @@ def test_translate_crop_config_name_to_rufas_id(
     assert result == expected_next_harvest_dates_rufas_ids
 
 
+def _mock_time(current_date: date, simulation_day: int) -> MagicMock:
+    mock_time = MagicMock(spec=RufasTime)
+    mock_time.current_date = datetime(current_date.year, current_date.month, current_date.day)
+    mock_time.simulation_day = simulation_day
+    return mock_time
+
+
 def test_receive_crop_routes_to_matching_storage(
     mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
 ) -> None:
@@ -665,6 +684,127 @@ def test_receive_crop_warns_when_no_matching_storage(
     assert info["class"] == feed_manager.__class__.__name__
     assert info["function"] == feed_manager.receive_crop.__name__
     assert info["simulation_day"] == 42
+
+
+def _curing_crop(harvested_crop: HarvestedCrop, storage_date: date) -> HarvestedCrop:
+    """A copy of ``harvested_crop`` that is still curing in the field until ``storage_date``."""
+    curing_crop = copy.deepcopy(harvested_crop)
+    curing_crop.storage_time = storage_date
+    return curing_crop
+
+
+def test_hold_crop_until_storage_date_delivers_on_storage_date(
+    mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
+    """A held crop is not stored on its harvest day; it reaches storage only on its storage date, with that day's
+    simulation_day, and is then no longer in transit."""
+    storage = next(iter(feed_manager.active_storages.values()))
+    storage.crop_name = harvested_crop.config_name
+    storage.field_names = [harvested_crop.field_name]
+    mocked_receive = mocker.patch.object(storage, "receive_crop")
+    storage_date = harvested_crop.storage_time + timedelta(days=3)
+    curing_crop = _curing_crop(harvested_crop, storage_date)
+
+    feed_manager.hold_crop_until_storage_date(curing_crop)
+    mocked_receive.assert_not_called()
+    assert feed_manager._crops_in_transit == [curing_crop]
+
+    feed_manager.release_crops_in_transit(_mock_time(storage_date - timedelta(days=1), 12))
+    mocked_receive.assert_not_called()
+    assert feed_manager._crops_in_transit == [curing_crop]
+
+    feed_manager.release_crops_in_transit(_mock_time(storage_date, 13))
+    mocked_receive.assert_called_once_with(curing_crop, 13)
+    assert feed_manager._crops_in_transit == []
+
+
+def test_release_crops_in_transit_only_releases_due_crops(
+    mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
+    """Of two crops in transit, only the one whose storage date has arrived is released."""
+    storage = next(iter(feed_manager.active_storages.values()))
+    storage.crop_name = harvested_crop.config_name
+    storage.field_names = [harvested_crop.field_name]
+    mocked_receive = mocker.patch.object(storage, "receive_crop")
+    due_crop = _curing_crop(harvested_crop, harvested_crop.storage_time + timedelta(days=2))
+    later_crop = _curing_crop(harvested_crop, harvested_crop.storage_time + timedelta(days=5))
+    feed_manager._crops_in_transit = [due_crop, later_crop]
+
+    feed_manager.release_crops_in_transit(_mock_time(due_crop.storage_time, 7))
+
+    mocked_receive.assert_called_once_with(due_crop, 7)
+    assert feed_manager._crops_in_transit == [later_crop]
+
+
+def test_get_total_projected_inventory_counts_crops_in_transit(
+    mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
+    """The projected inventory includes a crop still curing in the field, for the storage it will be delivered to.
+    Without it, planning on the harvest day would buy feed as if the harvest had not happened."""
+    storage = next(iter(feed_manager.active_storages.values()))
+    storage.crop_name = harvested_crop.config_name
+    storage.field_names = [harvested_crop.field_name]
+    feed_id = storage.rufas_feed_id
+    curing_crop = _curing_crop(harvested_crop, harvested_crop.storage_time + timedelta(days=3))
+    curing_crop.dry_matter_mass = 250.0
+    feed_manager._crops_in_transit = [curing_crop]
+    mocker.patch.object(feed_manager, "_query_available_feed_totals", return_value={feed_id: 40.0})
+    feed_manager._available_feeds = [feed for feed in feed_manager._available_feeds if feed.rufas_id == feed_id]
+
+    result = feed_manager.get_total_projected_inventory(
+        harvested_crop.harvest_time, MagicMock(spec=Weather), _mock_time(harvested_crop.harvest_time, 10)
+    )
+
+    assert result.available_feeds[feed_id] == pytest.approx(40.0 + 250.0)
+
+
+def test_get_total_projected_inventory_ignores_in_transit_crop_without_storage(
+    mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
+    """An in-transit crop that no storage will accept (it will be exported) adds nothing to the inventory."""
+    storage = next(iter(feed_manager.active_storages.values()))
+    storage.crop_name = "not-" + harvested_crop.config_name
+    feed_id = storage.rufas_feed_id
+    curing_crop = _curing_crop(harvested_crop, harvested_crop.storage_time + timedelta(days=3))
+    feed_manager._crops_in_transit = [curing_crop]
+    mocker.patch.object(feed_manager, "_query_available_feed_totals", return_value={feed_id: 40.0})
+    feed_manager._available_feeds = [feed for feed in feed_manager._available_feeds if feed.rufas_id == feed_id]
+
+    result = feed_manager.get_total_projected_inventory(
+        harvested_crop.harvest_time, MagicMock(spec=Weather), _mock_time(harvested_crop.harvest_time, 10)
+    )
+
+    assert result.available_feeds[feed_id] == pytest.approx(40.0)
+
+
+def test_report_undelivered_crops_warns_with_count_and_mass(
+    mocker: MockerFixture, feed_manager: FeedManager, harvested_crop: HarvestedCrop
+) -> None:
+    """Crops still curing when the simulation ends are reported, not silently dropped."""
+    mock_add_warning = mocker.patch.object(feed_manager._om, "add_warning")
+    first = _curing_crop(harvested_crop, harvested_crop.storage_time + timedelta(days=3))
+    second = _curing_crop(harvested_crop, harvested_crop.storage_time + timedelta(days=4))
+    first.dry_matter_mass, second.dry_matter_mass = 100.0, 50.0
+    feed_manager._crops_in_transit = [first, second]
+
+    feed_manager.report_undelivered_crops(_mock_time(harvested_crop.harvest_time, 99))
+
+    mock_add_warning.assert_called_once()
+    title, message, info = mock_add_warning.call_args.args
+    assert title == "Crops undelivered at end of simulation"
+    assert "2 harvested crop(s)" in message
+    assert "150.0 kg" in message
+    assert info["simulation_day"] == 99
+
+
+def test_report_undelivered_crops_silent_when_nothing_in_transit(
+    mocker: MockerFixture, feed_manager: FeedManager
+) -> None:
+    mock_add_warning = mocker.patch.object(feed_manager._om, "add_warning")
+
+    feed_manager.report_undelivered_crops(_mock_time(date(2022, 1, 1), 1))
+
+    mock_add_warning.assert_not_called()
 
 
 def test_process_degradations(feed_manager: FeedManager, mocker: MockerFixture) -> None:
@@ -1099,7 +1239,8 @@ def test_deduct_feeds_from_inventory(
         "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
-        "size": 1000.0,
+        "diameter_m": 3.0,
+        "dry_matter_density_kg_per_m3": 180.0,
         "capacity": 1_000_000.0,
     }
     feed_manager.active_storages["example_bag"] = Bag(config=bag_config)
@@ -1134,7 +1275,8 @@ def test_deduct_feeds_from_inventory_error(
         "field_names": ["field_1"],
         "crop_name": "corn",
         "initial_storage_dry_matter": 500.0,
-        "size": 1000.0,
+        "diameter_m": 3.0,
+        "dry_matter_density_kg_per_m3": 180.0,
         "capacity": 1_000_000.0,
     }
     feed_manager.active_storages["example_bag"] = Bag(config=bag_config)

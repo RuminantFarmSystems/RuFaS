@@ -61,6 +61,10 @@ class GeneralConstants:
         Earth's angular velocity (rad/h).
     CELSIUS_TO_KELVIN : float
         Conversion factor from Celsius to Kelvin (K/°C).
+    CELSIUS_TO_FAHRENHEIT_SCALE : float
+        Multiplicative term of the Celsius to Fahrenheit conversion (°F/°C).
+    CELSIUS_TO_FAHRENHEIT_OFFSET : float
+        Additive term of the Celsius to Fahrenheit conversion (°F).
     PERCENTAGE_TO_FRACTION : float
         Conversion factor from percentage to fractional values (unitless).
     FRACTION_TO_PERCENTAGE : float
@@ -133,6 +137,8 @@ class GeneralConstants:
 
     # Temperature-related
     CELSIUS_TO_KELVIN = 273.15
+    CELSIUS_TO_FAHRENHEIT_SCALE = 1.8
+    CELSIUS_TO_FAHRENHEIT_OFFSET = 32.0
 
     # Fractions and Percentages
     PERCENTAGE_TO_FRACTION = 0.01
@@ -182,6 +188,8 @@ class GeneralConstants:
         "G_CH4_TO_MJ_CH4": MeasurementUnits.MJ_CH4_PER_G_CH4,
         "EARTH_ANGULAR_VELOCITY": MeasurementUnits.RADIANS_PER_HOUR,
         "CELSIUS_TO_KELVIN": MeasurementUnits.DEGREES_CELSIUS,
+        "CELSIUS_TO_FAHRENHEIT_SCALE": MeasurementUnits.UNITLESS,
+        "CELSIUS_TO_FAHRENHEIT_OFFSET": MeasurementUnits.DEGREES_FAHRENHEIT,
         "PERCENTAGE_TO_FRACTION": MeasurementUnits.UNITLESS,
         "FRACTION_TO_PERCENTAGE": MeasurementUnits.UNITLESS,
         "HECTARES_TO_SQUARE_CENTIMETERS": MeasurementUnits.SQUARE_CENTIMETERS_PER_HECTARE,
