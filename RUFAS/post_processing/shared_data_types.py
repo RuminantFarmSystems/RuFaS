@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Any
 
 POOL_ELEMENT_TYPE = dict[str, Any]
+E2E_REPORT_FILTERS_KEY = "report_filters"
 
 
 class LogVerbosity(Enum):
