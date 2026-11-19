@@ -224,4 +224,4 @@ External Resources
 
 ```mypy`` Documentation <https://mypy.readthedocs.io/en/stable/>`__
 
-.. |image| image:: https://github.com/RuminantFarmSystems/MASM/assets/43901812/8d3f19c0-c57a-4aa6-96d8-9f00041051a7
+.. |image| image:: https://github.com/RuminantFarmSystems/RuFaS/assets/43901812/8d3f19c0-c57a-4aa6-96d8-9f00041051a7
