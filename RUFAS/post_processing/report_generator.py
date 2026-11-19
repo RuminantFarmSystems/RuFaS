@@ -205,9 +205,10 @@ class ReportGenerator:
         -----
         The rules for generating the name are as follows:
         1. If the report name is ``None``, the name is set to ``untitled_<timestamp>``.
-        2. If the name is already present in the list of previously generated reports, the timestamp is appended
+        2. If the name is not a string, it is converted to a string.
+        3. If the name is already present in the list of previously generated reports, the timestamp is appended
             to the name to make it unique.
-        3. Otherwise, return the report name as is.
+        4. Otherwise, return the report name as is.
         """
 
         if report_name is None:
@@ -251,7 +252,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        regex_patterns : list[str]
+        regex_patterns : List[str]
             A list of regex patterns to match with the existing report names.
 
         Returns
@@ -305,6 +306,7 @@ class ReportGenerator:
         ValueError
             If there is an error preparing the report data.
             If the report data is empty.
+            If the type of horizontal or vertical aggregation is not supported.
         """
         try:
             (
@@ -470,7 +472,7 @@ class ReportGenerator:
         Raises
         ------
         ValueError
-            If there is no report data to extract units from.
+            If there is an error extracting units from the report data.
 
         """
         if len(report_data) == 0:
@@ -621,7 +623,8 @@ class ReportGenerator:
 
     def _extract_aggregation_keys(self, filter_content: dict[str, Any]) -> tuple[str | None, str | None]:
         """
-        Extracts horizontal and vertical aggregation keys from the filter content.
+        Extracts horizontal and vertical aggregation keys from the filter content and validates them against
+        supported aggregation types.
 
         Parameters
         ----------
