@@ -5344,6 +5344,49 @@ def test_validate_report_filters_constants_no_change(mocker: Any) -> None:
     warning_spy.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    "omit_none_values, vertical_aggregation, horizontal_aggregation, should_raise",
+    [
+        (True, "sum", None, False),
+        (True, None, None, True),
+        (True, "sum", "sum", True),
+        (True, None, "sum", True),
+        (False, None, "sum", False),
+        (False, None, None, False),
+    ],
+)
+def test_validate_report_filters_omit_none_values(
+    mocker: MockerFixture,
+    omit_none_values: bool,
+    vertical_aggregation: str | None,
+    horizontal_aggregation: str | None,
+    should_raise: bool,
+) -> None:
+    """Test omit_none_values validation with different aggregation configurations."""
+    om = OutputManager()
+    error_spy = mocker.patch.object(om, "add_error")
+
+    filter_content = {
+        "name": "TestReport",
+        "filters": ["x"],
+        "omit_none_values": omit_none_values,
+    }
+    if vertical_aggregation is not None:
+        filter_content["vertical_aggregation"] = vertical_aggregation
+    if horizontal_aggregation is not None:
+        filter_content["horizontal_aggregation"] = horizontal_aggregation
+
+    if should_raise:
+        with pytest.raises(ValueError, match="Invalid configuration for report"):
+            om.validate_report_filters(filter_content, "test_filter")
+
+        error_spy.assert_called_once()
+        assert error_spy.call_args.args[0] == "Invalid report filter configuration"
+    else:
+        om.validate_report_filters(filter_content, "test_filter")
+        error_spy.assert_not_called()
+
+
 def test_validate_filter_content_unsupported_key(tmp_path: Path, mocker: MockerFixture) -> None:
     """Test for validate_filter_content() raising when filters key missing."""
     bad: Any = [{"name": "Report1", "filters": ["x"], "random": 0}]
