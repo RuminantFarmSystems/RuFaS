@@ -371,6 +371,60 @@ filter files, there is a key called "expected_results", which contains
 all the data that is expected to be collected with the filters listed in
 this file.
 
+.. _e2e-aggregated-results:
+
+Comparing aggregated results.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Instead of, or in addition to, comparing the raw variables collected by
+"filters", an E2E JSON filter file can compare results aggregated by the
+Report Generator. Add a "report_filters" entry holding a list of report
+filters, written exactly like the filters in a regular ``report_`` filter
+file. During E2E testing, each report filter collects variables with its
+own "filters" and is aggregated by the Report Generator, and the
+resulting report columns are saved with the raw variables as the actual
+results. They are then averaged, compared against "expected_results",
+and checked against must-change variables and accepted ranges like any
+other result. To compare only aggregated results, set "filters" to an
+empty list:
+
+.. code:: json
+
+   {
+       "name": "e2e_animal_aggregated",
+       "filters": [],
+       "report_filters": [
+           {
+               "name": "total_milk_produced",
+               "filters": ["AnimalModuleReporter.report_herd_statistics_data.daily_milk_production"],
+               "vertical_aggregation": "sum"
+           },
+           {
+               "name": "average_daily_milk_produced",
+               "filters": ["AnimalModuleReporter.report_herd_statistics_data.daily_milk_production"],
+               "vertical_aggregation": "average"
+           }
+       ],
+       "random_seeds": [42],
+       "expected_results_last_updated": "",
+       "expected_results": {}
+   }
+
+The report columns are named the same way as in a report CSV (for
+example ``total_milk_produced_ver_agg``), and these names are the keys
+found in "expected_results". Report filters are processed in order, so a
+report filter can cross-reference the reports generated before it. The
+following rules are checked before the simulations run:
+
+- "report_filters" must be a non-empty list of report filters.
+- Each report filter must have a unique "name", so its columns are named
+  the same way in every run.
+- Each report filter must have a "filters" or "cross_references" entry.
+- Report filters cannot have "graph_details", because graphed reports are
+  not saved as results.
+
+Updating the expected results keeps the "report_filters" entry.
+
 .. _e2e-comparison-filter-file:
 
 E2E Comparison filter file.

@@ -15,6 +15,8 @@ from RUFAS.data_validator import DataValidator
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.post_processing.output_config_validator import OutputConfigValidator
+from RUFAS.post_processing.shared_data_types import E2E_REPORT_FILTERS_KEY
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -207,7 +209,6 @@ class E2ETestResultsHandler:
         must-change and ranged variable names are only checked when every expected results file could be loaded,
         because a name may belong to a file that could not be read.
         """
-        om = OutputManager()
         info_map: dict[str, Any] = {
             "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler.validate_comparison_configuration.__name__,
@@ -252,16 +253,18 @@ class E2ETestResultsHandler:
                 "Must-change variables not found in the expected results of any domain: "
                 f"{sorted(unknown_must_change_variables)}"
             )
-            om.add_error("End-to-end testing must-change configuration error", message, info_map)
-            E2ETestResultsHandler._record_configuration_error(errors, message)
+            E2ETestResultsHandler._report_configuration_error(
+                errors, "End-to-end testing must-change configuration error", message, info_map
+            )
         unknown_ranged_variables = set(accepted_ranges) - matched_ranged_variables
         if unknown_ranged_variables and all_expected_results_loaded:
             message = (
                 "Variables with an accepted range not found in the expected results of any domain: "
                 f"{sorted(unknown_ranged_variables)}"
             )
-            om.add_error("End-to-end testing accepted-range configuration error", message, info_map)
-            E2ETestResultsHandler._record_configuration_error(errors, message)
+            E2ETestResultsHandler._report_configuration_error(
+                errors, "End-to-end testing accepted-range configuration error", message, info_map
+            )
         if errors:
             E2ETestResultsHandler._raise_configuration_errors(errors)
         return must_change_variables, accepted_ranges, expected_results_random_seeds
@@ -1171,6 +1174,27 @@ class E2ETestResultsHandler:
             errors.append(message)
 
     @staticmethod
+    def _report_configuration_error(
+        errors: list[str], error_title: str, message: str, info_map: dict[str, Any]
+    ) -> None:
+        """
+        Adds a configuration problem as an error to the ``OutputManager`` and records it in ``errors``.
+
+        Parameters
+        ----------
+        errors : list[str]
+            The list that the problem is appended to, so that the caller can report every problem together.
+        error_title : str
+            The title of the error added to the ``OutputManager``.
+        message : str
+            The description of the problem.
+        info_map : dict[str, Any]
+            The info map of the error added to the ``OutputManager``.
+        """
+        OutputManager().add_error(error_title, message, info_map)
+        E2ETestResultsHandler._record_configuration_error(errors, message)
+
+    @staticmethod
     def _raise_configuration_errors(errors: list[str]) -> None:
         """
         Raises a single error listing every configuration problem recorded by a validation.
@@ -1230,7 +1254,6 @@ class E2ETestResultsHandler:
         results file could not be loaded, ``actual_results_path`` is only checked against the part of the file name
         that does not depend on it, ``{output_prefix}_saved_variables_``.
         """
-        om = OutputManager()
         info_map: dict[str, Any] = {
             "class": E2ETestResultsHandler.__name__,
             "function": E2ETestResultsHandler._validate_result_path_set.__name__,
@@ -1246,16 +1269,14 @@ class E2ETestResultsHandler:
                 f"Expected results file {expected_results_path} for {path_set.domain} could not be loaded: "
                 f"{type(e).__name__}: {e}"
             )
-            om.add_error(error_title, message, info_map)
-            E2ETestResultsHandler._record_configuration_error(errors, message)
+            E2ETestResultsHandler._report_configuration_error(errors, error_title, message, info_map)
 
         if file_content is not None and expected_results_path.resolve().parent != Path(filters_directory).resolve():
             message = (
                 f"Expected results file {expected_results_path} is not in the task's filters directory "
                 f"{filters_directory}, so the run will not collect the domain's actual results from it."
             )
-            om.add_error(error_title, message, info_map)
-            E2ETestResultsHandler._record_configuration_error(errors, message)
+            E2ETestResultsHandler._report_configuration_error(errors, error_title, message, info_map)
 
         filter_name = file_content.get("name") if file_content is not None else None
         actual_results_path_name = Path(path_set.actual_results_path).name
@@ -1272,9 +1293,90 @@ class E2ETestResultsHandler:
                 f"actual_results_path '{path_set.actual_results_path}' for {path_set.domain} does not match the "
                 f"actual results file name the run will write, which starts with '{actual_results_file_prefix}'."
             )
-            om.add_error(error_title, message, info_map)
-            E2ETestResultsHandler._record_configuration_error(errors, message)
+            E2ETestResultsHandler._report_configuration_error(errors, error_title, message, info_map)
+
+        if file_content is not None and E2E_REPORT_FILTERS_KEY in file_content:
+            E2ETestResultsHandler._validate_report_filters(
+                file_content[E2E_REPORT_FILTERS_KEY], expected_results_path.name, errors, error_title, info_map
+            )
         return file_content
+
+    @staticmethod
+    def _validate_report_filters(
+        report_filters: Any,
+        filter_file_name: str,
+        errors: list[str],
+        error_title: str,
+        info_map: dict[str, Any],
+    ) -> None:
+        """
+        Checks the report filters that aggregate a domain's actual results.
+
+        Parameters
+        ----------
+        report_filters : Any
+            The value of the ``report_filters`` entry of the domain's expected results file.
+        filter_file_name : str
+            The name of the expected results file, used in the messages.
+        errors : list[str]
+            The list that every problem found is appended to, so that the caller can report them all together.
+        error_title : str
+            The title of the errors added to the ``OutputManager``.
+        info_map : dict[str, Any]
+            The info map of the errors added to the ``OutputManager``.
+
+        Notes
+        -----
+        Every problem found is added as an error to the ``OutputManager`` and recorded in ``errors``. The report
+        columns become keys of the actual and expected results, so each report filter needs a unique ``name`` for its
+        columns to be named the same way in every run. Graphed reports are not collected by the Report Generator, so
+        report filters cannot have ``graph_details``. The options of each report filter are additionally checked by
+        ``OutputConfigValidator.validate_report_filters``.
+        """
+        key = E2E_REPORT_FILTERS_KEY
+        if not isinstance(report_filters, list) or not report_filters:
+            E2ETestResultsHandler._report_configuration_error(
+                errors,
+                error_title,
+                f"'{key}' in {filter_file_name} must be a non-empty list of report filters.",
+                info_map,
+            )
+            return
+
+        seen_names: set[str] = set()
+        for index, report_filter in enumerate(report_filters):
+            location = f"Report filter {index} in '{key}' of {filter_file_name}"
+            if not isinstance(report_filter, dict):
+                E2ETestResultsHandler._report_configuration_error(
+                    errors, error_title, f"{location} must be a JSON object.", info_map
+                )
+                continue
+            name = report_filter.get("name")
+            if not isinstance(name, str) or not name:
+                E2ETestResultsHandler._report_configuration_error(
+                    errors, error_title, f"{location} must have a non-empty string 'name'.", info_map
+                )
+            elif name in seen_names:
+                E2ETestResultsHandler._report_configuration_error(
+                    errors,
+                    error_title,
+                    f"{location} has the name '{name}', which is used by an earlier report filter.",
+                    info_map,
+                )
+            else:
+                seen_names.add(name)
+            if "filters" not in report_filter and "cross_references" not in report_filter:
+                E2ETestResultsHandler._report_configuration_error(
+                    errors, error_title, f"{location} must have a 'filters' or 'cross_references' entry.", info_map
+                )
+            if "graph_details" in report_filter:
+                E2ETestResultsHandler._report_configuration_error(
+                    errors,
+                    error_title,
+                    f"{location} cannot have 'graph_details': graphed reports are not saved as results.",
+                    info_map,
+                )
+            OutputConfigValidator().validate_report_filters(report_filter, filter_file_name)
 
     @staticmethod
     def _evaluate_must_change_variables(
@@ -1842,10 +1944,21 @@ class E2ETestResultsHandler:
         ------
         ValueError
             If the input data is missing required keys.
+
+        Notes
+        -----
+        Keys other than those in ``ORDERED_EXPECTED_RESULTS_FILE_KEYS``, such as ``report_filters``, are kept and
+        written right after ``filters``, so that updating the expected results does not change how they are collected.
         """
         updated_data = {**data, "random_seeds": random_seeds}
         E2ETestResultsHandler._check_expected_results_file_keys(updated_data)
-        key_order = ORDERED_EXPECTED_RESULTS_FILE_KEYS
+        extra_keys = [key for key in updated_data if key not in ORDERED_EXPECTED_RESULTS_FILE_KEYS]
+        filters_position = ORDERED_EXPECTED_RESULTS_FILE_KEYS.index("filters") + 1
+        key_order = (
+            ORDERED_EXPECTED_RESULTS_FILE_KEYS[:filters_position]
+            + extra_keys
+            + ORDERED_EXPECTED_RESULTS_FILE_KEYS[filters_position:]
+        )
         ordered_data = {key: updated_data[key] for key in key_order}
         compact_expected_results = json.dumps(ordered_data["expected_results"], separators=(",", ":"))
         ordered_data["expected_results"] = "__EXPECTED_RESULTS_PLACEHOLDER__"

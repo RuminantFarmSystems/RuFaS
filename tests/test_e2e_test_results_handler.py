@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
+from RUFAS.post_processing.shared_data_types import E2E_REPORT_FILTERS_KEY
 import pytest
 from pytest_mock import MockerFixture
 
@@ -2314,3 +2315,130 @@ def test_validate_comparison_configuration_invalid_accepted_ranges_file(
     with pytest.raises(ValueError, match=expected_message):
         E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
     add_error.assert_called_once()
+
+
+VALID_REPORT_FILTERS: list[dict[str, Any]] = [
+    {"name": "milk_sum", "filters": ["A.x"], "vertical_aggregation": "sum"},
+    {"name": "milk_mean", "cross_references": ["milk_sum"], "vertical_aggregation": "average"},
+]
+
+
+def test_validate_report_filters_valid(mocker: MockerFixture) -> None:
+    """Tests that valid report filters record no errors and are each checked by the output config validator."""
+    _, add_error = patch_output_manager(mocker)
+    validate_report_filters = mocker.patch(
+        "RUFAS.e2e_test_results_handler.OutputConfigValidator.validate_report_filters"
+    )
+    errors: list[str] = []
+
+    E2ETestResultsHandler._validate_report_filters(
+        VALID_REPORT_FILTERS, "e2e_json_filter.json", errors, "title", {"domain": "Animal"}
+    )
+
+    assert errors == []
+    add_error.assert_not_called()
+    assert validate_report_filters.call_args_list == [
+        mocker.call(report_filter, "e2e_json_filter.json") for report_filter in VALID_REPORT_FILTERS
+    ]
+
+
+@pytest.mark.parametrize(
+    "report_filters, expected_message",
+    [
+        ({"name": "milk_sum", "filters": ["A.x"]}, "must be a non-empty list"),
+        ([], "must be a non-empty list"),
+        (["A.x"], "must be a JSON object"),
+        ([{"filters": ["A.x"]}], "non-empty string 'name'"),
+        ([{"name": "", "filters": ["A.x"]}], "non-empty string 'name'"),
+        ([{"name": "r", "filters": ["A.x"]}, {"name": "r", "filters": ["A.y"]}], "used by an earlier report filter"),
+        ([{"name": "r"}], "'filters' or 'cross_references'"),
+        ([{"name": "r", "filters": ["A.x"], "graph_details": {}}], "cannot have 'graph_details'"),
+    ],
+)
+def test_validate_report_filters_invalid(mocker: MockerFixture, report_filters: Any, expected_message: str) -> None:
+    """Tests that each kind of invalid report filters configuration is reported."""
+    _, add_error = patch_output_manager(mocker)
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputConfigValidator.validate_report_filters")
+    errors: list[str] = []
+    info_map = {"domain": "Animal"}
+
+    E2ETestResultsHandler._validate_report_filters(report_filters, "e2e_json_filter.json", errors, "title", info_map)
+
+    assert len(errors) == 1
+    assert expected_message in errors[0]
+    assert "e2e_json_filter.json" in errors[0]
+    add_error.assert_called_once_with("title", errors[0], info_map)
+
+
+def test_validate_comparison_configuration_with_valid_report_filters(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that an expected results file with valid report filters passes the validation."""
+    _, add_error = patch_output_manager(mocker)
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputConfigValidator.validate_report_filters")
+    path_sets = make_validation_path_sets(tmp_path)
+    animal_path = Path(path_sets[0].expected_results_path)
+    animal_content = json.loads(animal_path.read_text())
+    write_json_file(animal_path, {**animal_content, E2E_REPORT_FILTERS_KEY: VALID_REPORT_FILTERS})
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+
+    add_error.assert_not_called()
+
+
+def test_validate_comparison_configuration_with_invalid_report_filters(mocker: MockerFixture, tmp_path: Path) -> None:
+    """Tests that an expected results file with invalid report filters fails the validation."""
+    _, add_error = patch_output_manager(mocker)
+    mocker.patch("RUFAS.e2e_test_results_handler.OutputConfigValidator.validate_report_filters")
+    path_sets = make_validation_path_sets(tmp_path)
+    animal_path = Path(path_sets[0].expected_results_path)
+    animal_content = json.loads(animal_path.read_text())
+    write_json_file(animal_path, {**animal_content, E2E_REPORT_FILTERS_KEY: [{"filters": ["A.x"]}]})
+    mocker.patch.object(E2ETestResultsHandler, "_get_test_result_paths", return_value=path_sets)
+
+    with pytest.raises(ValueError, match="non-empty string 'name'"):
+        E2ETestResultsHandler.validate_comparison_configuration(VALIDATION_OUTPUT_PREFIX, None, tmp_path, True)
+    add_error.assert_called_once()
+    assert "Animal" in add_error.call_args.args[0]
+
+
+def test_write_formatted_json_keeps_report_filters(mocker: MockerFixture) -> None:
+    """Tests that _write_formatted_json keeps report filters and writes them right after the filters."""
+    mock_open = mocker.patch("builtins.open", mocker.mock_open())
+    data = {
+        "name": "Test",
+        "filters": [],
+        E2E_REPORT_FILTERS_KEY: VALID_REPORT_FILTERS,
+        "expected_results_last_updated": "2026-11-18T00:00:00",
+        "expected_results": {"milk_sum": {"values": [3.0]}},
+    }
+
+    E2ETestResultsHandler._write_formatted_json(Path("test_output.json"), data, [1, 2])
+
+    written_data = "".join(call.args[0] for call in mock_open().write.call_args_list).split("\n", 1)[1]
+    parsed_json = json.loads(written_data)
+    assert list(parsed_json) == [
+        "name",
+        "filters",
+        E2E_REPORT_FILTERS_KEY,
+        "random_seeds",
+        "expected_results_last_updated",
+        "expected_results",
+    ]
+    assert parsed_json[E2E_REPORT_FILTERS_KEY] == VALID_REPORT_FILTERS
+    assert parsed_json["random_seeds"] == [1, 2]
+
+
+def test_report_configuration_error(mocker: MockerFixture) -> None:
+    """Tests that a configuration problem is added to the OutputManager and recorded once without its prefix."""
+    _, add_error = patch_output_manager(mocker)
+    errors: list[str] = ["Earlier problem."]
+    info_map = {"domain": "Animal"}
+
+    E2ETestResultsHandler._report_configuration_error(errors, "title", "E2E testing error: New problem.", info_map)
+    E2ETestResultsHandler._report_configuration_error(errors, "title", "New problem.", info_map)
+
+    assert errors == ["Earlier problem.", "New problem."]
+    assert add_error.call_args_list == [
+        mocker.call("title", "E2E testing error: New problem.", info_map),
+        mocker.call("title", "New problem.", info_map),
+    ]
