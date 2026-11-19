@@ -1,0 +1,4 @@
+﻿Condition on percentile,Semen type assigned
+q > 1 − s,Sexed dairy
+1 − s − c < q ≤ 1 − s,Conventional dairy
+q ≤ 1 − s − c,Beef
