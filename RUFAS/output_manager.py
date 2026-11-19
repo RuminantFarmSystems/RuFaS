@@ -2935,6 +2935,16 @@ class OutputManager(object):
             The report filter to validate.
         filter_name : str
             The name of the filter to validate.
+
+        Raises
+        ------
+        ValueError
+            - If user has selected both ``horizontal_aggregation`` and ``omit_none_values``.
+
+        Notes
+        -----
+        ``horizontal_aggregation`` and ``omit_none_values`` are not allowed in a single report filter
+        because they could result in errors in the reporting process or scientifically incorrect aggregations.
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -2979,6 +2989,7 @@ class OutputManager(object):
             "use_verbose_report_name": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "expand_data_to_observed_range": partial(self.validate_type, expected=bool, type_label="a boolean"),
             "use_fill_value_before_start": partial(self.validate_type, expected=bool, type_label="a boolean"),
+            "omit_none_values": partial(self.validate_type, expected=bool, type_label="a boolean"),
         }
 
         for key, value in filter_content.items():
@@ -2995,6 +3006,22 @@ class OutputManager(object):
             else:
                 validator = key_validators[key]
                 validator(value, key, filter_name)
+
+        if filter_content.get("omit_none_values") is True:
+            if not filter_content.get("vertical_aggregation") or filter_content.get("horizontal_aggregation"):
+                error_message = (
+                    f"Invalid configuration for report '{filter_content.get('name')}' "
+                    f"in filter file '{filter_name}'. "
+                    "The 'omit_none_values' option can only be enabled when "
+                    "'vertical_aggregation' is specified and 'horizontal_aggregation' is not. "
+                    "Please update the report filter configuration to avoid incorrect aggregation results."
+                )
+                self.add_error(
+                    "Invalid report filter configuration",
+                    error_message,
+                    info_map,
+                )
+                raise ValueError(error_message)
 
     def validate_filter_constant_content(self, filters_dir_path: Path) -> None:
         """

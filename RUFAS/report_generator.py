@@ -340,10 +340,12 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_aggregation_keys(filter_content)
-            report_data: dict[str, dict[str, list[Any]]] = filtered_pool
+            report_data: dict[str, list[Any]] = filtered_pool
             if filter_content.get("display_units", False):
                 report_data = self._add_var_units(report_data)
             report_data = {key: report_data[key]["values"] for key in report_data}
+            if filter_content.get("omit_none_values", False):
+                report_data = self._omit_none_values(report_data)
             if not all(report_data[key] for key in report_data):
                 raise ValueError(
                     "Report Generator error: One or more columns in the report data are empty, "
@@ -845,15 +847,35 @@ class ReportGenerator:
 
         return aggregated_data, {}
 
+    @staticmethod
+    def _omit_none_values(report_data: dict[str, list[Any]]) -> dict[str, list[Any]]:
+        """
+        Removes None values from each column of report data.
+
+        Parameters
+        ----------
+        report_data : dict[str, list[Any]]
+            The report data containing columns of values.
+
+        Returns
+        -------
+        dict[str, list[Any]]
+            A new dictionary containing the report data with None values removed.
+        """
+        return {
+            key: [value for value in values if value is not None]
+            for key, values in report_data.items()
+        }
+
     def _add_constants_to_report_data(
-        self, report_data: dict[str, list[float]], filter_content: dict[str, Any]
+        self, report_data: dict[str, list[Any]], filter_content: dict[str, Any]
     ) -> list[dict[str, str | dict[str, str]]]:
         """
         Adds constants to the report data.
 
         Parameters
         ----------
-        report_data : dict[str, list[float]]
+        report_data : dict[str, list[Any]]
             The data to which constants need to be added.
         filter_content : dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
@@ -1003,18 +1025,18 @@ class ReportGenerator:
         return re.sub(r"[\s_]", "", name).lower()
 
     @staticmethod
-    def _add_var_units(report_data: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
+    def _add_var_units(report_data: dict[str, list[Any]]) -> dict[str, list[Any]]:
         """
         Adds variable units to variable name.
 
         Parameters
         ----------
-        report_data : dict[str, dict[str, list[Any]]]
+        report_data : dict[str, list[Any]]
             The data to be reported.
 
         Returns
         -------
-        dict[str, dict[str, list[Any]]]
+        dict[str, list[Any]]
             The updated data with units added.
         """
         updated_data: dict[str, dict[str, list[Any]]] = {}
