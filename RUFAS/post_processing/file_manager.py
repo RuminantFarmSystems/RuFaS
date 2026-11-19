@@ -1,6 +1,6 @@
 from enum import Enum
 from pathlib import Path
-from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
+from shared_data_types import POOL_ELEMENT_TYPE
 from typing import Any, Union
 
 import pandas as pd
@@ -307,7 +307,7 @@ class FileManager:
         """
         pass
 
-    def dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str | None = "portrait") -> None:
+    def _dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str | None = "portrait") -> None:
         """
         Saves a dictionary to a csv file.
 
@@ -361,7 +361,7 @@ class FileManager:
         """
         pass
 
-    def load_filter_file_content(self, path: Path) -> tuple[list[dict[str, Any]], str | None]:
+    def _load_filter_file_content(self, path: Path) -> tuple[list[dict[str, Any]], str | None]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -405,7 +405,7 @@ class FileManager:
         """
         pass
 
-    def save_to_json(
+    def _save_to_json(
         self,
         filter_file: str,
         save_path: Path,
@@ -428,11 +428,11 @@ class FileManager:
         """
         pass
 
-    def read_variables_pool_file(
+    def _read_variables_pool_file(
         self,
         file_path: Path,
         info_map: dict[str, Any],
-    ) -> dict[str, POOL_ELEMENT_TYPE]:
+    ) -> dict[str, list[Any]]:
         """Reads a ``variables_pool`` JSON file and returns its contents."""
         pass
 
@@ -502,7 +502,6 @@ class FileManager:
         """
         pass
 
-    @staticmethod
-    def normalize_module_header(json_key: str) -> str:
+    def _normalize_module_header(json_key: str) -> str:
         """Normalizes the module header from a JSON key."""
         pass

@@ -1,0 +1,32 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "HERD_INITIALIZATION",
+      "metadata_file_path": "input/metadata/example_open_lot_metadata_mbw700.json",
+      "output_prefix": "mbw700",
+      "save_animals": true,
+      "save_animals_directory": "output/mbw_populations",
+      "log_verbosity": "warnings",
+      "random_seeds": [42]
+    },
+            {
+      "task_type": "HERD_INITIALIZATION",
+      "metadata_file_path": "input/metadata/example_open_lot_metadata_mbw600.json",
+      "output_prefix": "mbw600",
+      "save_animals": true,
+      "save_animals_directory": "output/mbw_populations",
+      "log_verbosity": "warnings",
+      "random_seeds": [42]
+    },
+        {
+      "task_type": "HERD_INITIALIZATION",
+      "metadata_file_path": "input/metadata/example_open_lot_metadata_mbw500.json",
+      "output_prefix": "mbw500",
+      "save_animals": true,
+      "save_animals_directory": "output/mbw_populations",
+      "log_verbosity": "warnings",
+      "random_seeds": [42]
+    }
+  ]
+}

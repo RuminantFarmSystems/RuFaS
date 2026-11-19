@@ -1,8 +1,7 @@
 {
   "cross_validation": [
     {
-      "title": "Crop optimal vs. minimum temperature",
-      "description": "In every entry of crop_configurations.crop_configurations, optimal_temperature must be greater than or equal to minimum_temperature.",
+      "description": "All crop configurations: optimal_temperature must be greater than or equal to minimum_temperature",
       "aliases": {
         "variables": {
           "crop_configurations": "crop_configurations.crop_configurations"
@@ -34,8 +33,7 @@
       ]
     },
     {
-      "title": "Crop optimal vs. minimum harvest index",
-      "description": "In every entry of crop_configurations.crop_configurations, optimal_harvest_index must be greater than or equal to minimum_harvest_index.",
+      "description": "All crop configurations: optimal_harvest_index must be greater than or equal to minimum_harvest_index",
       "aliases": {
         "variables": {
           "crop_configurations": "crop_configurations.crop_configurations"
@@ -67,8 +65,7 @@
       ]
     },
     {
-      "title": "field_1 watering amount without interval",
-      "description": "field_1.watering_amount_in_liters must be 0 when field_1.watering_interval is 0. Set a watering interval greater than 0 or set the watering amount to 0.",
+      "description": "field_1 watering amount must be zero when watering interval is zero",
       "aliases": {
         "variables": {
           "watering_amount_in_liters": "field_1.watering_amount_in_liters",
@@ -114,8 +111,7 @@
       ]
     },
     {
-      "title": "field_1 watering interval with amount",
-      "description": "field_1.watering_interval must be greater than 0 when field_1.watering_amount_in_liters is greater than 0.",
+      "description": "field_1 watering interval must be greater than zero when watering amount is positive",
       "aliases": {
         "variables": {
           "watering_amount_in_liters": "field_1.watering_amount_in_liters",
@@ -161,8 +157,7 @@
       ]
     },
     {
-      "title": "field_2 watering amount without interval",
-      "description": "field_2.watering_amount_in_liters must be 0 when field_2.watering_interval is 0. Set a watering interval greater than 0 or set the watering amount to 0.",
+      "description": "field_2 watering amount must be zero when watering interval is zero",
       "aliases": {
         "variables": {
           "watering_amount_in_liters": "field_2.watering_amount_in_liters",
@@ -208,8 +203,7 @@
       ]
     },
     {
-      "title": "field_2 watering interval with amount",
-      "description": "field_2.watering_interval must be greater than 0 when field_2.watering_amount_in_liters is greater than 0.",
+      "description": "field_2 watering interval must be greater than zero when watering amount is positive",
       "aliases": {
         "variables": {
           "watering_amount_in_liters": "field_2.watering_amount_in_liters",
@@ -255,8 +249,7 @@
       ]
     },
     {
-      "title": "soil_1 field capacity vs. wilting point",
-      "description": "In every layer of soil_1.soil_layers, field_capacity_water_concentration must be greater than or equal to wilting_point_water_concentration.",
+      "description": "All soil_1 layers: field_capacity_water_concentration must be greater than or equal to wilting_point_water_concentration",
       "aliases": {
         "variables": {
           "soil_1_layers": "soil_1.soil_layers"
@@ -288,8 +281,7 @@
       ]
     },
     {
-      "title": "soil_1 saturation vs. field capacity",
-      "description": "In every layer of soil_1.soil_layers, saturation_point_water_concentration must be greater than or equal to field_capacity_water_concentration.",
+      "description": "All soil_1 layers: saturation_point_water_concentration must be greater than or equal to field_capacity_water_concentration",
       "aliases": {
         "variables": {
           "soil_1_layers": "soil_1.soil_layers"
@@ -321,8 +313,7 @@
       ]
     },
     {
-      "title": "soil_2 field capacity vs. wilting point",
-      "description": "In every layer of soil_2.soil_layers, field_capacity_water_concentration must be greater than or equal to wilting_point_water_concentration.",
+      "description": "All soil_2 layers: field_capacity_water_concentration must be greater than or equal to wilting_point_water_concentration",
       "aliases": {
         "variables": {
           "soil_2_layers": "soil_2.soil_layers"
@@ -354,8 +345,7 @@
       ]
     },
     {
-      "title": "soil_2 saturation vs. field capacity",
-      "description": "In every layer of soil_2.soil_layers, saturation_point_water_concentration must be greater than or equal to field_capacity_water_concentration.",
+      "description": "All soil_2 layers: saturation_point_water_concentration must be greater than or equal to field_capacity_water_concentration",
       "aliases": {
         "variables": {
           "soil_2_layers": "soil_2.soil_layers"
@@ -387,8 +377,7 @@
       ]
     },
     {
-      "title": "field_1 tractor size required",
-      "description": "field_1.tractor_size must be set when config.simulation_type is 'field_only' or 'field_and_feed'.",
+      "description": "field_1 tractor_size must not be null when fields are simulated without animals.",
       "aliases": {
         "variables": {
           "simulation_type": "config.simulation_type",
@@ -436,8 +425,7 @@
       ]
     },
     {
-      "title": "field_2 tractor size required",
-      "description": "field_2.tractor_size must be set when config.simulation_type is 'field_only' or 'field_and_feed'.",
+      "description": "field_2 tractor_size must not be null when fields are simulated without animals.",
       "aliases": {
         "variables": {
           "simulation_type": "config.simulation_type",
@@ -485,8 +473,7 @@
       ]
     },
     {
-      "title": "manure_schedule_1 daily spread storage",
-      "description": "manure_schedule_1.daily_spread.is_daily_spreading is true, but manure_management.storage has no storage with processor type 'DailySpread'. Add a DailySpread storage or turn off daily spreading.",
+      "description": "manure_schedule_1 daily spreading requires at least one DailySpread manure storage",
       "aliases": {
         "variables": {
           "is_daily_spreading": "manure_schedule_1.daily_spread.is_daily_spreading",
@@ -537,8 +524,7 @@
       ]
     },
     {
-      "title": "manure_schedule_1 spread all available manure",
-      "description": "manure_schedule_1.daily_spread.spread_all_available_manure can only be true when manure_schedule_1.daily_spread.is_daily_spreading is true.",
+      "description": "manure_schedule_1 spread_all_available_manure requires is_daily_spreading to be true",
       "aliases": {
         "variables": {
           "is_daily_spreading": "manure_schedule_1.daily_spread.is_daily_spreading",
@@ -584,8 +570,7 @@
       ]
     },
     {
-      "title": "manure_schedule_1 daily spread amount",
-      "description": "When manure_schedule_1.daily_spread.is_daily_spreading is true and manure_schedule_1.daily_spread.spread_all_available_manure is false, manure_schedule_1.daily_spread.nitrogen_spread_amount or manure_schedule_1.daily_spread.phosphorus_spread_amount must be greater than 0.",
+      "description": "manure_schedule_1 daily spread nitrogen or phosphorus spread amount must be greater than zero when spread_all_available_manure is false",
       "aliases": {
         "variables": {
           "is_daily_spreading": "manure_schedule_1.daily_spread.is_daily_spreading",
@@ -650,8 +635,7 @@
       ]
     },
     {
-      "title": "manure_schedule_2 daily spread storage",
-      "description": "manure_schedule_2.daily_spread.is_daily_spreading is true, but manure_management.storage has no storage with processor type 'DailySpread'. Add a DailySpread storage or turn off daily spreading.",
+      "description": "manure_schedule_2 daily spreading requires at least one DailySpread manure storage",
       "aliases": {
         "variables": {
           "is_daily_spreading": "manure_schedule_2.daily_spread.is_daily_spreading",
@@ -702,8 +686,7 @@
       ]
     },
     {
-      "title": "manure_schedule_2 spread all available manure",
-      "description": "manure_schedule_2.daily_spread.spread_all_available_manure can only be true when manure_schedule_2.daily_spread.is_daily_spreading is true.",
+      "description": "manure_schedule_2 spread_all_available_manure requires is_daily_spreading to be true",
       "aliases": {
         "variables": {
           "is_daily_spreading": "manure_schedule_2.daily_spread.is_daily_spreading",
@@ -749,8 +732,7 @@
       ]
     },
     {
-      "title": "manure_schedule_2 daily spread amount",
-      "description": "When manure_schedule_2.daily_spread.is_daily_spreading is true and manure_schedule_2.daily_spread.spread_all_available_manure is false, manure_schedule_2.daily_spread.nitrogen_spread_amount or manure_schedule_2.daily_spread.phosphorus_spread_amount must be greater than 0.",
+      "description": "manure_schedule_2 daily spread nitrogen or phosphorus spread amount must be greater than zero when spread_all_available_manure is false",
       "aliases": {
         "variables": {
           "is_daily_spreading": "manure_schedule_2.daily_spread.is_daily_spreading",

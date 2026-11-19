@@ -1,8 +1,7 @@
 {
   "cross_validation": [
     {
-      "title": "CornSilage-CoverCrop schedule 0 planting years/days",
-      "description": "CornSilage-CoverCrop.crop_schedules.0.planting_years and CornSilage-CoverCrop.crop_schedules.0.planting_days must have the same number of entries (one planting day per planting year).",
+      "description": "CornSilage-CoverCrop schedule 0 has equal planting year/day lengths",
       "aliases": {
         "variables": {
           "planting_years": "CornSilage-CoverCrop.crop_schedules.0.planting_years",
@@ -34,8 +33,7 @@
       ]
     },
     {
-      "title": "CornSilage-CoverCrop schedule 0 harvest years/days",
-      "description": "CornSilage-CoverCrop.crop_schedules.0.harvest_years and CornSilage-CoverCrop.crop_schedules.0.harvest_days must have the same number of entries (one harvest day per harvest year).",
+      "description": "CornSilage-CoverCrop schedule 0 has equal harvest year/day lengths",
       "aliases": {
         "variables": {
           "harvest_years": "CornSilage-CoverCrop.crop_schedules.0.harvest_years",
@@ -67,8 +65,7 @@
       ]
     },
     {
-      "title": "CornSilage-CoverCrop schedule 1 planting years/days",
-      "description": "CornSilage-CoverCrop.crop_schedules.1.planting_years and CornSilage-CoverCrop.crop_schedules.1.planting_days must have the same number of entries (one planting day per planting year).",
+      "description": "CornSilage-CoverCrop schedule 1 has equal planting year/day lengths",
       "aliases": {
         "variables": {
           "planting_years": "CornSilage-CoverCrop.crop_schedules.1.planting_years",
@@ -100,8 +97,7 @@
       ]
     },
     {
-      "title": "CornSilage-CoverCrop schedule 1 harvest years/days",
-      "description": "CornSilage-CoverCrop.crop_schedules.1.harvest_years and CornSilage-CoverCrop.crop_schedules.1.harvest_days must have the same number of entries (one harvest day per harvest year).",
+      "description": "CornSilage-CoverCrop schedule 1 has equal harvest year/day lengths",
       "aliases": {
         "variables": {
           "harvest_years": "CornSilage-CoverCrop.crop_schedules.1.harvest_years",

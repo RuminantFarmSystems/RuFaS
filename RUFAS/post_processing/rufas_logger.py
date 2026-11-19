@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 import sys
-from RUFAS.post_processing.shared_data_types import LogVerbosity
+from RUFAS.output_manager import LogVerbosity
 from pathlib import Path
 from typing import Any
 

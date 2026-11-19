@@ -154,7 +154,6 @@ class Pen:
         self.first_parlor_processor = first_parlor_processor
         self.parlor_stream_name = parlor_stream_name
         self.manure_streams = manure_streams
-        self._validate_general_manure_stream_names()
 
         self.beddings: dict[str, Bedding] = {}
         self._initialize_beddings()
@@ -965,61 +964,6 @@ class Pen:
         if self.animal_combination == AnimalCombination.LAC_COW:
             return exposed_manure_surface_area.has_lac_cows * self.num_stalls
         return exposed_manure_surface_area.no_lac_cows * self.num_stalls
-
-    def _validate_general_manure_stream_names(self) -> None:
-        """
-        Validates that every general manure stream defined for the pen has a name and that the names are unique.
-
-        Raises
-        ------
-        ValueError
-            If a general manure stream in the pen has a missing or empty ``stream_name``, if more than one general
-            manure stream in the pen is configured with the same ``stream_name``, or both.
-
-        Notes
-        -----
-        Stream names key the ManureStream objects the pen passes to the manure module. If two streams in a pen
-        shared a name, one would silently overwrite the other and the overwritten stream's first processor would
-        never receive any manure, which only surfaces later as an unrelated error in the manure module.
-
-        A ``stream_name`` that is not a string, or that is empty once surrounding whitespace is removed, counts as
-        missing. Names are compared with surrounding whitespace removed, so names that differ only by surrounding
-        whitespace count as duplicates. Missing and duplicate names are each reported with their own error, and
-        both are reported before the ValueError is raised.
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._validate_general_manure_stream_names.__name__,
-        }
-        unique_stream_names: set[str] = set()
-        duplicate_stream_names: set[str] = set()
-        unnamed_stream_count = 0
-        for stream_config in self.manure_streams:
-            raw_stream_name = stream_config.get("stream_name")
-            stream_name = raw_stream_name.strip() if isinstance(raw_stream_name, str) else ""
-            if not stream_name:
-                unnamed_stream_count += 1
-            elif stream_name in unique_stream_names:
-                duplicate_stream_names.add(stream_name)
-            else:
-                unique_stream_names.add(stream_name)
-
-        requirement = "Each manure stream defined for a pen must have a unique 'stream_name'."
-        error_details: list[str] = []
-        if unnamed_stream_count > 0:
-            error_detail = (
-                f"Missing or empty manure stream name for {unnamed_stream_count} manure stream(s) in pen {self.id}."
-            )
-            om.add_error("Missing pen manure stream names", f"{error_detail} {requirement}", info_map=info_map)
-            error_details.append(error_detail)
-        if duplicate_stream_names:
-            duplicate_names = ", ".join(f"'{stream_name}'" for stream_name in sorted(duplicate_stream_names))
-            error_detail = f"Duplicate manure stream name(s) {duplicate_names} in pen {self.id}."
-            om.add_error("Duplicate pen manure stream names", f"{error_detail} {requirement}", info_map=info_map)
-            error_details.append(error_detail)
-        if error_details:
-            raise ValueError(f"{' '.join(error_details)} {requirement}")
 
     def _validate_general_manure_stream_proportions(self) -> None:
         """

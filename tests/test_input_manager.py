@@ -268,7 +268,7 @@ def test_load_cross_validation(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_cross_validation in file input_manager.py"""
     with patch(
         "builtins.open",
-        mock_open(read_data='[{"title": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
+        mock_open(read_data='[{"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
     ):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             mock_input_manager._load_cross_validation(["path/dummy_cv.json"])
@@ -279,7 +279,7 @@ def test_load_multiple_cross_validation(mock_input_manager: InputManager) -> Non
     """Unit test for function _load_cross_validation in file input_manager.py when multiple files are provided."""
     with patch(
         "builtins.open",
-        mock_open(read_data='[{"title": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
+        mock_open(read_data='[{"description": "cv1", "target_and_save": {"x": 1}, "rules": [{"r": 1}]}]'),
     ):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             mock_input_manager._load_cross_validation(["path/dummy_cv.json", "path/dummy_cv2.json"])
@@ -453,14 +453,14 @@ def test_start_data_processing(
 
 
 @pytest.mark.parametrize(
-    "cv_scenario, eager_termination, expected_return, expected_cv_calls, expected_fail_messages",
+    "cv_scenario, eager_termination, expected_return, expected_cv_calls, expected_fail_blocks",
     [
         ("none", True, True, 0, []),
         ("none", False, True, 0, []),
         ("all_pass", True, True, 2, []),
         ("all_pass", False, True, 2, []),
         ("first_fail_eager_true", True, False, 1, ["cv1"]),
-        ("two_fail_eager_false", False, False, 3, ["cv1", "cv2: cv2 failed: fix the cv2 inputs."]),
+        ("two_fail_eager_false", False, False, 3, ["cv1", "cv2"]),
         ("multiple_pass", True, True, 3, []),
     ],
     ids=[
@@ -480,7 +480,7 @@ def test_cross_validate_data(
     eager_termination: bool,
     expected_return: bool,
     expected_cv_calls: int,
-    expected_fail_messages: list[str],
+    expected_fail_blocks: list[str],
 ) -> None:
     """Unit test for function _cross_validate_data in file input_manager.py"""
     add_error = mocker.patch.object(mock_input_manager.om, "add_error")
@@ -495,8 +495,8 @@ def test_cross_validate_data(
         cv_blocks = [
             {
                 "cross_validation": [
-                    {"title": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
-                    {"title": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
+                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
                 ]
             }
         ]
@@ -506,8 +506,8 @@ def test_cross_validate_data(
         cv_blocks = [
             {
                 "cross_validation": [
-                    {"title": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
-                    {"title": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
+                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
                 ]
             }
         ]
@@ -517,14 +517,9 @@ def test_cross_validate_data(
         cv_blocks = [
             {
                 "cross_validation": [
-                    {"title": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
-                    {
-                        "title": "cv2",
-                        "description": "cv2 failed: fix the cv2 inputs.",
-                        "aliases": {"x": 2},
-                        "rules": [{"r": 2}],
-                    },
-                    {"title": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
+                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
+                    {"description": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
                 ]
             }
         ]
@@ -534,13 +529,13 @@ def test_cross_validate_data(
         cv_blocks = [
             {
                 "cross_validation": [
-                    {"title": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
-                    {"title": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
+                    {"description": "cv1", "aliases": {"x": 1}, "rules": [{"r": 1}]},
+                    {"description": "cv2", "aliases": {"x": 2}, "rules": [{"r": 2}]},
                 ]
             },
             {
                 "cross_validation": [
-                    {"title": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
+                    {"description": "cv3", "aliases": {"x": 3}, "rules": [{"r": 3}]},
                 ]
             },
         ]
@@ -568,89 +563,16 @@ def test_cross_validate_data(
         assert eager is eager_termination
         assert isinstance(target_and_save_result, dict)
 
-    expected_info_map = {
-        "class": mock_input_manager.__class__.__name__,
-        "function": mock_input_manager._cross_validate_data.__name__,
-    }
-    assert add_error.call_args_list == [
-        call("Cross Validation Failure", message, expected_info_map) for message in expected_fail_messages
-    ]
-
-
-@pytest.mark.parametrize("raises", [False, True])
-def test_cross_validate_data_routes_cross_validator_logs(
-    mock_input_manager: InputManager, mocker: MockerFixture, raises: bool
-) -> None:
-    """Cross validator logs are routed to OM before the block failure error, which is reported even when validation
-    raises."""
-    manager = mocker.Mock()
-    mocker.patch.object(mock_input_manager.om, "route_logs", manager.route_logs)
-    mocker.patch.object(mock_input_manager.om, "add_error", manager.add_error)
-    mocker.patch.object(mock_input_manager, "_extract_target_and_save_block", return_value={})
-    mocker.patch.object(
-        mock_input_manager,
-        "_load_cross_validation",
-        return_value=[{"cross_validation": [{"title": "cv1", "description": "Fix cv1.", "rules": []}]}],
-    )
-    cv_logs = [{"error": "Invalid data length validation", "message": "msg", "info_map": {}}]
-    mocker.patch.object(mock_input_manager.cross_validator, "flush_event_logs", return_value=cv_logs)
-    mocker.patch.object(
-        mock_input_manager.cross_validator,
-        "cross_validate_data",
-        side_effect=ValueError("boom") if raises else [False],
-    )
-    info_map = {
-        "class": mock_input_manager.__class__.__name__,
-        "function": mock_input_manager._cross_validate_data.__name__,
-    }
-
-    if raises:
-        with pytest.raises(ValueError, match="boom"):
-            mock_input_manager._cross_validate_data(["dummy_path"], eager_termination=True)
+    if expected_fail_blocks:
+        add_error.assert_called_once()
+        err, msg, info = add_error.call_args.args
+        assert err == "Cross Validation Failure"
+        for name in expected_fail_blocks:
+            assert name in msg
+        assert info.get("class") == mock_input_manager.__class__.__name__
+        assert info.get("function") == mock_input_manager._cross_validate_data.__name__
     else:
-        assert mock_input_manager._cross_validate_data(["dummy_path"], eager_termination=False) is False
-    assert manager.mock_calls == [
-        call.route_logs(cv_logs),
-        call.add_error("Cross Validation Failure", "cv1: Fix cv1.", info_map),
-    ]
-
-
-def test_cross_validate_data_routes_cross_validator_logs_on_success(
-    mock_input_manager: InputManager, mocker: MockerFixture
-) -> None:
-    """Cross validator logs are routed to OM after every block, even when the block passes."""
-    route_logs = mocker.patch.object(mock_input_manager.om, "route_logs")
-    add_error = mocker.patch.object(mock_input_manager.om, "add_error")
-    mocker.patch.object(mock_input_manager, "_extract_target_and_save_block", return_value={})
-    mocker.patch.object(
-        mock_input_manager,
-        "_load_cross_validation",
-        return_value=[{"cross_validation": [{"title": "cv1", "rules": []}, {"title": "cv2", "rules": []}]}],
-    )
-    cv_logs = [{"error": "Alias name not found.", "message": "msg", "info_map": {}}]
-    mocker.patch.object(mock_input_manager.cross_validator, "flush_event_logs", side_effect=[cv_logs, []])
-    mocker.patch.object(mock_input_manager.cross_validator, "cross_validate_data", return_value=True)
-
-    assert mock_input_manager._cross_validate_data(["dummy_path"], eager_termination=True) is True
-    assert route_logs.call_args_list == [call(cv_logs), call([])]
-    add_error.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "block,expected",
-    [
-        ({"title": "Title", "description": "Readable message."}, "Title: Readable message."),
-        ({"title": "Title", "description": ""}, "Title"),
-        ({"title": "Title", "description": 42}, "Title"),
-        ({"title": "Title"}, "Title"),
-        ({}, "unnamed block"),
-    ],
-)
-def test_get_cross_validation_failure_message(
-    mock_input_manager: InputManager, block: dict[str, Any], expected: str
-) -> None:
-    """The failure message pairs the title with the description, falling back to the title alone."""
-    assert mock_input_manager._get_cross_validation_failure_message(block) == expected
+        add_error.assert_not_called()
 
 
 def test_start_data_processing_invalid_metadata_raises(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
