@@ -59,7 +59,7 @@
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
       "description": "Purchased feeds emission values used in the EEE module. Missing data interpolated following script in helpful_scripts/emissions_interpolation.",
-      "path": "input/data/EEE/feed_emissions_total_20261111_interpolated_regional_average.csv",
+      "path": "input/data/EEE/feed_emissions_total_11112026_interpolated_regional_average.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
