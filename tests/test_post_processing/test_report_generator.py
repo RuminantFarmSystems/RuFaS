@@ -5,7 +5,6 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.post_processing.report_generator import AGGREGATION_FUNCTIONS, ReportGenerator
-from RUFAS.post_processing.unit_handler import UnitHandler
 from RUFAS.util import Aggregator
 
 
@@ -34,7 +33,6 @@ def test_report_generator_init(mocker: MockerFixture) -> None:
 
     assert report_generator.reports == {}
     assert report_generator.time == mock_time
-    assert isinstance(report_generator.unit_handler, UnitHandler)
 
 
 def test_clear_reports(report_generator: ReportGenerator) -> None:
@@ -177,7 +175,6 @@ def test_generate_report(
 ) -> None:
     """Unit test for the generate_report method of ReportGenerator."""
     mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
-    mocker.patch("RUFAS.post_processing.unit_handler.logger")
 
     for filter_content, filtered_pool in zip(filter_contents, filtered_pools):
         report_generator.generate_report(filter_content, filtered_pool)
@@ -1114,7 +1111,47 @@ def test_update_key(key: str, expected: str, report_generator: ReportGenerator) 
 
 
 @pytest.mark.parametrize(
-    "aggregator, expected",
+    "report_data, aggregator, simplify_units, expected",
+    [
+        # A single column keeps its units
+        ({"temperature (Celsius)": [23.0, 24.0, 25.0]}, Aggregator.sum, False, "Celsius"),
+        ({"wind_speed (m/s)": [10.0, 12.0, 15.0]}, Aggregator.average, True, "m/s"),
+        ({"temperature": [23.0, 24.0, 25.0]}, Aggregator.sum, True, ""),
+        # More than two columns keep the units of the first column
+        ({"a (kg)": [1.0], "b (L)": [2.0], "c (m)": [3.0]}, Aggregator.product, True, "kg"),
+        ({"a": [1.0], "b (L)": [2.0], "c (m)": [3.0]}, Aggregator.sum, True, ""),
+        # Units of two columns are combined
+        ({"a (kg)": [1.0], "b (m)": [2.0]}, Aggregator.product, True, "kg*m"),
+        ({"a (m^2)": [1.0], "b (m)": [2.0]}, Aggregator.product, True, "m^3"),
+        ({"a (kg/day)": [1.0], "b (day)": [2.0]}, Aggregator.product, True, "kg"),
+        ({"a (kg/day)": [1.0], "b (day)": [2.0]}, Aggregator.product, False, "kg*day/day"),
+        ({"milk (kg)": [1.0], "cows (animal)": [2.0]}, Aggregator.division, True, "kg/animal"),
+        ({"a (kg*day/animal)": [1.0], "b (day)": [2.0]}, Aggregator.division, True, "kg/animal"),
+        ({"a (kg)": [1.0], "b (kg)": [2.0]}, Aggregator.division, True, "unitless"),
+        ({"a (kg)": [1.0], "b (kg)": [2.0]}, Aggregator.division, False, "kg/kg"),
+        ({"a (kg)": [1.0], "b (kg)": [2.0]}, Aggregator.sum, True, "kg"),
+        ({"a (kg)": [1.0], "b (L)": [2.0]}, Aggregator.subtraction, True, "kg"),
+        ({"a": [1.0], "b": [2.0]}, Aggregator.average, True, "unitless"),
+        # Aggregation function that is not one of the supported aggregation functions
+        ({"a (kg)": [1.0], "b (kg)": [2.0]}, Aggregator.no_op, True, "kg"),
+    ],
+)
+def test_aggregate_units(
+    report_data: dict[str, list[Any]],
+    aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
+    simplify_units: bool,
+    expected: str,
+    report_generator: ReportGenerator,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for the _aggregate_units method of ReportGenerator."""
+    mocker.patch("RUFAS.post_processing.report_generator.logger")
+
+    assert report_generator._aggregate_units(report_data, aggregator, simplify_units) == expected
+
+
+@pytest.mark.parametrize(
+    "aggregator, expected_operation",
     [
         (Aggregator.average, "average"),
         (Aggregator.division, "division"),
@@ -1126,13 +1163,95 @@ def test_update_key(key: str, expected: str, report_generator: ReportGenerator) 
         (sum, None),
     ],
 )
-def test_get_aggregator_key(
+def test_aggregate_units_combines_units_of_two_columns(
     aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
-    expected: str | None,
+    expected_operation: str | None,
     report_generator: ReportGenerator,
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for the _get_aggregator_key method of ReportGenerator."""
-    assert report_generator._get_aggregator_key(aggregator) == expected
+    """Unit test for the _aggregate_units method of ReportGenerator when there are two columns to aggregate."""
+    mock_combine_units = mocker.patch.object(
+        report_generator, "_combine_units", return_value=({"kg": 1}, {"animal": 1})
+    )
+
+    result = report_generator._aggregate_units({"milk (kg/day)": [1.0], "cows (animal)": [2.0]}, aggregator, False)
+
+    assert result == "kg/animal"
+    mock_combine_units.assert_called_once_with({"kg": 1}, {"day": 1}, {"animal": 1}, {}, expected_operation, False)
+
+
+def test_aggregate_units_no_report_data(report_generator: ReportGenerator) -> None:
+    """Unit test for the _aggregate_units method of ReportGenerator when there is no report data."""
+    with pytest.raises(ValueError, match="No report data available to aggregate units from."):
+        report_generator._aggregate_units({}, Aggregator.sum, True)
+
+
+@pytest.mark.parametrize(
+    "numerator1, denominator1, numerator2, denominator2, operation, simplify_units, expected, expect_warning",
+    [
+        # Product
+        ({"kg": 1}, {"day": 1}, {"day": 1}, {}, "product", True, ({"kg": 1}, {}), False),
+        ({"kg": 1}, {"day": 1}, {"day": 1}, {}, "product", False, ({"kg": 1, "day": 1}, {"day": 1}), False),
+        ({"m": 1}, {"s": 1}, {"m": 1}, {"s": 1}, "product", True, ({"m": 2}, {"s": 2}), False),
+        # Division
+        ({"kg": 1}, {}, {"animal": 1}, {"day": 1}, "division", True, ({"kg": 1, "day": 1}, {"animal": 1}), False),
+        ({"kg": 1}, {}, {"kg": 1}, {}, "division", True, ({}, {}), False),
+        ({"kg": 1}, {}, {"kg": 1}, {}, "division", False, ({"kg": 1}, {"kg": 1}), False),
+        # Operations that keep the units, with matching units
+        ({"kg": 1}, {"day": 1}, {"kg": 1}, {"day": 1}, "sum", True, ({"kg": 1}, {"day": 1}), False),
+        ({"kg": 1}, {"day": 1}, {"kg": 1}, {"day": 1}, "average", False, ({"kg": 1}, {"day": 1}), False),
+        # Operations that keep the units, with different units
+        ({"kg": 1}, {"day": 1}, {"g": 1}, {"day": 1}, "subtraction", True, ({"kg": 1}, {"day": 1}), True),
+        ({"kg": 1}, {"day": 1}, {"kg": 1}, {"year": 1}, "SD", True, ({"kg": 1}, {"day": 1}), True),
+        # Operations that are not supported aggregation functions
+        ({"kg": 1}, {}, {"kg": 1}, {}, "bad_aggregator_function", True, ({"kg": 1}, {}), False),
+        ({"kg": 1}, {}, {"L": 1}, {}, None, True, ({"kg": 1}, {}), True),
+    ],
+)
+def test_combine_units(
+    numerator1: dict[str, int],
+    denominator1: dict[str, int],
+    numerator2: dict[str, int],
+    denominator2: dict[str, int],
+    operation: str | None,
+    simplify_units: bool,
+    expected: tuple[dict[str, int], dict[str, int]],
+    expect_warning: bool,
+    report_generator: ReportGenerator,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for the _combine_units method of ReportGenerator."""
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
+
+    result = report_generator._combine_units(
+        numerator1, denominator1, numerator2, denominator2, operation, simplify_units
+    )
+
+    assert result == expected
+    if expect_warning:
+        assert mock_logger.mock_calls == [
+            mocker.call.warning(
+                f"Report units do not match for operation {operation}.",
+                extra={"rufas_log_name": "Report Generator Units Warning"},
+            )
+        ]
+    else:
+        assert mock_logger.mock_calls == []
+
+
+def test_combine_units_does_not_change_units(report_generator: ReportGenerator) -> None:
+    """Unit test for the _combine_units method of ReportGenerator to check the units passed to it are left unchanged."""
+    numerator1, denominator1 = {"kg": 1}, {"day": 1}
+    numerator2, denominator2 = {"kg": 1}, {"day": 1}
+
+    combined_numerator, combined_denominator = report_generator._combine_units(
+        numerator1, denominator1, numerator2, denominator2, "sum", True
+    )
+    combined_numerator["kg"] = 2
+    combined_denominator["day"] = 2
+
+    assert numerator1 == {"kg": 1}
+    assert denominator1 == {"day": 1}
 
 
 @pytest.mark.parametrize(
@@ -1240,7 +1359,7 @@ def test_handle_horizontal_and_vertical_aggregations_vertical_first_calls(
         report_generator, "_apply_vertical_aggregation", return_value=vertically_aggregated
     )
     mock_handle_aggregation = mocker.patch.object(report_generator, "_handle_aggregation", return_value=7.0)
-    mock_aggregate_units = mocker.patch.object(report_generator.unit_handler, "aggregate_units", return_value="units")
+    mock_aggregate_units = mocker.patch.object(report_generator, "_aggregate_units", return_value="units")
 
     result = report_generator._handle_horizontal_and_vertical_aggregations(
         aggregate_report, "sum", "average", {"display_units": True}
@@ -1249,7 +1368,7 @@ def test_handle_horizontal_and_vertical_aggregations_vertical_first_calls(
     assert result == {"ver_hor_agg_(units)": [7.0]}
     mock_apply_vertical_aggregation.assert_called_once_with(aggregate_report, Aggregator.average)
     mock_handle_aggregation.assert_called_once_with(Aggregator.sum, [2.0, 5.0], "'col1', 'col2'")
-    mock_aggregate_units.assert_called_once_with(vertically_aggregated, "sum", True)
+    mock_aggregate_units.assert_called_once_with(vertically_aggregated, Aggregator.sum, True)
     mock_apply_horizontal_aggregation.assert_not_called()
 
 
@@ -1371,7 +1490,7 @@ def test_apply_horizontal_aggregation_calls(report_generator: ReportGenerator, m
     """Unit test for the functions called by the _apply_horizontal_aggregation method of ReportGenerator."""
     report_data = {"a": [1, 2], "b": [3, 4], "c": [5, 6]}
     mock_handle_aggregation = mocker.patch.object(report_generator, "_handle_aggregation", side_effect=[10.0, 20.0])
-    mock_aggregate_units = mocker.patch.object(report_generator.unit_handler, "aggregate_units", return_value="units")
+    mock_aggregate_units = mocker.patch.object(report_generator, "_aggregate_units", return_value="units")
 
     result = report_generator._apply_horizontal_aggregation(report_data, ["c", "a"], Aggregator.division, False)
 
@@ -1380,7 +1499,7 @@ def test_apply_horizontal_aggregation_calls(report_generator: ReportGenerator, m
         mocker.call(Aggregator.division, [5, 1], "'a', 'b', 'c'"),
         mocker.call(Aggregator.division, [6, 2], "'a', 'b', 'c'"),
     ]
-    mock_aggregate_units.assert_called_once_with({"c": [5, 6], "a": [1, 2]}, "division", False)
+    mock_aggregate_units.assert_called_once_with({"c": [5, 6], "a": [1, 2]}, Aggregator.division, False)
     assert list(mock_aggregate_units.call_args.args[0].keys()) == ["c", "a"]
 
 
@@ -1564,7 +1683,7 @@ def test_add_constants_to_report_data(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for the _add_constants_to_report_data method of ReportGenerator."""
-    mock_add_units_to_constants = mocker.patch.object(report_generator.unit_handler, "add_units_to_constants")
+    mock_add_units_to_constants = mocker.patch.object(report_generator, "_add_units_to_constants")
 
     report_generator._add_constants_to_report_data(report_data, filter_content)
 
@@ -1577,7 +1696,7 @@ def test_add_constants_to_report_data_with_units(report_generator: ReportGenerat
     report_data = {"existing_data (kg)": [1, 2, 3]}
     constants_config = {"Constant1": 10}
     mock_add_units_to_constants = mocker.patch.object(
-        report_generator.unit_handler, "add_units_to_constants", return_value={"Constant1_(units)": 10}
+        report_generator, "_add_units_to_constants", return_value={"Constant1_(units)": 10}
     )
 
     report_generator._add_constants_to_report_data(report_data, {"constants": constants_config, "display_units": True})
@@ -1607,6 +1726,61 @@ def test_add_constants_to_report_data_with_error(
         report_generator._add_constants_to_report_data(report_data, filter_content)
 
     assert report_data == expected_report_data
+
+
+@pytest.mark.parametrize(
+    "constants_config, expected, expected_warnings",
+    [
+        # Constants matching GeneralConstants
+        (
+            {"LEAP_YEAR_LENGTH": 366, "FRACTION_TO_PERCENTAGE": 100.0},
+            {"LEAP_YEAR_LENGTH_(day/leap year)": 366, "FRACTION_TO_PERCENTAGE_(unitless)": 100.0},
+            [],
+        ),
+        # Constant names are normalized before they are matched to GeneralConstants
+        (
+            {"leap year length": 366, "KG to grams": 1000},
+            {"leap year length_(day/leap year)": 366, "KG to grams_(g/kg)": 1000},
+            [],
+        ),
+        # Constants not matching any GeneralConstants
+        (
+            {"SomeConstant": 10, "AnotherConstant": 5.5},
+            {"SomeConstant_(unit_not_found)": 10, "AnotherConstant_(unit_not_found)": 5.5},
+            ["SomeConstant", "AnotherConstant"],
+        ),
+        # Matching and non-matching constants
+        (
+            {"UnknownConstant": 100, "YEAR_LENGTH": 365},
+            {"UnknownConstant_(unit_not_found)": 100, "YEAR_LENGTH_(day/year)": 365},
+            ["UnknownConstant"],
+        ),
+        # Constant matching an attribute of GeneralConstants that has no units
+        ({"CONSTANTS_TO_UNITS": 1}, {"CONSTANTS_TO_UNITS_(unit_not_found)": 1}, []),
+        # No constants
+        ({}, {}, []),
+    ],
+)
+def test_add_units_to_constants(
+    constants_config: dict[str, int | float],
+    expected: dict[str, int | float],
+    expected_warnings: list[str],
+    report_generator: ReportGenerator,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for the _add_units_to_constants method of ReportGenerator."""
+    mock_logger = mocker.patch("RUFAS.post_processing.report_generator.logger")
+
+    result = report_generator._add_units_to_constants(constants_config)
+
+    assert result == expected
+    assert mock_logger.mock_calls == [
+        mocker.call.warning(
+            f"No matching GeneralConstant found for filter constant {name}.",
+            extra={"rufas_log_name": "report_generation_warning"},
+        )
+        for name in expected_warnings
+    ]
 
 
 @pytest.mark.parametrize(
@@ -1646,3 +1820,82 @@ def test_validate_constants(
         assert str(excinfo.value) == f"Report Generator error: {expected_message}"
     else:
         report_generator._validate_constants(report_data, constant_config)
+
+
+@pytest.mark.parametrize(
+    "input_name, expected_output",
+    [
+        ("CONSTANT_NAME", "constantname"),
+        ("  constant   name ", "constantname"),
+        ("ConstantName", "constantname"),
+        ("constant_name", "constantname"),
+        ("CONSTANT__NAME", "constantname"),
+        ("constant name", "constantname"),
+        ("CONSTANT NAME", "constantname"),
+        (" constant _ Name ", "constantname"),
+        ("", ""),
+    ],
+)
+def test_normalize_constant_name(input_name: str, expected_output: str, report_generator: ReportGenerator) -> None:
+    """Unit test for the _normalize_constant_name method of ReportGenerator."""
+    assert report_generator._normalize_constant_name(input_name) == expected_output
+
+
+@pytest.mark.parametrize(
+    "report_data, expected",
+    [
+        # Units given as a string
+        (
+            {"temperature": {"info_maps": [{"units": "Celsius"}], "values": [23, 24, 25]}},
+            {"temperature (Celsius)": {"info_maps": [{"units": "Celsius"}], "values": [23, 24, 25]}},
+        ),
+        # Units given as a dictionary containing the variable name
+        (
+            {"pressure": {"info_maps": [{"units": {"pressure": "Pascal"}}], "values": [101325, 101300]}},
+            {"pressure (Pascal)": {"info_maps": [{"units": {"pressure": "Pascal"}}], "values": [101325, 101300]}},
+        ),
+        # Units given as a dictionary that does not contain the variable name
+        (
+            {"pressure": {"info_maps": [{"units": {"other": "Pascal"}}], "values": [101325]}},
+            {"pressure (not available)": {"info_maps": [{"units": {"other": "Pascal"}}], "values": [101325]}},
+        ),
+        # Only the units in the first info map are used
+        (
+            {"mass": {"info_maps": [{"units": "kg"}, {"units": "g"}], "values": [1, 2]}},
+            {"mass (kg)": {"info_maps": [{"units": "kg"}, {"units": "g"}], "values": [1, 2]}},
+        ),
+        # Multiple variables
+        (
+            {
+                "milk": {"info_maps": [{"units": "kg"}], "values": [30]},
+                "cows": {"info_maps": [{"units": "animal"}], "values": [100]},
+            },
+            {
+                "milk (kg)": {"info_maps": [{"units": "kg"}], "values": [30]},
+                "cows (animal)": {"info_maps": [{"units": "animal"}], "values": [100]},
+            },
+        ),
+        # No info maps in any variable
+        ({"humidity": {"values": [80, 75, 70]}}, {"humidity": {"values": [80, 75, 70]}}),
+        # No variables
+        ({}, {}),
+    ],
+)
+def test_add_var_units(
+    report_data: dict[str, dict[str, list[Any]]],
+    expected: dict[str, dict[str, list[Any]]],
+    report_generator: ReportGenerator,
+) -> None:
+    """Unit test for the _add_var_units method of ReportGenerator."""
+    assert report_generator._add_var_units(report_data) == expected
+
+
+def test_add_var_units_missing_info_maps(report_generator: ReportGenerator) -> None:
+    """Unit test for the _add_var_units method of ReportGenerator when only some variables have info maps."""
+    report_data: dict[str, dict[str, list[Any]]] = {
+        "milk": {"info_maps": [{"units": "kg"}], "values": [30]},
+        "cows": {"values": [100]},
+    }
+
+    with pytest.raises(KeyError):
+        report_generator._add_var_units(report_data)
