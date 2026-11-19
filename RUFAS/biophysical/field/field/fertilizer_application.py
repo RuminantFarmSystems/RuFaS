@@ -4,15 +4,11 @@ from RUFAS.biophysical.field.soil.soil import Soil
 class FertilizerApplication:
     """
     This module provides a way for Field to apply fertilizer, based on SWAT Theoretical documentation section (6:1.7)
-    This class can be initialized with a Soil object or create one if none is provided
 
     Parameters
     ----------
-    soil : Soil, optional
+    soil : Soil
         Soil object to which fertilizer should be applied.
-    field_size : float, optional
-        Size of the field. Used to initialize a Soil object for this module to work with, if a pre-configured
-        SoilData object is not provided (ha)
 
     Attributes
     ----------
@@ -29,8 +25,8 @@ class FertilizerApplication:
         Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.
     """
 
-    def __init__(self, soil: Soil | None = None, field_size: float | None = None):
-        self.soil = soil or Soil(field_size=field_size)
+    def __init__(self, soil: Soil):
+        self.soil = soil
 
     def apply_fertilizer(
         self,

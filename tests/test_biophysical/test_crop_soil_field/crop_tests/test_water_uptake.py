@@ -97,6 +97,16 @@ def test_extract_water_from_soil(
         mock_add_error.assert_not_called()
 
 
+def test_extract_water_from_soil_without_uptakes(mock_crop_data: CropData, mocker: MockerFixture) -> None:
+    """Test that an error is raised when water is extracted before the water uptakes are calculated."""
+    soil_data = SoilData(field_size=3)
+    uptake = WaterUptake(crop_data=mock_crop_data)
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+    with pytest.raises(ValueError, match="actual_water_uptakes must be calculated before water is extracted"):
+        uptake.extract_water_from_soil(soil_data)
+    mock_add_error.assert_called_once()
+
+
 @pytest.mark.parametrize(
     "potential_uptakes,water_availabilities,available_capacities,should_fail",
     [

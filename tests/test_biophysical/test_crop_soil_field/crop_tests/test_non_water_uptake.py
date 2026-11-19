@@ -66,14 +66,13 @@ def test_uptake_nutrient(
 @pytest.mark.parametrize(
     "old,new",
     [
-        (None, 1),  # no start
         (0, 1),  # start = 0
         (1, 2),  # start = 0
         (2, 1),  # start > new
         (133.26, 149.4),  # arbitrary
     ],
 )
-def test_shift_nutrient_time(old: float | None, new: float, mock_crop_data: CropData) -> None:
+def test_shift_nutrient_time(old: float, new: float, mock_crop_data: CropData) -> None:
     """Ensure shift_nutrient_time correctly copies current nutrient value to previous_nutrient."""
     incorp = NitrogenUptake(mock_crop_data, previous_nutrient=old)
     incorp.shift_nutrient_time(new)

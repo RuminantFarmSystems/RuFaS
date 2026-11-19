@@ -9,11 +9,8 @@ class Decomposition:
 
     Parameters
     ----------
-    soil_data : SoilData, optional
-        An instance of SoilData containing soil properties and carbon pool information. A new instance is created if not
-        provided.
-    field_size : float, optional
-        The size of the field in hectares (ha). This is used to initialize a SoilData object if one is not provided.
+    soil_data : SoilData
+        An instance of SoilData containing soil properties and carbon pool information.
 
     Attributes
     ----------
@@ -35,8 +32,8 @@ class Decomposition:
 
     """
 
-    def __init__(self, soil_data: SoilData | None, field_size: float | None = None):
-        self.data = soil_data or SoilData(field_size=field_size)
+    def __init__(self, soil_data: SoilData):
+        self.data = soil_data
 
     def decompose(self) -> None:
         """

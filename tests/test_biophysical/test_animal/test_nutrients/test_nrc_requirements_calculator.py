@@ -28,7 +28,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     previous_temperature: float | None = 22.0
     net_energy_diet_concentration: float = 2.1
     days_born: float = 900
-    TDN_percentage: float = 65.0
+    TDN_fraction: float = 65.0
     process_based_phosphorus_requirement: float = 0.45
 
     mock_calculate_maintenance_energy_requirements = mocker.patch.object(
@@ -79,7 +79,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
         previous_temperature,
         net_energy_diet_concentration,
         days_born,
-        TDN_percentage,
+        TDN_fraction,
         process_based_phosphorus_requirement,
     )
 
@@ -116,7 +116,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
         0.7,
         1.5,
         18.0,
-        TDN_percentage,
+        TDN_fraction,
     )
     mock_calculate_calcium_requirement.assert_called_once_with(
         body_weight, mature_body_weight, day_of_pregnancy, animal_type, 0.7, milk_production
