@@ -91,7 +91,7 @@ class ReportGenerator:
         )
 
         try:
-            report_filter_data = {}
+            report_filter_data: dict[str, Any] = {}
             if "cross_references" in filter_content:
                 self._check_for_missing_references(filter_content["cross_references"])
                 cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])
@@ -302,7 +302,7 @@ class ReportGenerator:
 
     def _perform_aggregations(
         self,
-        filtered_pool: dict[str, dict[str, list[Any]]],
+        filtered_pool: dict[str, Any],
         filter_content: dict[str, Any],
     ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]], bool]:
         """
@@ -310,7 +310,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        filtered_pool : dict[str, dict[str, list[Any]]]
+        filtered_pool : dict[str, Any]
             The data pool from which the report is to be generated, structured as a dictionary.
         filter_content : dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
@@ -340,7 +340,7 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_aggregation_keys(filter_content)
-            report_data: dict[str, list[Any]] = filtered_pool
+            report_data: dict[str, Any] = filtered_pool
             if filter_content.get("display_units", False):
                 report_data = self._add_var_units(report_data)
             report_data = {key: report_data[key]["values"] for key in report_data}
@@ -374,7 +374,7 @@ class ReportGenerator:
 
     def _route_aggregator_functions(
         self,
-        report_data: dict[str, dict[str, list[Any]]],
+        report_data: dict[str, Any],
         filter_content: dict[str, Any],
         horizontal_agg_key: Optional[str] = None,
         vertical_agg_key: Optional[str] = None,
@@ -384,7 +384,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        report_data : dict[str, dict[str, list[Any]]]
+        report_data : dict[str, Any]
             The data to be aggregated.
         filter_content : dict[str, Any]
             The report filter settings.
@@ -400,7 +400,7 @@ class ReportGenerator:
             - The logs to be passed to ``OutputManager``.
 
         """
-        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
+        aggregate_report: dict[str, Any] = report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
         display_units: bool = filter_content.get("display_units", False)
 
@@ -613,7 +613,7 @@ class ReportGenerator:
 
     def _handle_horizontal_and_vertical_aggregations(
         self,
-        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
+        aggregate_report: dict[str, Any],
         horizontal_agg_key: str,
         vertical_agg_key: str,
         filter_content: dict[str, Any],
@@ -768,7 +768,7 @@ class ReportGenerator:
         self,
         report_data: dict[str, dict[str, list[float | None]]] | dict[str, list[float | None]],
         aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
-    ) -> tuple[dict[str, list[float | None]], list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, Any], list[dict[str, str | dict[str, str]]]]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -782,13 +782,13 @@ class ReportGenerator:
 
         Returns
         -------
-        tuple[dict[str, list[float | None]], list[dict[str, str | dict[str, str]]]]
+        tuple[dict[str, Any], list[dict[str, str | dict[str, str]]]]
             - The aggregated data.
             - The event logs.
 
         """
 
-        aggregated_data: dict[str, list[float | None]] = {}
+        aggregated_data: dict[str, Any] = {}
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for key, data in report_data.items():
             vertically_aggregated_data, aggregation_log = self._handle_aggregation(aggregator, data, key)
