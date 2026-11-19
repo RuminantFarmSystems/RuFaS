@@ -219,6 +219,45 @@ def test_apply_horizontal_aggregation(
 
 
 @pytest.mark.parametrize(
+    "report_data, expected",
+    [
+        (
+            {"col1": [1, None, 3], "col2": [None, 2, None, 4]},
+            {"col1": [1, 3], "col2": [2, 4]},
+        ),
+        (
+            {"col1": [1, 2, 3]},
+            {"col1": [1, 2, 3]},
+        ),
+        (
+            {"col1": [None, None, None]},
+            {"col1": []},
+        ),
+        (
+            {"col1": []},
+            {"col1": []},
+        ),
+        (
+            {},
+            {},
+        ),
+        (
+            {"col1": [0, False, "", None]},
+            {"col1": [0, False, ""]},
+        ),
+    ],
+)
+def test_omit_none_values(
+    report_data: dict[str, list[Any]],
+    expected: dict[str, list[Any]],
+) -> None:
+    """Test that None values are removed from report data columns."""
+    result = ReportGenerator._omit_none_values(report_data)
+
+    assert result == expected
+
+
+@pytest.mark.parametrize(
     "report_data, filter_content, expected_report_data, expected_exception",
     [
         # Valid case with a valid constant
