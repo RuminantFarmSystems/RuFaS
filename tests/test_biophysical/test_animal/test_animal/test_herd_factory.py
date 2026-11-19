@@ -1089,14 +1089,14 @@ def test_random_sample_with_replacement_by_type(
     mock_post_animal_population.next_id = mocker.patch.object(
         mock_post_animal_population,
         "next_id",
-        side_effct=mock_post_animal_population_next_id_list,
+        side_effect=mock_post_animal_population_next_id_list,
     )
     herd_factory.post_animal_population = mock_post_animal_population
 
     mock_random_choices = MagicMock(return_value=[0] * post_num)
     mocker.patch("random.choices", mock_random_choices)
 
-    mock_deepcopy = MagicMock()
+    mock_deepcopy = mocker.patch("copy.deepcopy")
     mocker.patch("copy.deepcopy", mock_deepcopy)
 
     result = herd_factory._random_sample_with_replacement_by_type(
@@ -1110,7 +1110,7 @@ def test_random_sample_with_replacement_by_type(
         call("animal.herd_initialization.simulation_days"),
         call(ANIMAL_NUM_KEY[TEST_CONFIG_BY_ANIMAL_TYPE[animal_type]["animal_type_string"]]),
     ]
-    mock_random_choices.assert_called_once_with(list(range(pre_num)), k=post_num)
+    mock_random_choices.assert_called_once_with(range(pre_num), k=post_num)
     assert mock_deepcopy.call_count == post_num
     assert len(result) == post_num
 
@@ -1289,7 +1289,7 @@ def test_random_sample_with_replacement_by_type_replacement(
         call("animal.herd_initialization.simulation_days"),
         call("animal.herd_information.replace_num"),
     ]
-    mock_random_choices.assert_called_once_with(list(range(pre_num)), k=post_num)
+    mock_random_choices.assert_called_once_with(range(pre_num), k=post_num)
     assert mock_deepcopy.call_count == post_num
     assert len(result) == post_num
 
