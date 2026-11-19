@@ -1,4 +1,4 @@
-Nutrient or Energy,Min,Max,Animal Groups
+Constituent,Min,Max,Animal Groups
 Dry matter intake,80% of requirement,120% of requirement,All except calves
 Metabolizable protein,100% of requirement,150% of requirement,All except calves
 Net energy: lactation,100% of requirement,--,Lactating pen only
