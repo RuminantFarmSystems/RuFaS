@@ -1723,11 +1723,14 @@ $$
 #### Feed Consumption
 
 ##### Introduction
-Feed consumption in RuFaS consists of 4 key components, which are defined for each animal combination: 1) the total DMI amount, 2) the feeds available, 3) the available feed costs and nutritive composition, and 4) the proportional inclusion of each ingredient in the diet. RuFaS provides several options for configuring these components in order to represent feed consumption. 
+Feed consumption in RuFaS consists of 4 key components, which are defined for each animal combination: 1) the total DMI amount, 2) the feeds available, 3) the available feed costs and nutritive composition, and 4) the proportional inclusion of each ingredient in the diet. RuFaS provides several options for configuring these components in order to represent feed consumption. The two ends of this range of options are:
 
-In the least-controlled formulation context, the user specifies only the list of feeds available to use for each animal combination, and allows a least-cost optimization procedure (@Li_2022) to formulate a ration that meets each pen’s nutrient requirements. Individual feed inclusions are unlimited, and DMI may increase by up to 30% from the initial value predicted by NASEM or NRC. If formulation of a diet that meets requirements is not possible with the given feeds and allowable DMI, milk production is penalized and the process is reattempted at a lower milk production. In the most-controlled context, the user specifies the exact DMI or DMI per unit of milk or gain, the exact inclusion rate of each feed, and prohibits any milk penalization. The input options detailed in this section allow the user to define the level of control exerted over the intake amounts and composition of the ration, depending on their use case. 
+* In the least-controlled formulation context, the user specifies only the list of feeds available to use for each animal combination, and allows a least-cost optimization procedure (@Li_2022) to formulate a ration that meets each pen’s nutrient requirements. Individual feed inclusions are unlimited, and DMI may increase by up to 30% from the initial value predicted by NASEM or NRC. If formulation of a diet that meets requirements is not possible with the given feeds and allowable DMI, milk production is penalized and the process is reattempted at a lower milk production.
+* In the most-controlled context, the user specifies the exact DMI or DMI per unit of milk or gain, the exact inclusion rate of each feed, and prohibits any milk penalization.
 
-Rations for each animal combination are formulated at the beginning of each user-defined formulation interval (the user-specified number of days between formulations). A formulation attempt will always occur at least once at the beginning of the interval. If the initial attempt fails, formulation will be reattempted as described in the Diet Formulation section. Available feeds, nutritive composition, feed costs, etc. do not vary over time in RuFaS. However, at the beginning of each formulation interval, nutrient requirements are recalculated to reflect the updated population of animals in each pen. 
+The input options detailed in this section allow the user to define the level of control exerted over the intake amounts and composition of the ration, depending on their use case. 
+
+Rations for each animal combination are formulated at the beginning of each user-defined formulation interval (`formulation_interval`; the number of days between formulations). A formulation attempt will occur at least once at the beginning of the interval. If the initial attempt fails, formulation will be reattempted as described in the [Diet Formulation](#diet-formulation) section. Available feeds, nutritive composition, feed costs, etc. do not vary over time in RuFaS. However, at the beginning of each formulation interval, nutrient requirements are recalculated to reflect the updated population of animals in each pen. 
 
 ::: {.callout-note}
 Because intake and/or diet composition information is provided at the animal combination level, only one list of ingredients (and, optionally, ingredient inclusions) can be provided per animal combination. Ration inputs cannot be configured at the pen level. However, if multiple pens are defined within an animal combination, and intake and ingredient composition are not fixed, pen-level intake of DMI and individual feeds may vary due to differing nutrient requirements of pens.
@@ -1761,7 +1764,7 @@ Ration outputs are reported by several classes and functions, each of which incl
 
 **AnimalModuleReporter.report_average_nutrient_requirements.avg_rqmts**  
 
-* **Description**: Lists the average nutrient requirements per animal in each ration interval, by pen.
+* **Description**: Lists the average nutrient requirements by animal, per pen. Reported for each ration formulation interval.
 * **Variables** (listed by unit): 
   + mcal: NEg_requirement, NEpreg_requirement, NEl_requirement
   + g: MP_requirement, Ca_requirement, P_req, P_req_process, avg_essential_amino_acid_requirement 
@@ -1804,16 +1807,22 @@ Ration outputs are reported by several classes and functions, each of which incl
 ##### Dry Matter Intake {#dmi-section}
 
 ###### Basic options for configuring dry matter intake
-Dry matter intake is set at the beginning of each ration formulation attempt, as is based on the user-defined DMI input options described in this section. There are 3 distinct options available to the user to configure DMI of each animal combination, which are detailed below. The `intake_option` value in the feed input JSON sets the desired DMI option, and `intake_value` sets the DMI value, if required by the DMI option used. 
+Dry matter intake is set at the beginning of each ration formulation attempt, and is based on the user-defined DMI input options described in this section. There are 3 distinct options available to the user to configure DMI of each animal combination, which are detailed below:
 
-If the initial ration formulation attempt fails, formulation will be reattempted as described in the Diet Formulation section. Importantly, if allowable by the selected DMI input option and tolerance value, DMI may increase or decrease at each formulation reattempt. See the Diet Formulation section for more information on how DMI may be modulated in the formulation reattempt process. The global tolerance parameter may also be used to enable user-controlled variation in DMI and ingredient inclusion. At this time, only a single tolerance value applicable to all animal combinations can be set; tolerance cannot be set by combination.
+1. `predict_DMI`: DMI is predicted using the equations of the user-selected nutritional model (NRC or NASEM).
+2. `set_DMI`: DMI is set to a user-specified value (kg/animal/day).
+3. `set_DMI_per_X`: DMI is set to a user-specified value per kg of milk yield (lactating cows) or per kg of average daily gain (growing animals).
+
+The `intake_option` value in the feed input JSON sets the desired DMI option, and `intake_value` sets the DMI value, if required by the DMI option used. 
+
+If the initial ration formulation attempt fails, formulation will be reattempted as described in the [Diet Formulation](#diet-formulation) section. Importantly, if allowable by the selected DMI input option and tolerance value, DMI may increase or decrease at each formulation reattempt. See the [Diet Formulation](#diet-formulation) section for more information on how DMI may be modulated in the formulation reattempt process. The global tolerance parameter (`user_defined_ration_tolerance`) may also be used to enable user-controlled variation in DMI and ingredient inclusion. At this time, only a single tolerance value applicable to all animal combinations can be set; tolerance cannot be set by combination.
 
 ###### Predict DMI option
-With the `predict_DMI` option, DMI prediction equations from the user-selected nutritional model (@nrc_2001 or @nrc_2021) are utilized to predict a DMI value based each animal's attributes at the time of formulation. Importantly, input values to these equations may be modulated by the formulation reattempt process and the DMI re-estimated from the updated values. For example, milk reduction may be reduced, thereby reducing the estimated DMI of lactating cows. See Diet Formulation for more details. As this time, this option is not usable with the Calf animal combination.
+With the `predict_DMI` option, DMI prediction equations from the user-selected nutritional model (@nrc_2001 or @nrc_2021) are utilized to predict a DMI value based on each animal's attributes at the time of formulation. Importantly, input values to these equations may be modulated by the formulation reattempt process and the DMI re-estimated from the updated values. For example, milk production may be reduced, thereby reducing the estimated DMI of lactating cows. See [Diet Formulation](#diet-formulation) for more details. At this time, this option is not usable with the Calf animal combination.
 
 ***NRC DMI Estimation***
 
-Methods for estimating DMI are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-dmi-var. The sum of DMI of each feed is assumed to be less or equal to than the estimated DMI:
+Methods for estimating DMI are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-dmi-var. The sum of DMI of each feed is assumed to be less than or equal to the estimated DMI:
 
 $$
 \sum_{i} \text{Feed}_{i} \le \text{DMIest}
@@ -1821,7 +1830,7 @@ $$
 
 **Lactating Cows** <br>
 
-For lactating cows, the estimated DMI (DIMest) is calculated as a function of the fat corrected milk (FCM), bodyweight (BW), and week of lactation (WOL). 
+For lactating cows, the estimated DMI (DMIest) is calculated as a function of the fat corrected milk (FCM), bodyweight (BW), and week of lactation (WOL). 
 
 :::{#eq-an-nrc-51}
 [[**AN.NRC.51**]]{.aside .content-visible when-format="html"}
@@ -1859,7 +1868,7 @@ $$
 $$
 :::
 
-* If the heifer is *MORE* than 365 days old, a separate intercept is used and adjustment is also made for the pregnacy status if she is greater than 210 DOP:
+* If the heifer is *MORE* than 365 days old, a separate intercept is used and adjustment is also made for the pregnancy status if she is greater than 210 DOP:
 
 :::{#eq-an-nrc-55}
 [[**AN.NRC.55**]]{.aside .content-visible when-format="html"}
@@ -1870,7 +1879,7 @@ $$
 
 ```{python}
 #| label: tbl-an-dmi-var
-#| tbl-cap: Key variables used in DMI calculations.
+#| tbl-cap: Key variables used in NRC DMI calculations.
 import_table(
   "../resources/table_data/animal/tbl-an-dmi-var.csv",
   colalign = ["left", "left", "left"]
@@ -1884,7 +1893,7 @@ import_table(
 Dry matter intake estimation is different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-nasem-dmi-var. For all animal classes, the sum of the DMI of each feed is assumed to be less than or equal to the DMI estimate:
 
 $$
-\sum_{i} \text{Feed}_{i} < \text{DMIest}
+\sum_{i} \text{Feed}_{i} \le \text{DMIest}
 $$
 
 **Lactating Cows** 
@@ -1914,7 +1923,7 @@ $$
 
 ```{python}
 #| label: tbl-an-nasem-dmi-var
-#| tbl-cap: Key variables used in DMI estimation calculations.
+#| tbl-cap: Key variables used in NASEM DMI estimation calculations.
 import_table(
   "../resources/table_data/animal/tbl-an-nasem-dmi-var.csv",
   colalign = ["left", "left", "center"]
@@ -1923,11 +1932,11 @@ import_table(
 
 
 
-###### `Set_DMI` and `set_DMI_per_X` options
+###### `set_DMI` and `set_DMI_per_X` options
 
-Two options exist to control DMI of each animal combination. The `set_DMI` option will force the formulation process to utilize the same user-specified DMI (kg) at every formulation attempt. As a result, animals in this combination will consume the same amount of DM every single day of the simulation. However, the user may elect to allow DMI to vary by a user-defined percentage value, which is configured by the `tolerance` input value. For example, if the `intake_value`  is 20 kg and the tolerance value is 1%, the DMI will range between 19.8 and 20.2 kg. `Set_DMI` is usable with all animal combinations.
+Two options exist to control DMI of each animal combination. The `set_DMI` option will force the formulation process to utilize the same user-specified DMI (kg) at every formulation attempt. As a result, animals in this combination will consume the same amount of DM every single day of the simulation. However, the user may elect to allow DMI to vary by a user-defined percentage value, which is configured by the `user_defined_ration_tolerance` input value. For example, if the `intake_value` is 20 kg and `user_defined_ration_tolerance` is 0.01 (1%), the DMI will range between 19.8 and 20.2 kg. `set_DMI` is usable with all animal combinations.
 
-The `set_DMI_per_X` option sets the DMI of all animals in an animal combination according to a user-provided value for feed intake (kg) per kg of milk yield (for lactating) or average daily gain (for growing). The provided DMI per X value is multiplied by the milk production or average daily gain value for the pen at the beginning of the ration formulation interval. Allowable variance in the ratio between DMI and X can also be set by the `tolerance` value. For example, if an input value of 0.65 lbs DMI/lb milk is provided, with a `tolerance` of 0.05, the ratio of DMI to milk may range from 0.6175 to 0.6825. Though pen-level daily milk production and gain will vary from day to day in the stimulation, the DMI is based only on the milk production or average daily gain at the beginning of the ration formulation interval, and is fixed for the duration of the interval. The `set_DMI_per_X` option is usable with lactating and growing animal combinations.
+The `set_DMI_per_X` option sets the DMI of all animals in an animal combination according to a user-provided value for feed intake (kg) per kg of milk yield (for lactating) or average daily gain (for growing). The provided DMI per X value is multiplied by the milk production or average daily gain value for the pen at the beginning of the ration formulation interval. Allowable variance in the ratio between DMI and X can also be set by the `user_defined_ration_tolerance` value. For example, if an input value of 0.65 kg DMI/kg milk is provided, with a `user_defined_ration_tolerance` of 0.05 (5%), the ratio of DMI to milk may range from 0.6175 to 0.6825. Though pen-level daily milk production and gain will vary from day to day in the simulation, the DMI is based only on the milk production or average daily gain at the beginning of the ration formulation interval, and is fixed for the duration of the interval. The `set_DMI_per_X` option is usable with lactating and growing animal combinations.
 
 ::: {.callout-note}
 At this time, DMI of calves must be set to a kg/day amount using the `set_DMI` option; calf DMI cannot be predicted or set per unit of daily gain.
@@ -1940,9 +1949,9 @@ The RuFaS feed libraries were adapted from @nrc_2001 and @nrc_2021 and include >
 
 If desired, users may also provide their own nutritive composition information by either modifying the library feeds or adding additional feeds to the library. These changes can be made directly in the feed library .csv file (note that feed libraries for NRC and NASEM are referenced in metadata files as `NRC_Comp` and `NASEM_Comp`, respectively). Users are encouraged to utilize library values as “templates” for adding new or modified versions of feeds, to ensure all required nutritive information is present. 
 
-##### Diet Formulation
+#### Diet Formulation {#diet-formulation}
 
-###### Overview
+##### Overview
 Ration formulation is carried out at the pen level on a user-defined interval (`formulation_interval`), and uses a user-provided list of feeds available per animal combination. Broadly speaking, there are two methods to formulate rations: the fully automated method (@fig-ani_auto_ration), and the user-defined method (@fig-ani_UDR). In both cases, nutrient and energy requirements are first calculated for each animal in a given pen, and then the pen average requirements are calculated and used in subsequent steps. Ration formulation is then attempted using a least-cost optimization method (`minimize` from the package SciPy; @Li_2022). A set of internal constraints (@tbl-an-diet-const) serve to prevent formulation of inappropriate rations when optimization logic is in use, and ingredient-specific minimum and maximum inclusions (kg or %DM) are also definable by the user. Successful formulation occurs if the ration meets all ingredient inclusion bounds and passes all constraints. 
 
 ```{python}
@@ -1959,9 +1968,9 @@ import_table(
 Bounds for individual feed ingredient inclusion on a mass basis (kg) are set as raw minimum and maximum values for all animal combinations via the `lower_limit` and `limit` columns in the feed library file. These values by default are set to a minimum of 0 kg and maximum of 100 kg/animal/day, and thus do not restrict formulation unless modified by the user.
 
 ##### Feed ingredient inclusion percentages
-When utilizing the user-defined ration formulation option (`user_input` set to true in @tbl-an-ration-input-animal), ingredient inclusion percentages are defined for each animal combination. The DMI value is used as reference for the inclusion percentage, so a feed ingredient with a given value of 0.2 (20%) in a diet at 25 kg total DMI would result in 5 kg of said feed ingredient allowed in a successful ration, overriding the bounds set in the feed library file. User-defined ingredient inclusion proportions may be further modified by the tolerance value (see `user_defined_ration_tolerance` in @tbl-an-ration-input-feed). The tolerance value determines the “width” of the bounds by defining a +/- fractional variance for each ration inclusion percentage value. The primary role of `tolerance` is to allow the intake and diet composition to be adjusted as necessary to avoid violating constraints (@tbl-an-diet-const) as the population and requirements of animals vary over time.
+When utilizing the user-defined ration formulation option (`user_input` set to true in @tbl-an-ration-input-animal), ingredient inclusion percentages are defined for each animal combination. The DMI value is used as reference for the inclusion percentage, so a feed ingredient with a given value of 0.2 (20%) in a diet at 25 kg total DMI would result in 5 kg of said feed ingredient allowed in a successful ration, overriding the bounds set in the feed library file. User-defined ingredient inclusion proportions may be further modified by the tolerance value (`user_defined_ration_tolerance` in @tbl-an-ration-input-feed). A single value of `user_defined_ration_tolerance` is specified for the entire ration; it applies to every ingredient and to all animal combinations. The tolerance value determines the “width” of the bounds by defining a +/- fractional variance for each ration inclusion percentage value. The primary role of `user_defined_ration_tolerance` is to allow the intake and diet composition to be adjusted as necessary to avoid violating constraints (@tbl-an-diet-const) as the population and requirements of animals vary over time.
 
-* Tolerance value example: a feed with a user defined ration percentage value of 0.2 (20% of DM) and tolerance of 0.1 (10%) would correspond to an allowable range for said feed ingredient of 18% to 22% of the DMI value.
+* Tolerance value example: a feed with a user-defined ration percentage value of 0.2 (20% of DM) and tolerance of 0.1 (10%) would correspond to an allowable range for said feed ingredient of 18% to 22% of the DMI value.
 * Note: setting a tolerance of 0.0 collapses the bounds to a single value for each inclusion percentage, meaning that the resultant ration will precisely match the user-defined ingredient inclusion percentages.
 
 ##### Ration formulation failure: overview
@@ -1984,7 +1993,7 @@ Failure of a ration to be formulated successfully indicates that the requirement
 
 **Lactating animals**: the following steps will be attempted, in sequence.
 
-1. Given that the DMI value (based on the `DMI_input` option; see [DMI section](#dmi-section) above) drives overall intake, and a user may want to increase intake without deviating from feed ingredient inclusion rates, intake is increased and optimization is attempted either until 1. a successful formulation occurs, or 2. the upper intake limit is reached. When the `predict_DMI` option is used, intake may increase by up to 30%. When `set_DMI` or `set_DMI_per_X` is used, intake may increase only up to the tolerance value. Once the upper intake limit is reached, the process continues to the next step.
+1. Given that the DMI value (based on the `intake_option` setting; see [DMI section](#dmi-section) above) drives overall intake, and a user may want to increase intake without deviating from feed ingredient inclusion rates, intake is increased and optimization is attempted either until 1. a successful formulation occurs, or 2. the upper intake limit is reached. When the `predict_DMI` option is used, intake may increase by up to 30%. When `set_DMI` or `set_DMI_per_X` is used, intake may increase only up to the tolerance value. Once the upper intake limit is reached, the process continues to the next step.
 2. If milk yield can be reduced (see Automated method: Lactating animals section above for more details), milk yield will be reduced and the process loops back to recalculate nutritional requirements for all animals in a pen. Note that when the `predict_DMI` option is used, DMI will decrease when milk reductions occur, as milk energy output is a factor in DMI prediction equations. The DMI reduction amount is capped at 30% of the initial DMI estimation, before milk yield reductions are attempted.
 3. If both Steps 1 and 2 are no longer possible to carry out, then the user defined inclusion percentages are used to generate a ration, following the DMI value as reference. This allows the simulation to continue, but the final “failure” is still recorded for the user to inspect if needed.
 
