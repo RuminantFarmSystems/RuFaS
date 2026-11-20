@@ -1,0 +1,5 @@
+```{python}
+import sys
+sys.path.append("../scripts")
+from markdown_tables import import_table, display_md_tbl, read_tbl
+```

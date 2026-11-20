@@ -1,0 +1,34 @@
+# ----------------------------------------------------
+# This .gitignore sub-file filters files that are
+# tracked by git anywhere within this folder
+# (docs/scientific/quarto-scidoc) and its subfolders
+# ----------------------------------------------------
+
+# raw LaTeX files
+*.tex
+
+# ignore all intermediate index files except index.qmd and index.html
+index.*
+!index.qmd
+!index.html
+
+# ------------------------------------------------------------
+# Quarto generated build/cache/output directories
+# These folders are automatically regenerated during
+# `quarto render` and should not be version controlled.
+# Ignoring them does NOT affect HTML/PDF compilation.
+# ------------------------------------------------------------
+
+# ignore quarto specific files
+/.quarto/
+
+# temporarily ignore the rendered output
+_book/
+
+# Intermediate jupyter notebook files
+*.quarto_ipynb*
+.ipynb_checkpoints/
+**/*.quarto_ipynb*
+.~*#
+
+**/*.quarto_ipynb
