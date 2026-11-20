@@ -253,7 +253,7 @@ $$
 *Where*:
 
 * `num_stalls` = the number of stalls in the pen assigned to the handler
-* `surface_area` (m^2/animal) = surface area per stall, provided in @tbl-mn-surface-area
+* `surface_area` (m$^2$/animal) = surface area per stall, provided in @tbl-mn-surface-area
 
 ```{python}
 #| label: tbl-mn-surface-area
@@ -558,7 +558,6 @@ import_table(
 ```
 [@Jorgensen2009; @Fournel2019]
 
-
 **Calculate Total Mass and Water**
 
 *Separated solids fraction*
@@ -632,7 +631,6 @@ import_table(
   colalign = ["left", "center", "left", "left"]
 )
 ```
-
 
 ## Anaerobic Digestion
 
@@ -762,7 +760,7 @@ $$
 
 *Where*:
 
-* `generated_methane_volume` (m$^3$): volume of CH<sub>4</sub> generated in the digester on a single day, calculated in [MN.ADG.1]{#eq-mn-adg-1}.
+* `generated_methane_volume` (m$^3$): volume of CH<sub>4</sub> generated in the digester on a single day, calculated in [MN.ADG.1](#eq-mn-adg-1).
 
 **Calculate Destroyed Volatile Solids `_destroy_volatile_solids`**
 
@@ -858,7 +856,7 @@ $$
 
 **Calculate Methane Leakage `_calculate_methane_leakage`**
 
-Calculates the volume of CH<sub>4</sub> generated that is lost to the atmosphere via leakage. The leakage fraction is currently a user input with a default value of 1\%, which represents a conservative leakage rate. Leakage is largely dependent on the age and type of digester and should ideally be provided by the user for specificity.
+Calculates the volume of CH<sub>4</sub> generated that is lost to the atmosphere via leakage. The leakage fraction is currently a user input with a default value of 1%, which represents a conservative leakage rate. Leakage is largely dependent on the age and type of digester and should ideally be provided by the user for specificity.
 
 ::: {#eq-mn-adg-12}
 [[**MN.ADG.12**]]{.aside .content-visible when-format="html"}
@@ -1103,7 +1101,7 @@ $$
 
 * `24` = conversion factor from hours to day. 
 * `Arrh_exp` = Arrhenius parameter for CH<sub>4</sub> emission rate (g CH<sub>4</sub> kg$^{-1}$ VS h$^{-1}$), calculated in [MN.MET.2](#eq-mn-met-2). 
-* `VS<sub>d_or_nd</sub>` = The mass (kg) of VSd or VSnd in manure in slurry storage.
+* VS<sub>d_or_nd</sub> = The mass (kg) of VSd or VSnd in manure in slurry storage.
 * `rate_factor` = The unitless rate-correcting factor, set to 1 for VS$_\text{d}$ and 0.01 for VS$_{\text{nd}}$. 
 
 The total daily CH<sub>4</sub> emission is equal to the sum of emissions from the VS<sub>d</sub> and VS<sub>nd</sub> fractions.
@@ -1121,8 +1119,8 @@ $$
 
 *Where*:
 
-* `emitted_storage_CH<sub>4</sub>` (kg) = daily kg of CH<sub>4</sub> emitted from stored manure
-* `total_storage_CH<sub>4</sub>` (kg) = daily kg of CH<sub>4</sub> generated, calculated in [MN.MET.3](#eq-mn-met-3). 
+* emitted_storage_CH<sub>4</sub> (kg) = daily kg of CH<sub>4</sub> emitted from stored manure
+* total_storage_CH<sub>4</sub> (kg) = daily kg of CH<sub>4</sub> generated, calculated in [MN.MET.3](#eq-mn-met-3). 
 * `METHANE_DESTRUCTION_EFFICIENCY` = coefficient for destruction of methane by the flare, set to 0.81.
 
 **Calculate Volatile Solids Loss** `_apply_methane_emissions`
@@ -1140,7 +1138,7 @@ $$
 
 *Where*:
 
-* `CH<sub>4</sub> emission from VS<sub>d or nd</sub>` (kg) = total daily kg of CH<sub>4</sub> emitted from VS<sub>d or nd</sub>, calculated in [MN.MET.3](#eq-mn-met-3)
+* CH<sub>4</sub> emission from VS<sub>d or nd</sub> (kg) = total daily kg of CH<sub>4</sub> emitted from VS<sub>d or nd</sub>, calculated in [MN.MET.3](#eq-mn-met-3)
 * `VS_TO_METHANE_LOSS_RATIO` = default ratio of VS degraded per kg of CH<sub>4</sub> emitted from slurry storage, set to 6.665
 
 **Calculate Ammonia Emissions `_calculate_ammonia_emissions`**
@@ -1181,8 +1179,8 @@ $$
 
 *Where*:
 
-* `K<sub>h</sub>` = Henry’s law coefficient, calculated in [MN.AMM.1](#eq-mn-amm-1).
-* `K<sub>a</sub>` = Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#-eq-mn-amm-2).
+* K<sub>h</sub> = Henry’s law coefficient, calculated in [MN.AMM.1](#eq-mn-amm-1).
+* K<sub>a</sub> = Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#-eq-mn-amm-2).
 
 Next, the rate of NH<sub>3</sub>-N loss in kg N/m$^2$ from stored manure is calculated:
 
@@ -1198,7 +1196,7 @@ $$
 * `y` = manure density, set to 990 kg/m$^3$ 
 * `STORAGE_RESISTANCE` = A constant value representing the sum of resistance of NH<sub>3</sub> transfer from solution to manure surface, and from manure surface to atmosphere, set at 23.1 s/m.
 * `M` (kg) = Total mass of stored manure
-*` Q` = Equilibrium coefficient calculated in [MN.AMM.3](#eq-mn-amm-3)
+* `Q` = Equilibrium coefficient calculated in [MN.AMM.3](#eq-mn-amm-3)
 
 Lastly, we calculate total NH<sub>3</sub>-N emissions (kg), based on the emission rate we just calculated and the manure storage surface area.
 
@@ -1226,7 +1224,7 @@ $$
 *Where*:
 
 * `Received_N` (kg) = Quantity of manure total N loaded into storage on the current day
-* `N<sub>2</sub>O_factor` = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to storage, based on the following logic:
+* N<sub>2</sub>O_factor = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to storage, based on the following logic:
     * Cover type = crust OR cover; 0.005
     * Cover type = no cover; 0 (no N<sub>2</sub>O emissions)
 
@@ -1708,9 +1706,7 @@ $$
 * `DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP` = The effect of moisture on microbial decomposition, set at 0.65. This is a simplification as moisture content of the manure pack is not currently modeled. 
 * `anaerobic_effect` = the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. Set to 0.9664 by default.
 
-**Calculate Total VS Loss** 
-
-`_apply_dry_matter_loss`
+**Calculate Total VS Loss** `_apply_dry_matter_loss`
 
 The quantity of total and volatile solids remaining in the accumulated bedded pack must be updated according to estimated CH<sub>4</sub> and C decomposition losses. To do this, we calculate the total loss of VS through CH<sub>4</sub> emission and C decomposition. Loss of mass through CH<sub>4</sub> emissions is assumed to be equal to the mass of CH<sub>4</sub> emitted. Manure volatile solids are assumed to be 50% C, therefore, to determine total mass loss through C decomposition, we divide the mass of C decomposition by 0.50. Importantly, volatile solids destruction is attributed only to manure-excreted volatile solids; bedding volatile solids destruction is not considered at this time.
 
@@ -1726,9 +1722,7 @@ $$
 * `methane` (kg) = The daily methane loss, calculated with [MN.MET.6](#eq-mn-met-6), based on the daily quantity of manure VS added to the bedded pack
 * `total_carbon_decomposition` (kg) = quantity of C lost through microbial decomposition (kg), calculated with [MN.STO.10](#eq-mn-sto-10), based on the daily quantity of manure VS added to the bedded pack
 
-**Calculate N Loss to Ammonia** 
-
-`_calculate_cbpb_ammonia_emission`
+**Calculate N Loss to Ammonia** `_calculate_cbpb_ammonia_emission`
 
 Manure nitrogen being deposited and accumulating in the bedded pack results in NH<sub>3</sub> emissions. Here we utilize an emission factor based on mixing activity [@Hanson2024]  to estimate total kg of ammonia loss based on the daily manure N deposition by animals. 
 
@@ -1746,9 +1740,7 @@ $$
     * Bedded pack (no mixing) = `AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING` (0.25) 
     * Compost bedded pack (mixing) = `AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING` (0.50)
 
-**Calculate N loss to Nitrous Oxide** 
-
-`_calculate_cbpb_nitrous_oxide_emission`
+**Calculate N loss to Nitrous Oxide** `_calculate_cbpb_nitrous_oxide_emission`
 
 In addition to NH<sub>3</sub>-N emissions, manure nitrogen deposition in the bedded pack also results in N<sub>2</sub>O emissions. Similar to NH<sub>3</sub>, we estimate daily N<sub>2</sub>O-N loss using an emissions factor from @Hanson2024 based on the type of management used. 
 
@@ -1764,9 +1756,7 @@ $$
     * Bedded pack (no mixing) = `NITROUS_OXIDE_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING` (0.01) 
     * Compost bedded pack (mixing) = `NITROUS_OXIDE_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING` (0.07)
 
-**Calculate N Loss to Leaching** 
-
-`calculate_nitrogen_loss_to_leaching`
+**Calculate N Loss to Leaching** `calculate_nitrogen_loss_to_leaching`
 
 Manure nitrogen deposited in bedded packs may also be lost to leaching. Leaching of manure N may occur when fecal and urinary N are converted to nitrate in the soil beneath the bedded pack, if the pack is not concrete, lined, or otherwise sealed. Nitrate can then be carried away via water movement through the subsoil. Similar to NH<sub>3</sub> and N<sub>2</sub>O, we estimate daily leaching-N loss using an emissions factor from @Hanson2024, which is not influenced by management of the bedded pack (i.e., mixing activity). 
 
@@ -2171,8 +2161,6 @@ import_table(
 The “Max(0, )” notation prevents the ammoniacal N value from becoming negative. This is especially important early in a simulation when accumulated manure quantities that are very small compared to the fixed surface area value can lead to high ammonia emissions.
 
 `degradable_volatile_solids_frac` = received manure `degradable_volatile_solids` / received manure `total_volatile_solids`
-
-
 ::: 
 
 
