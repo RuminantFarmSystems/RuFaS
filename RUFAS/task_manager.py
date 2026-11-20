@@ -20,6 +20,7 @@ from SALib.sample import morris as morris_sampler
 
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
+from RUFAS.EEE.EEE_manager import EEEManager
 from RUFAS.e2e_test_results_handler import E2ETestResultsHandler
 from RUFAS.input_manager import InputManager
 
@@ -319,6 +320,7 @@ class TaskManager:
                 "input_data_csv_export_path": Path(input_data_csv_export_path),
                 "input_data_csv_import_path": Path(input_data_csv_import_path),
                 "output_prefix": "task_manager",
+                "run_eee": False,
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
@@ -1243,6 +1245,7 @@ class TaskManager:
 
         group_args = e2e_runs[0].copy()
         group_args["output_prefix"] = e2e_group
+        group_args["run_eee"] = False
         task_type = group_args["task_type"]
 
         output_manager = OutputManager()
@@ -1404,6 +1407,7 @@ class TaskManager:
 
         output_manager.add_log("End-to-end testing", "Starting E2E simulation.", info_map)
 
+        args["run_eee"] = True
         TaskManager._handle_simulation_engine_run_tasks(
             args=args,
             input_manager=input_manager,
@@ -1511,10 +1515,9 @@ class TaskManager:
 
         Notes
         -----
-        - For args, when the optional ``run_eee`` key is set to ``True``, the Emissions, Energy, and Economics
-        estimators are executed before the remaining post-processing steps. When ``load_saved_output_pools`` is
-        ``True`` the saved pools defined in ``saved_output_pools`` are loaded and namespaced prior to
-        post-processing.
+        - For args, when ``load_saved_output_pools`` is ``True`` the saved pools defined in ``saved_output_pools``
+        are loaded and namespaced prior to post-processing. When the optional ``run_eee`` key is set to ``True``, the
+        Emissions, Energy, and Economics estimators are then executed on the variables pool before results are saved.
         """
         info_map = {
             "class": TaskManager.__name__,
@@ -1522,13 +1525,6 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
-
-        if args.get("run_eee", False):
-            pass
-            # TODO update path to `RUFAS.EEE.EEE_manager` when EEE is finalized and moved in either PR #2524 or #1299
-            # TODO update to be able to run EEE once farmgrown feed emissions are finalized #2580
-            # eee_manager_module = import_module("RUFAS.routines.EEE.EEE_manager")
-            # eee_manager_module.EEEManager.estimate_all()
 
         if export_input_data_to_csv:
             output_manager.create_directory(args["input_data_csv_export_path"])
@@ -1555,6 +1551,9 @@ class TaskManager:
             output_manager.load_variables_pool_from_file(args["output_pool_path"])
             output_manager.set_metadata_prefix("reload")
 
+        if args.get("run_eee", False):
+            TaskManager._run_eee(args, input_manager)
+
         output_manager.print_errors_warnings_logs_counts(task_id, args["output_prefix"])
         if should_flush_im_pool:
             input_manager.flush_pool()
@@ -1578,6 +1577,29 @@ class TaskManager:
             output_manager.dump_all_nondata_pools(
                 args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
             )
+
+    @staticmethod
+    def _run_eee(args: dict[str, Any], input_manager: InputManager) -> None:
+        """
+        Runs the Emissions, Energy, and Economics estimators for the modules simulated in the task.
+
+        Parameters
+        ----------
+        args : dict[str, Any]
+            Arguments for post-processing. ``simulation_type`` is used when present, otherwise it is read from the
+            ``InputManager`` configuration data.
+        input_manager : InputManager
+            Manager holding the input data for the task.
+        """
+        simulation_type = SimulationType.get_simulation_type(
+            args.get("simulation_type") or input_manager.get_data("config.simulation_type")
+        )
+        EEEManager.estimate_all(
+            simulation_type.simulate_animals,
+            simulation_type.simulate_feed,
+            simulation_type.simulate_fields,
+            simulation_type.simulate_manure,
+        )
 
     @staticmethod
     def set_random_seed(random_seed: int | None, output_manager: OutputManager) -> None:
