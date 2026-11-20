@@ -36,7 +36,7 @@ and Cow).
 *  Heifer II animals that successfully conceive become Heifer III's when the number of days left in their pregnancy 
 is equal to the user-defined input for prefresh days (default 21).
 *  When a Heifer III calves, she becomes a Cow for the rest of her life on the RuFaS farm.
-*  Cows cycle through lactating and non-lactating phases until they are removed from the herd through mortality, disease-related sale, or herd-size management (i.e., lowest producing cows are replaced by incoming heifers).
+*  Cows cycle through lactating and non-lactating phases until they are removed from the herd through mortality, acute sale, or low production sale (i.e., herd-size management in which the lowest-ranking eligible cows are sold as incoming heifers calve).
 
 When a Heifer III or Cow reaches full gestation length, a new calf object is created. The calf is assigned a birthweight according to a user-informed random distribution. All live male calves are recorded and removed from the farm on the day of birth. Female calves either remain on the farm or are sold according to the user-selected calf retention method. Users may retain female calves using either a probability-based retention rate or a target annual number of calves to retain. Youngstock that remain in the herd are also subject to user-defined calf and heifer mortality probabilities as they progress through the calf and heifer life stages.
 
@@ -1987,8 +1987,7 @@ The rate of Heifer IIIs calving is largely determined by the rate of dairy femal
 At each herd-size check, `HerdManager` evaluates the current number of cows relative to the user-defined buying and selling thresholds.
 Low production sales in RuFaS are used to reduce the cow population when cow numbers exceed the user-defined selling threshold, in the same way that springing heifers replace low-producing cows in real herds.
 
-Low production sales are sometimes referred in code or documentation as "oversupply" because the number of sales are regulated by the herd size growth driven by heiferIII's calving. 
-
+Low production sales, previously referred to as "oversupply" or "herd resize" culls, are assigned the cull reason `culled for low production` (`LOW_PRODUCTION_CULL` in `animal_constants.py`), and the number sold is reported as `sold_cow_low_production_num`.
 Not all cows are eligible for removal. Eligibility is determined using the user-defined days-in-milk and pregnancy thresholds. By default, a cow must have at least 60 days in milk and must have carried her current calf for no more than 180 days to be considered for a low production cull. These limits protect fresh cows and cows in later pregnancy, respectively.
 
 Eligible cows are ranked according to `cull_ranking_criteria`:
@@ -2013,19 +2012,19 @@ Low production culling replaces the previous production-related culling mechanis
 
 **Parameters and Equations**
 
-* `HerdManager._check_if_cows_need_to_be_sold()` evaluates whether the current cow population exceeds the user-defined selling threshold and coordinates the removal of cows when herd size exceeds that threshold via `cull_ranking_criteria`.
-  * Called by `HerdManager.daily_routines()` and returns a list of cows removed
-  * Logic 
-	    * Compare the current number of cows with `herd_num` × `herd_size_sell_threshold`.
-      * If the cow population exceeds the selling threshold, identify cows to remove. 
-      * Rank eligible cows according to `cull_ranking_criteria`.
-      * Removes cows until the herd-size selling condition has been addressed.
-      * Record removed animals and update cow low production sale statistics.
+* `HerdManager._check_if_cows_need_to_be_sold()` evaluates whether the current cow population exceeds the user-defined selling threshold and coordinates the removal of cows when herd size exceeds that threshold.
+  * Called by `HerdManager._apply_daily_herd_structure_updates()` (within `HerdManager.execute_daily_routines()`) on each herd-size evaluation day (every `herd_size_adjustment_period` days) and returns a list of cows removed.
+  * Logic
+    * Compare the current number of cows with `herd_size_sell_threshold`, which is a number of cows.
+    * While the number of cows is above the selling threshold, remove the lowest-ranking eligible cow according to `cull_ranking_criteria`.
+    * Assign each removed cow the cull reason `culled for low production` and record the day of sale.
+    * If no eligible cow remains while the herd is still above the threshold, record an error ("Unable to adjust herd size") and stop selling for that day.
+  * The removed cows are then passed to `HerdManager._update_sold_and_died_cow_statistics()`, which updates `sold_cow_low_production_num`.
 
 * `HerdManager._get_cow_removal_index()` identifies the lowest-ranking cow that is eligible for a low production cull.
-      * Cow eligibility is determined using `cull_eligibility_minimum_days_in_milk` and `cull_eligibility_maximum_days_carried_calf`.
-      * Eligible cows are ranked according to the user-defined `cull_ranking_criteria`.
-      * Returns the index of the eligible cow selected for removal.
+  * Cow eligibility is determined using `cull_eligibility_minimum_days_in_milk` and `cull_eligibility_maximum_days_carried_calf`.
+  * Eligible cows are ranked according to the user-defined `cull_ranking_criteria`.
+  * Returns the index of the eligible cow selected for removal.
 
 #### Heifer III Purchases
 
@@ -2091,9 +2090,10 @@ when they are close to calving. Specifically, Heifers II become Heifers III when
 user-defined input for the prefresh days. When a Heifer III animal calves for the first time, she becomes a Cow and will remain a cow for the 
 rest of her life on the RuFaS farm. 
 
-When a Heifer III calves for the first time and becomes a Cow, then that animal will cycle through lactating and non-lactating phases until they are removed 
-from the herd due to a failure to conceive or a user-provided probability for culling within each parity. The methods that determine when a cow will leave 
-the herd are described in detail in the Herd Exits section.
+When a Heifer III calves for the first time and becomes a Cow, then that animal will cycle through lactating and non-lactating phases until she is removed
+from the herd. Cows may leave the herd through mortality, acute sale, or low production sale. Mortality and acute sale are evaluated daily using
+whole-herd annual probabilities that are distributed across parity groups and adjusted for fresh cows, while low production sales are used to regulate herd size.
+The methods that determine when a cow will leave the herd are described in detail in the [Culling](#sec-an-cull) section.
 
 **Parturition and New Calves** 
 
@@ -3023,25 +3023,25 @@ Sale may occur of:
 
 * Newborn calves: all male calves and crossbred beef calves; female calves based on `calf_retention_method`
 * Heifer IIs: if the heifer does not have a successful conception or pregnancy and age (days born) exceeds `heifer_repro_cull_time`
-* Cows (through two possible mechanisms): 
-   * Acute culls, determined by a statistical distribution of occurrence, or
-   * Low production culls, driven by the rate of heiferIII calvings causing herd size to increase above the `herd_size_sell_threshold`
+* Cows (through two possible mechanisms):
+   * Acute sales, determined daily by a parity- and lactation-stage-specific probability of occurrence, or
+   * Low production sales, driven by the rate of Heifer III calvings causing herd size to increase above the `herd_size_sell_threshold`
 
 Deaths that may occur:
 
-* Cows: determined by a statistical distribution of occurrence 
+* Cows: determined daily by a parity- and lactation-stage-specific probability of occurrence
 * Youngstock: determined by a statistical distribution of occurrence, governed separately for pre-weaned calves and post-weaning heifers
-* Stillborn calves 
+* Stillborn calves
 
-Information about death and sale events are tracked and aggregated daily, including the day of death or sale, body weight, days in milk, and parity. 
+Information about death and sale events are tracked and aggregated daily, including the day of death or sale, body weight, days in milk, parity, and cull reason. 
 
 #### Cow Removals
 
 Cows can leave the RuFaS herd through three primary removal pathways: acute sales, mortality, and low production culling. Acute sales and mortality are stochastic processes based on cow parity and stage of lactation, while low production culling is a management-driven process used to regulate herd size.
 
-Acute-sale and mortality risks are evaluated daily using separate parity-specific annual removal probabilities. These probabilities are converted to daily risks and adjusted according to whether a cow is classified as fresh (DIM < 50) or non-fresh (DIM ≥ 50). Fresh cows have 2.55 times the daily removal risk of non-fresh cows [@usda_aphis_2018_dairy]. This adjustment accounts for the elevated risk of removal during early lactation while maintaining the overall parity-specific removal probability.
+The user defines a whole-herd annual probability of death, a whole-herd annual probability of sale, and the fraction of deaths and sales that come from each of three parity groups (1st, 2nd, and 3rd+ lactation). Each day, RuFaS converts these herd-level inputs into an annual risk for each parity group based on the current parity structure of the cow herd. Each parity-group risk is then converted to a daily risk and adjusted according to whether a cow is classified as fresh (DIM < 50) or non-fresh (DIM ≥ 50). Fresh cows have 2.55 times the daily removal risk of non-fresh cows [@usda_aphis_2018_dairy]. This adjustment accounts for the elevated risk of removal during early lactation while maintaining the overall parity-specific removal probability.
 
-Acute-sale risk is evaluated before mortality risk. If a cow is selected for acute sale, she is removed from further mortality assessment on that day.
+Removal risk is assessed every day for every cow in the herd. A Heifer III that calves and becomes a cow is also assessed on the day she calves. Acute-sale risk is evaluated before mortality risk. If a cow is selected for acute sale, she is removed from further mortality assessment on that day, so a cow is never both sold and dead on the same day. A cow selected for either pathway is removed from the herd on the same simulation day.
 
 ::: {.callout-note}
 Low production sales are covered in detail in the [Herd Size Management](#sec-an-hsm) section
@@ -3049,20 +3049,59 @@ Low production sales are covered in detail in the [Herd Size Management](#sec-an
 
 **Acute Sales**
 
-An acute sale represents the immediately necessary sale of a cow, in contrast to a heifer-supply-driven low production cull.
-As with mortality, acute-sale risk is determined using a parity-specific annual probability. The annual probability is converted to an average daily risk and redistributed between fresh and non-fresh cows. Fresh cows have 2.55 times the daily acute-sale risk of non-fresh cows [@usda_aphis_2018_dairy].
+An acute sale represents the immediately necessary (involuntary) sale of a cow, in contrast to a heifer-supply-driven low production cull.
 
-Acute-sale and mortality probabilities are separate. A cow will likely have different annual probabilities for the two removal pathways even though the same parity and fresh-cow adjustment framework is used for both.
+The user-defined `annual_sale_prob` represents all cow sales in a year. Only a fraction of those sales are assumed to be acute; this fraction is set by the model constant `ACUTE_SALE_FRACTION` (default 0.3) in `animal_constants.py` and is not a user input. The whole-herd annual acute-sale risk is therefore:
+
+:::{#eq-an-cul-1}
+$$
+\text{herd\_annual\_acute\_sale\_risk} = \text{ACUTE\_SALE\_FRACTION} \times \text{annual\_sale\_prob}
+$$
+:::
+
+The whole-herd acute-sale risk is distributed across parity groups using `parity_sale_dist` and then converted to a daily, fresh-adjusted risk. A cow selected for acute sale is assigned the cull reason `culled for acute sale`.
+
+Acute-sale and mortality probabilities are separate. A cow will likely have different annual risks for the two removal pathways even though the same parity and fresh-cow adjustment framework is used for both.
 
 **Cow Death and Mortality**
 
-Cow mortality represents removal of a cow from the herd because of death.
-Each cow is assigned an annual mortality probability according to her parity. Parities 1, 2, and 3+ use their corresponding probability.
+Cow mortality represents removal of a cow from the herd because of death. The whole-herd annual death risk is the user-defined `annual_death_prob`. This risk is distributed across parity groups using `parity_death_dist` and then converted to a daily, fresh-adjusted risk. A cow selected for mortality is recorded as a death, assigned the cull reason `culled for death`, and removed from the herd.
 
-The annual mortality probability is converted to an average daily mortality risk. RuFaS then adjusts this risk according to stage of lactation. Cows with fewer than 50 DIM are classified as fresh and receive 2.55 times the daily mortality risk assigned to non-fresh cows.
+Each cow is assigned to one of three parity groups: 1st lactation, 2nd lactation, or 3rd and later lactations. The fraction of the cow herd in each parity group is recalculated daily from the current cow population. The annual risk for a cow in parity group $p$ is calculated by spreading the expected events from that group over the cows currently in that group:
 
-The proportion of fresh cows is calculated from the current cow population. Therefore, the fresh-cow adjustment redistributes the parity-specific mortality risk between fresh and non-fresh cows rather than simply multiplying the annual mortality probability by 2.55.
-Each eligible cow receives a daily stochastic mortality assessment. A cow selected for mortality is recorded as a death and removed from the herd.
+:::{#eq-an-cul-2}
+$$
+\text{annual\_risk}_p = \frac{\text{herd\_annual\_risk} \times \text{event\_fraction}_p}{\text{parity\_group\_fraction}_p}
+$$
+:::
+
+Where `herd_annual_risk` is `annual_death_prob` for mortality or the result of for acute sales, `event_fraction` is the corresponding entry of `parity_death_dist` or `parity_sale_dist`, and `parity_group_fraction` is the fraction of the current cow herd in parity group $p$. If no cows are currently in a parity group, the annual risk for that group is set to 0.
+
+The annual risk for the cow's parity group is first converted to an average daily risk:
+
+:::{#eq-an-cul-3}
+$$
+\text{average\_daily\_risk} = \frac{\text{annual\_risk}_p}{365}
+$$
+:::
+
+The average daily risk is then redistributed between fresh and non-fresh cows, where `percent_fresh` is the fraction of the current cow herd with DIM < 50:
+
+:::{#eq-an-cul-4}
+$$
+\text{daily\_risk\_non\_fresh} = \frac{\text{average\_daily\_risk}}{(2.55 \times \text{percent\_fresh}) + (1 - \text{percent\_fresh})}
+$$
+:::
+
+:::{#eq-an-cul-5}
+$$
+\text{daily\_risk\_fresh} = 2.55 \times \text{daily\_risk\_non\_fresh}
+$$
+:::
+
+Because the proportion of fresh cows is calculated from the current cow population, the fresh-cow adjustment redistributes the parity-specific risk between fresh and non-fresh cows rather than simply multiplying the annual risk by 2.55.
+
+Each cow then receives a daily event-based Monte Carlo assessment: if a random draw from $U(0,1)$ is less than or equal to the daily risk that applies to her (fresh or non-fresh), she is selected for removal. This is done separately for acute sale and mortality, in that order.
 
 ::: {.callout-note}
 Low production culling is handled separately through herd-size management. It is not based on the parity-specific mortality or acute-sale probabilities and does not use the fresh/non-fresh risk adjustment.
@@ -3070,23 +3109,58 @@ Low production culling is handled separately through herd-size management. It is
 
 **User Inputs and Constants**
 
-* `parity_death_probability`: Parity-specific annual probabilities of cow mortality.
-* `parity_cull_probability`: Parity-specific annual probabilities of acute sale. The exact configuration key should be confirmed against the current implementation.
+The following inputs are found in the `culling` section of `animal_config.from_literature` in the animal input file.
+
+* `annual_death_prob`: Annual probability that a cow in the whole cow herd dies during a given year (decimal, 0-1) (Default: 0.05).
+* `parity_death_dist`: Fractions of all cow deaths that come from the 1st, 2nd, and 3rd+ parity groups. Must contain exactly 3 entries that sum to 1 (Default: [0.2, 0.3, 0.5]).
+* `annual_sale_prob`: Annual probability that a cow in the whole cow herd is sold during a given year, including both acute and low production sales (decimal, 0-1) (Default: 0.32).
+* `parity_sale_dist`: Fractions of all cow sales that come from the 1st, 2nd, and 3rd+ parity groups. Must contain exactly 3 entries that sum to 1 (Default: [0.2, 0.3, 0.5]).
+* `ACUTE_SALE_FRACTION`: Fraction of all annual cow sales that are acute sales. Model constant in `animal_constants.py`; not a user input (Default: 0.3).
 * Fresh-cow threshold: 50 days in milk (DIM).
 * Fresh-cow risk multiplier: 2.55.
 
+::: {.callout-note}
+This input structure replaces the previous culling inputs, which assigned each cull a reason and a future removal date drawn from reason-specific distributions once per lactation. The following inputs are no longer used and should be removed from older animal input files: `parity_death_prob`, `parity_cull_prob`, `death_day_prob`, `cull_day_count`, and the `feet_leg_cull`, `injury_cull`, `mastitis_cull`, `disease_cull`, `udder_cull`, and `unknown_cull` blocks (each with a `probability` and `cull_day_prob`).
+:::
+
 **Parameters and Equations**
 
-The average daily mortality risk for a cow's parity is calculated as: 
+* `HerdManager._process_daily_removals()`
+  * Called by `HerdManager._process_daily_herd_updates()` (within `HerdManager.execute_daily_routines()`) each day for all cows, and for Heifer IIIs that calved and became cows that day.
+  * Calculates `percent_fresh` (cows with DIM < 50) and the fraction of cows in each parity group from the entire current cow population.
+  * Calls `HerdManager._calculate_annual_risk_by_parity()` to convert `annual_death_prob` and the acute-sale risk ([AN.CUL.1](#eq-an-cul-1)) into annual risks for each parity group.
+  * Passes these values to `Animal.assess_and_schedule_removal()` for each cow and returns the lists of cows sold and cows that died.
+* `HerdManager._calculate_annual_risk_by_parity()`
+  * Converts a whole-herd annual risk into an annual risk for each parity group ([AN.CUL.2](#eq-an-cul-2)).
+  * Returns a risk of 0 for any parity group that has no cows.
+* `Animal.assess_and_schedule_removal()`
+  * Evaluates acute-sale risk first, then mortality risk, for the cow's parity group.
+  * If the cow is selected, sets the removal to the current day and assigns the cull reason (`culled for acute sale` or `culled for death`).
+  * A pathway is only evaluated if the cow does not already have a pending removal of that type.
+* `Animal.is_selected_for_removal()`
+  * Converts the annual risk to a fresh-adjusted daily risk ([AN.CUL.3](#eq-an-cul-3) - [AN.CUL.5](#eq-an-cul-5)) and compares it with a random draw from $U(0,1)$.
+  * Returns *True* if the cow is selected for removal.
+* `Animal.parity_index`
+  * Returns the cow's parity group (`RemovalRiskParityGroup.ONE`, `TWO`, or `THREE_PLUS`); animals that are not cows return `RemovalRiskParityGroup.NONE`.
 
-* `HerdManager._assess_removal_risk()` determines the proportion of the cow herd that is currently fresh and initiates the individual removal-risk assessment.
-* Fresh cows are identified as cows with DIM < 50.
-* `percent_fresh_cows` is calculated from the entire current cow population.
-* Each cow is passed the current fresh-cow proportion for individual removal-risk assessment.
-* `Animal.assess_removal_risk()` evaluates the cow's daily acute-sale and mortality risks.
-* The mortality-risk calculation uses the cow's parity to select the appropriate `parity_death_probability`, applies the fresh/non-fresh adjustment, and stochastically determines whether the cow dies.
+**Relevant Outputs**
 
-A parallel process determines the acute sale risk. 
+Each removed cow is assigned one of three cull reasons:
+
+* `culled for death`: mortality (`DEATH_CULL`)
+* `culled for acute sale`: acute sale (`ACUTE_SALE_CULL`)
+* `culled for low production`: low production sale through herd-size management (`LOW_PRODUCTION_CULL`)
+
+Class and function: `AnimalModuleReporter.report_herd_statistics_data`
+
+Output variables:
+
+* `cull_reason_stats`: number of cows removed for each of the three cull reasons.
+* `sold_cow_low_production_num`: number of cows sold through low production culling.
+
+::: {.callout-note}
+The previous cull reasons (`culled for lameness`, `culled for injury`, `culled for mastitis`, `culled for disease`, `culled for udder`, `culled for unknown`, and `culled for herd resize`) and the output `sold_cow_oversupply_num` are no longer reported.
+:::
 
 
 #### Youngstock Removals: sales
