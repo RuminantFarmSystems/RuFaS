@@ -179,6 +179,7 @@ def animal_json() -> dict[str, Any]:
                 "pen_type": "freestall",
                 "max_stocking_density": 1.2,
                 "manure_management_scenario_id": 0,
+                "manure_streams": [],
             },
             {
                 "id": 1,
@@ -191,6 +192,7 @@ def animal_json() -> dict[str, Any]:
                 "pen_type": "freestall",
                 "max_stocking_density": 1.2,
                 "manure_management_scenario_id": 1,
+                "manure_streams": [],
             },
             {
                 "id": 2,
@@ -203,6 +205,7 @@ def animal_json() -> dict[str, Any]:
                 "pen_type": "freestall",
                 "max_stocking_density": 1.2,
                 "manure_management_scenario_id": 2,
+                "manure_streams": [],
             },
             {
                 "id": 3,
@@ -215,6 +218,7 @@ def animal_json() -> dict[str, Any]:
                 "pen_type": "freestall",
                 "max_stocking_density": 1.2,
                 "manure_management_scenario_id": 5,
+                "manure_streams": [],
             },
         ],
     }
