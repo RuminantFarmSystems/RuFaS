@@ -6,7 +6,8 @@ import pytest
 from RUFAS.util import Utility
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.animal_config import AnimalConfig, OutputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
