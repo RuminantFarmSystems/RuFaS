@@ -1085,19 +1085,13 @@ def test_random_sample_with_replacement_by_type(
     herd_factory.pre_animal_population = mock_pre_animal_population
 
     mock_post_animal_population = MagicMock(auto_spec=AnimalPopulation)
-    mock_post_animal_population_next_id_list = list(range(post_num))
-    mock_post_animal_population.next_id = mocker.patch.object(
-        mock_post_animal_population,
-        "next_id",
-        side_effect=mock_post_animal_population_next_id_list,
-    )
+    mocker.patch.object(AnimalPopulation, "next_id", return_value=1)
     herd_factory.post_animal_population = mock_post_animal_population
 
     mock_random_choices = MagicMock(return_value=[0] * post_num)
     mocker.patch("random.choices", mock_random_choices)
 
     mock_deepcopy = mocker.patch("copy.deepcopy")
-    mocker.patch("copy.deepcopy", mock_deepcopy)
 
     result = herd_factory._random_sample_with_replacement_by_type(
         TEST_CONFIG_BY_ANIMAL_TYPE[animal_type]["animal_type_string"]
