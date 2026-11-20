@@ -160,7 +160,7 @@ import_table(
 #| label: tbl-sc-field-tillage-outputs
 #| tbl-cap: Tillage-associated outputs. Here, [FIELD_NAME] indicates the name of the field.
 import_table(
-  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-field-tillage-outputs.csv",
+  "../resources/table_data/soil_and_crop/tbl-sc-field-tillage-outputs.csv",
 )
 ```
 
@@ -168,7 +168,7 @@ import_table(
 #| label: tbl-sc-field-amendments-outputs
 #| tbl-cap: Soil amendment-associated outputs. Here, [FIELD_NAME] indicates the name of the field.
 import_table(
-  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-field-amendments-outputs.csv",
+  "../resources/table_data/soil_and_crop/tbl-sc-field-amendments-outputs.csv",
 )
 ```
 
@@ -699,7 +699,7 @@ import_table(
 #| tbl-cap: "Expected soil outputs"
 
 import_table(
-  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-soil-outputs.csv",
+  "../resources/table_data/soil_and_crop/tbl-sc-soil-outputs.csv",
   colalign = ["left", "left", "left"],
   maxcolwidths = [None, None, 12],
   tablefmt = "simple"
@@ -3489,7 +3489,7 @@ in response to weather and nutrient availability.
 #| tbl-cap: "Expected crop yield outputs. The name of the field is indicated by the stand-in [FIELD_NAME]."
 
 import_table(
-    "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-crop-yld-outputs.csv",
+    "../resources/table_data/soil_and_crop/tbl-sc-crop-yld-outputs.csv",
     # headersalign = ["left", "center", "left"], # NOT WORKING
     colalign = ["left", "left", "center"],
     maxcolwidths = [None, None, 8],
@@ -3502,7 +3502,7 @@ import_table(
 #| tbl-cap: "Expected crop (daily) growth outputs. Here, [X] is substituted for \"field=[FIELD_NAME],crop=[CROP_NAME],planted=[PLANT_DAY],[PLANT_YEAR]\" where [FIELD_NAME] is the name of the field, [CROP_NAME] is the name of the crop in that field, [PLANT_DAY] and [PLANT_YEAR] indicate the date the crop was planted."
 
 import_table(
-  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-crop-growth-outputs.csv",
+  "../resources/table_data/soil_and_crop/tbl-sc-crop-growth-outputs.csv",
   colalign = ["left", "left", "center"],
   maxcolwidths = [None, None, 10],
 )
