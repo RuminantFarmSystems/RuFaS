@@ -230,10 +230,6 @@ def test_apply_horizontal_aggregation(
             {"col1": [1, 2, 3]},
         ),
         (
-            {"col1": [None, None, None]},
-            {"col1": []},
-        ),
-        (
             {"col1": []},
             {"col1": []},
         ),
@@ -245,16 +241,76 @@ def test_apply_horizontal_aggregation(
             {"col1": [0, False, "", None]},
             {"col1": [0, False, ""]},
         ),
+        (
+            {"col1": [None, None, None]},
+            {"col1": [None, None, None]},
+        ),
     ],
 )
 def test_omit_none_values(
     report_data: dict[str, list[Any]],
     expected: dict[str, list[Any]],
 ) -> None:
-    """Test that None values are removed from report data columns."""
+    """Test that None values are removed while preserving all-None and empty columns."""
     result = ReportGenerator._omit_none_values(report_data)
 
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    "omit_none_values, expected",
+    [
+        (
+            True,
+            {
+                "col1": [1, 3],
+                "col2": [None, None, None],
+            },
+        ),
+        (
+            False,
+            {
+                "col1": [1, None, 3],
+                "col2": [None, None, None],
+            },
+        ),
+    ],
+)
+def test_perform_aggregations_omit_none_values(
+    report_generator: ReportGenerator,
+    omit_none_values: bool,
+    expected: dict[str, list[Any]],
+    mocker: MockerFixture,
+) -> None:
+    """Test that None values are omitted according to the filter configuration."""
+    filtered_pool = {
+        "col1": {"values": [1, None, 3]},
+        "col2": {"values": [None, None, None]},
+    }
+    filter_content = {
+        "name": "Test None Handling",
+        "omit_none_values": omit_none_values,
+    }
+
+    mocker.patch.object(
+        report_generator,
+        "_extract_aggregation_keys",
+        return_value=(None, None),
+    )
+    mocker.patch.object(
+        report_generator,
+        "_add_constants_to_report_data",
+        return_value=[],
+    )
+
+    result, event_logs, was_aggregated = report_generator._perform_aggregations(
+        filtered_pool,
+        filter_content,
+    )
+
+    assert result == expected
+    assert event_logs == []
+    assert was_aggregated is False
 
 
 @pytest.mark.parametrize(

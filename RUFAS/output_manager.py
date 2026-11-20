@@ -2939,12 +2939,13 @@ class OutputManager(object):
         Raises
         ------
         ValueError
-            - If user has selected both ``horizontal_aggregation`` and ``omit_none_values``.
+            - If ``omit_none_values`` is ``True`` and ``vertical_aggregation`` is missing or ``horizontal_aggregation``
+            is set.
 
         Notes
         -----
-        ``horizontal_aggregation`` and ``omit_none_values`` are not allowed in a single report filter
-        because they could result in errors in the reporting process or scientifically incorrect aggregations.
+        ``omit_none_values`` only works with ``vertical_aggregation`` alone, because removing ``None`` values makes
+        the columns different lengths, which breaks non-aggregated reports and ``horizontal_aggregation``.
         """
         info_map = {
             "class": self.__class__.__name__,
