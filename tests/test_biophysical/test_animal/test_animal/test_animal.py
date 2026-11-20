@@ -1,3 +1,4 @@
+import copy
 import sys
 from datetime import datetime
 from typing import Any
@@ -191,6 +192,21 @@ def assert_animal_init_properties(
     assert result.days_born == args["days_born"]
     assert result.birth_weight == args["birth_weight"]
     assert result.cull_reason == ""
+
+
+def test_animal_deepcopy_preserves_output_manager(
+    mock_lactating_cow: Animal,
+) -> None:
+    """Test that deep copying an animal preserves the shared OutputManager."""
+    original = mock_lactating_cow
+
+    copied = copy.deepcopy(original)
+
+    assert "om" not in vars(original)
+    assert "om" not in vars(copied)
+
+    assert original.om is copied.om
+    assert original.om is OutputManager()
 
 
 @pytest.mark.parametrize(
@@ -905,6 +921,44 @@ def mock_dry_cow(mocker: MockerFixture, mock_time: RufasTime) -> Animal:
         parity=3,
     )
     return Animal(args, mock_time)
+
+
+def test_animal_deepcopy_preserves_independent_state(
+    mock_lactating_cow: Animal,
+) -> None:
+    """Test that deep-copied animals have independent mutable state."""
+    original = mock_lactating_cow
+    copied = copy.deepcopy(original)
+
+    assert copied is not original
+
+    assert copied.events is not original.events
+    assert copied.growth is not original.growth
+    assert copied.digestive_system is not original.digestive_system
+    assert copied.milk_production is not original.milk_production
+    assert copied.nutrients is not original.nutrients
+    assert copied._reproduction is not original._reproduction
+
+    assert copied.body_weight_history is not original.body_weight_history
+    assert copied.pen_history is not original.pen_history
+    assert copied.genetic_history is not original.genetic_history
+
+
+def test_animal_deepcopy_does_not_modify_original(
+    mock_lactating_cow: Animal,
+) -> None:
+    """Test that modifying a copied animal does not affect the original."""
+    original = mock_lactating_cow
+    copied = copy.deepcopy(original)
+
+    original_body_weight = original.body_weight
+    original_history = original.body_weight_history.copy()
+
+    copied.body_weight += 50.0
+    copied.body_weight_history.clear()
+
+    assert original.body_weight == original_body_weight
+    assert original.body_weight_history == original_historygi
 
 
 def test_setup_lactation_curve_parameters(mocker: MockerFixture, mock_time: RufasTime) -> None:
