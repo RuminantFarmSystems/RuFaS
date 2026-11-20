@@ -266,7 +266,7 @@ class TaskManager:
                     }
                 )
 
-            e2e_processing_succeeded = self._process_e2e_results(
+            e2e_processing_succeeded, expected_results_random_seeds = self._process_e2e_results(
                 comparison_args=comparison_args,
                 produce_graphics=produce_graphics,
                 metadata_depth_limit=metadata_depth_limit,
@@ -297,7 +297,11 @@ class TaskManager:
 
                 if e2e_processing_succeeded:
                     self.output_manager.summarize_e2e_test_results(
-                        json_output_directory, output_prefixes, e2e_random_seeds, failed_e2e_groups
+                        json_output_directory=json_output_directory,
+                        output_prefixes=output_prefixes,
+                        e2e_random_seeds=e2e_random_seeds,
+                        failed_e2e_groups=failed_e2e_groups,
+                        expected_results_random_seeds=expected_results_random_seeds,
                     )
 
             if is_update_end_to_end_test_task and e2e_processing_succeeded:
@@ -1112,7 +1116,7 @@ class TaskManager:
         workers: int,
         output_directory: Path,
         verbosity: LogVerbosity | None,
-    ) -> bool:
+    ) -> tuple[bool, dict[str, dict[str, list[int]]]]:
         """
         Runs all E2E result averaging and comparison tasks, in parallel if a process pool is available.
 
@@ -1134,8 +1138,9 @@ class TaskManager:
 
         Returns
         -------
-        bool
-            True if all E2E result groups were successfully processed, False if any group failed.
+        tuple[bool, dict[str, dict[str, list[int]]]]
+            - True if all E2E result groups were successfully processed, False if any group failed.
+            - The list of random seeds used to generate the expected e2e results.
 
         Notes
         -----
@@ -1166,7 +1171,13 @@ class TaskManager:
                 )
             )
 
-        failed = [result for result in results if result is not None]
+        failed = [group_name for group_name, _ in results if group_name is not None]
+
+        expected_results_random_seeds = {
+            comparison_arg["e2e_group"]: random_seeds
+            for comparison_arg, (group_name, random_seeds) in zip(comparison_args, results)
+            if group_name is None and random_seeds is not None
+        }
 
         if failed:
             self.output_manager.add_error(
@@ -1174,12 +1185,12 @@ class TaskManager:
                 f"Failed E2E comparison task(s): {failed}",
                 {
                     "class": TaskManager.__name__,
-                    "function": (self._process_e2e_results.__name__),
+                    "function": self._process_e2e_results.__name__,
                 },
             )
-            return False
+            return False, expected_results_random_seeds
 
-        return True
+        return True, expected_results_random_seeds
 
     @staticmethod
     def _process_e2e_group_results(
@@ -1189,7 +1200,7 @@ class TaskManager:
         workers: int,
         output_directory: Path,
         verbosity: LogVerbosity | None,
-    ) -> str | None:
+    ) -> tuple[str | None, dict[str, list[int]] | None]:
         """
         Processes the completed simulation results for one E2E testing group.
 
@@ -1219,9 +1230,11 @@ class TaskManager:
 
         Returns
         -------
-        str or None
-            The E2E group name if input validation, averaging, comparison, or post-processing fails; otherwise
+        tuple[str | None, dict[str, list[int]] | None]
+            - The E2E group name if input validation, averaging, comparison, or post-processing fails; otherwise
             ``None``.
+            - The random seeds used to generate the expected e2e results, by e2e path-set domain or None if input data
+            is invalid.
         """
 
         e2e_group: str = comparison_args["e2e_group"]
@@ -1264,7 +1277,7 @@ class TaskManager:
                 },
             )
             TaskManager.handle_post_processing(comparison_args, input_manager, output_manager, task_id, False)
-            return e2e_group
+            return e2e_group, None
 
         try:
             averaged_results_path = E2ETestResultsHandler.process_test_result_averaging(
@@ -1274,12 +1287,16 @@ class TaskManager:
 
             output_manager.is_first_post_processing = False
 
+            expected_results_random_seeds: dict[str, list[int]] | None = None
+
             if task_type == TaskType.END_TO_END_TESTING:
-                must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
-                    group_args["output_prefix"],
-                    group_args["convert_variable_table_path"],
-                    group_args["filters_directory"],
-                    group_args["use_accepted_ranges"],
+                must_change_variables, accepted_ranges, expected_results_random_seeds = (
+                    E2ETestResultsHandler.validate_comparison_configuration(
+                        group_args["output_prefix"],
+                        group_args["convert_variable_table_path"],
+                        group_args["filters_directory"],
+                        group_args["use_accepted_ranges"],
+                    )
                 )
 
                 E2ETestResultsHandler.compare_actual_and_expected_test_results(
@@ -1300,7 +1317,8 @@ class TaskManager:
                     save_results=True,
                 )
             elif task_type == TaskType.UPDATE_E2E_TEST_RESULTS:
-                E2ETestResultsHandler.update_expected_test_results(averaged_results_path, e2e_group)
+                random_seeds: list[int] = [run["random_seed"] for run in e2e_runs]
+                E2ETestResultsHandler.update_expected_test_results(averaged_results_path, e2e_group, random_seeds)
                 output_manager.add_log(
                     "End-to-end testing",
                     "Completed generation of new set of end-to-end expected test results",
@@ -1320,9 +1338,9 @@ class TaskManager:
                         "units": MeasurementUnits.UNITLESS,
                     },
                 )
-                return e2e_group
+                return e2e_group, None
 
-            return None
+            return None, expected_results_random_seeds
 
         except Exception as e:
             info_map = {
@@ -1342,7 +1360,7 @@ class TaskManager:
                 "block",
             )
 
-            return e2e_group
+            return e2e_group, None
 
     @staticmethod
     def _run_e2e_simulation(

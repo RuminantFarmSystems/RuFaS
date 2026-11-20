@@ -57,6 +57,7 @@ from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
@@ -3311,7 +3312,7 @@ def test_calculate_nutrition_requirements_nasem(mock_lactating_cow: Animal, mock
     animal.calves = 2
     animal.calving_interval = 365
     animal.body_condition_score_5 = 3.0
-    animal.growth = type("DummyGrowth", (), {"daily_growth": 1.0})()
+    animal.growth = type("DummyGrowth", (), {"daily_growth": 1.0, "daily_tissue_change": -0.5})()
     MilkProduction.set_milk_quality(fat_percent=3.5, true_protein_percent=3.0, lactose_percent=4.5)
     milk_prod = MilkProduction()
     milk_prod._daily_milk_produced = 30.0
@@ -3353,6 +3354,76 @@ def test_calculate_nutrition_requirements_nasem(mock_lactating_cow: Animal, mock
     mocker.patch.object(NASEMRequirementsCalculator, "calculate_requirements", return_value=dummy_requirements)
     result = animal.calculate_nutrition_requirements("barn", 10.0, 20.0, [])
     assert result == dummy_requirements
+
+
+def test_calculate_nutrition_requirements_ndf_percentage(
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
+) -> None:
+    """Test that NDF supply is converted to a percentage for NASEM requirements."""
+    animal = mock_lactating_cow
+    animal.animal_type = AnimalType.LAC_COW
+    animal.nutrient_standard = NutrientStandard.NASEM
+
+    supply = MagicMock(spec=NutritionSupply)
+    supply.configure_mock(
+        dry_matter=10.0,
+        ndf_supply=4.0,
+        tdn_supply=5.0,
+        metabolizable_energy=20.0,
+    )
+    animal.previous_nutrition_supply = supply
+
+    mock_calculate_requirements = mocker.patch.object(
+        NASEMRequirementsCalculator,
+        "calculate_requirements",
+    )
+
+    animal.calculate_nutrition_requirements("barn", 10.0, 20.0, [])
+
+    assert mock_calculate_requirements.call_args.kwargs["ndf_percentage"] == pytest.approx(40.0)
+
+
+@pytest.mark.parametrize(
+    "nutrient_standard, calculator, expected_argument, expected_value",
+    [
+        (
+            NutrientStandard.NASEM,
+            NASEMRequirementsCalculator,
+            "ndf_percentage",
+            AnimalModuleConstants.DEFAULT_NDF_FRACTION * GeneralConstants.FRACTION_TO_PERCENTAGE,
+        ),
+        (
+            NutrientStandard.NRC,
+            NRCRequirementsCalculator,
+            "TDN_fraction",
+            AnimalModuleConstants.DEFAULT_TDN_FRACTION,
+        ),
+    ],
+)
+def test_calculate_nutrition_requirements_default_nutrition_supply(
+    mock_lactating_cow: Animal,
+    mocker: MockerFixture,
+    nutrient_standard: NutrientStandard,
+    calculator: type[NASEMRequirementsCalculator] | type[NRCRequirementsCalculator],
+    expected_argument: str,
+    expected_value: float,
+) -> None:
+    """Test default NDF percentage and TDN fraction when previous nutrition supply is None."""
+    animal = mock_lactating_cow
+    animal.animal_type = AnimalType.LAC_COW
+    animal.nutrient_standard = nutrient_standard
+    animal.previous_nutrition_supply = None
+
+    mock_calculate_requirements = mocker.patch.object(
+        calculator,
+        "calculate_requirements",
+    )
+
+    animal.calculate_nutrition_requirements("barn", 10.0, 20.0, [])
+
+    mock_calculate_requirements.assert_called_once()
+    assert mock_calculate_requirements.call_args.kwargs[expected_argument] == pytest.approx(expected_value)
 
 
 def test_calculate_nutrition_requirements_nrc(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:

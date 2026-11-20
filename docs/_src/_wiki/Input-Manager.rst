@@ -500,10 +500,15 @@ every file in that list and runs all blocks from all files in order.
 Structure of a validation block
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Each block has four top-level keys:
+Each block has the following top-level keys:
 
-- ``description`` — human-readable label reported in error logs when
-  the block fails.
+- ``title`` — very short label identifying the block.
+- ``description`` — detailed, plain-language explanation of the rule
+  the block enforces, naming every input variable involved by its full
+  data address (and, where useful, how to fix it). It doubles as the
+  failure message: when the block fails, it is reported together with
+  the title as ``<title>: <description>``. If it is missing or not a
+  non-empty string, ``title`` alone is reported instead.
 - ``aliases`` — maps short local names (used inside this block) to
   actual data addresses or literal constant values.
 - ``apply_when`` *(optional)* — an array of condition clauses that
@@ -517,7 +522,8 @@ Template:
 ::
 
    {
-     "description": "<human-readable label>",
+     "title": "<short label>",
+     "description": "<detailed rule, naming full data addresses; reported when the block fails>",
      "aliases": {
        "variables": {
          "<alias>": "<dot-separated address in IM pool>"
@@ -705,19 +711,30 @@ type is ``"CALF"``.
 Error behaviour and ``eager_termination``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When a block's rules fail, Input Manager records the block's
-``description`` in a list of failures. Two termination modes control
-what happens next:
+When a block's rules fail, Input Manager adds one
+``Cross Validation Failure`` error for that block, whose message is
+``<title>: <description>`` (or the ``title`` alone if no
+``description`` is given). Each rule that is not satisfied is also
+logged as ``Rule not satisfied: <comparison>``, naming the compared
+variables and their data addresses. Two termination modes control what
+happens next:
 
 - **Eager termination on** (normal simulation): the first failing rule
   inside a block stops evaluation of that block immediately. The first
   failing block stops evaluation of the entire ruleset.
 - **Eager termination off** (``-ov`` mode): all rules in all blocks are
-  evaluated. At the end, if any block failed, Input Manager logs all
-  failing block descriptions and returns ``False``.
+  evaluated, one error is added for every failing block, and Input
+  Manager returns ``False``.
 
 In both modes, ``apply_when`` failures are silent — they mean "this
 block does not apply" and are always counted as passing.
+
+Errors raised while evaluating a rule itself (e.g. comparing lists of
+unequal length, or an unsupported type for ``is_of_type``) are also
+reported, and end with a ``Comparison:`` description naming the aliases
+being compared together with their data addresses, for example
+``Comparison: 'weather_high' (weather.high) greater_or_equal_to
+'weather_avg' (weather.avg).``
 
 Full example
 ^^^^^^^^^^^^
@@ -730,7 +747,8 @@ if the first pen is not a calf pen:
 ::
 
    {
-     "description": "Number of stalls in calf pen",
+     "title": "Number of stalls in calf pen",
+     "description": "The total number of stalls in calf pens (animal.pen_information.0.number_of_stalls) must be at least the number of calves (animal.herd_information.calf_num) divided by the pen's max_stocking_density.",
      "aliases": {
        "variables": {
          "number_of_calves":    "animal.herd_information.calf_num",
