@@ -33,6 +33,9 @@ class Genetics:
     environmental effect distributions are read from ``AnimalConfig``, where they are user inputs in the
     ``genetics`` section of the animal input that default to the CDCB national averages.
 
+    Animals without a simulated dam (the initial herd and purchased replacements) draw their true breeding values
+    around the national average breeding value of their birth year, which is also read from ``AnimalConfig``.
+
     Attributes
     ----------
     TBV_fat : float
@@ -65,6 +68,12 @@ class Genetics:
         A flag indicating if a warning for animals born before the earliest available phenotype data was raised.
     phenotype_too_recent_warning: bool
         A flag indicating if a warning for animals born before the latest available phenotype data was raised.
+    national_average_too_early_warning: bool
+        A flag indicating if a warning for animals born before the earliest available national average breeding
+        value data was raised.
+    national_average_too_recent_warning: bool
+        A flag indicating if a warning for animals born after the latest available national average breeding
+        value data was raised.
     """
 
     TBV_fat: float
@@ -84,6 +93,8 @@ class Genetics:
     top_semen_too_recent_warning: bool = False
     phenotype_too_early_warning: bool = False
     phenotype_too_recent_warning: bool = False
+    national_average_too_early_warning: bool = False
+    national_average_too_recent_warning: bool = False
 
     def __init__(
         self,
@@ -108,7 +119,7 @@ class Genetics:
                 dam_tbv_fat, dam_tbv_protein, f"{birth_year}-{birth_month:02d}"
             )
         else:
-            self.TBV_fat, self.TBV_protein = self._calculate_tbv_values()
+            self.TBV_fat, self.TBV_protein = self._calculate_tbv_values(birth_year=birth_year)
         self.E_permanent_fat, self.E_permanent_protein = self._calculate_ep_values()
         self.E_temporary_fat, self.E_temporary_protein = self._calculate_et_values()
         self.phenotype_fat, self.phenotype_protein = self._calculate_phenotype_values(birth_year=birth_year)
@@ -151,16 +162,102 @@ class Genetics:
             )
         self.ranking_index = self._calculate_ranking_index()
 
-    def _calculate_tbv_values(self) -> tuple[float, float]:
-        """Calculate TBV values for an animal entering the herd using the herd-level TBV distribution."""
+    def _calculate_tbv_values(self, birth_year: int) -> tuple[float, float]:
+        """
+        Calculate TBV values for an animal entering the herd without a simulated dam.
+
+        The TBV distribution is centered on the national average breeding values of animals born in the same year
+        and uses the herd-level TBV variances and correlation.
+
+        Parameters
+        ----------
+        birth_year : int
+            The birth year of the animal.
+
+        Returns
+        -------
+        tuple[float, float]
+            - TBV for fat, (kg).
+            - TBV for protein, (kg).
+
+        """
+        national_average_fat, national_average_protein = Genetics.get_national_average_breeding_values(birth_year)
         tbv_fat, tbv_protein = Utility.generate_bivariate_random_numbers(
-            0.0,
-            0.0,
+            national_average_fat,
+            national_average_protein,
             np.sqrt(AnimalConfig.tbv_fat_variance),
             np.sqrt(AnimalConfig.tbv_protein_variance),
             AnimalConfig.tbv_correlation,
         )
         return tbv_fat, tbv_protein
+
+    @classmethod
+    def get_national_average_breeding_values(cls, birth_year: int) -> tuple[float, float]:
+        """
+        Gets the national average breeding values (BV) for fat and protein of animals born in the given year.
+
+        Parameters
+        ----------
+        birth_year : int
+            The birth year of the animal.
+
+        Returns
+        -------
+        tuple[float, float]
+            - National average BV for fat, (kg).
+            - National average BV for protein, (kg).
+
+        Raises
+        ------
+        KeyError
+            If the birth year is within the range of the available data but has no entry.
+
+        Notes
+        -----
+        Animals born before the earliest or after the latest available birth year use the values of the nearest
+        available year. A warning is logged the first time each of these two cases occurs.
+
+        """
+        try:
+            national_average_fat = AnimalConfig.national_average_breeding_value["fat_kg"][birth_year]
+            national_average_protein = AnimalConfig.national_average_breeding_value["protein_kg"][birth_year]
+        except KeyError as key_error:
+            om = OutputManager()
+            info_map = {
+                "class": cls.__name__,
+                "function": cls.get_national_average_breeding_values.__name__,
+            }
+            earliest_birth_year = min(AnimalConfig.national_average_breeding_value["fat_kg"])
+            latest_birth_year = max(AnimalConfig.national_average_breeding_value["fat_kg"])
+            if birth_year < earliest_birth_year:
+                national_average_fat = AnimalConfig.national_average_breeding_value["fat_kg"][earliest_birth_year]
+                national_average_protein = AnimalConfig.national_average_breeding_value["protein_kg"][
+                    earliest_birth_year
+                ]
+                if not cls.national_average_too_early_warning:
+                    om.add_warning(
+                        "Animal born before the earliest available National Average Breeding Value data",
+                        f"All animals born before {earliest_birth_year} will use values {national_average_fat=} "
+                        f"and {national_average_protein=} from the earliest available year of "
+                        f"{earliest_birth_year}.",
+                        info_map,
+                    )
+                    cls.set_national_average_too_early_warning_raised(True)
+            elif birth_year > latest_birth_year:
+                national_average_fat = AnimalConfig.national_average_breeding_value["fat_kg"][latest_birth_year]
+                national_average_protein = AnimalConfig.national_average_breeding_value["protein_kg"][latest_birth_year]
+                if not cls.national_average_too_recent_warning:
+                    om.add_warning(
+                        "Animal born after the latest available National Average Breeding Value data",
+                        f"All animals born after {latest_birth_year} will use values {national_average_fat=} "
+                        f"and {national_average_protein=} from the latest available year of {latest_birth_year}.",
+                        info_map,
+                    )
+                    cls.set_national_average_too_recent_warning_raised(True)
+            else:
+                om.add_error("National average breeding value key error.", str(key_error), info_map)
+                raise key_error
+        return national_average_fat, national_average_protein
 
     def _calculate_newborn_calf_tbv_values(
         self, dam_tbv_fat: float, dam_tbv_protein: float, birth_year_month: str
@@ -239,7 +336,25 @@ class Genetics:
         return et_fat, et_protein
 
     def _calculate_phenotype_values(self, birth_year: int) -> tuple[float, float]:
-        """Calculate phenotype values."""
+        """
+        Calculate phenotype values.
+
+        The phenotype is the mean phenotype of animals born in the same year, plus the deviation of the animal's
+        TBV from the national average breeding value of that birth year, plus the permanent and temporary
+        environmental effects.
+
+        Parameters
+        ----------
+        birth_year : int
+            The birth year of the animal.
+
+        Returns
+        -------
+        tuple[float, float]
+            - Phenotype for fat, (kg).
+            - Phenotype for protein, (kg).
+
+        """
         try:
             mean_fat = AnimalConfig.average_phenotype["fat_kg"][birth_year]
             mean_protein = AnimalConfig.average_phenotype["protein_kg"][birth_year]
@@ -277,8 +392,14 @@ class Genetics:
             else:
                 self.om.add_error("Phenotype value calculation key error.", str(key_error), info_map)
                 raise key_error
-        phenotype_fat = mean_fat + self.TBV_fat + self.E_permanent_fat + self.E_temporary_fat
-        phenotype_protein = mean_protein + self.TBV_protein + self.E_permanent_protein + self.E_temporary_protein
+        national_average_fat, national_average_protein = Genetics.get_national_average_breeding_values(birth_year)
+        phenotype_fat = mean_fat + (self.TBV_fat - national_average_fat) + self.E_permanent_fat + self.E_temporary_fat
+        phenotype_protein = (
+            mean_protein
+            + (self.TBV_protein - national_average_protein)
+            + self.E_permanent_protein
+            + self.E_temporary_protein
+        )
         return phenotype_fat, phenotype_protein
 
     def _calculate_ebv_values(
@@ -451,3 +572,31 @@ class Genetics:
             True if the birthdate too recent warning for phenotype has been raised, False otherwise.
         """
         cls.phenotype_too_recent_warning = birthdate_too_recent_warning_raised
+
+    @classmethod
+    def set_national_average_too_early_warning_raised(cls, birthdate_too_early_warning_raised: bool) -> None:
+        """
+        Sets the flag indicating whether a warning has been raised for animals born before
+        the earliest available national average breeding value data.
+
+        Parameters
+        ----------
+        birthdate_too_early_warning_raised : bool
+            True if the birthdate too early warning for the national average breeding value has been raised,
+            False otherwise.
+        """
+        cls.national_average_too_early_warning = birthdate_too_early_warning_raised
+
+    @classmethod
+    def set_national_average_too_recent_warning_raised(cls, birthdate_too_recent_warning_raised: bool) -> None:
+        """
+        Sets the flag indicating whether a warning has been raised for animals born after
+        the latest available national average breeding value data.
+
+        Parameters
+        ----------
+        birthdate_too_recent_warning_raised : bool
+            True if the birthdate too recent warning for the national average breeding value has been raised,
+            False otherwise.
+        """
+        cls.national_average_too_recent_warning = birthdate_too_recent_warning_raised
