@@ -958,7 +958,7 @@ def test_animal_deepcopy_does_not_modify_original(
     copied.body_weight_history.clear()
 
     assert original.body_weight == original_body_weight
-    assert original.body_weight_history == original_historygi
+    assert original.body_weight_history == original_history
 
 
 def test_setup_lactation_curve_parameters(mocker: MockerFixture, mock_time: RufasTime) -> None:
