@@ -1,7 +1,8 @@
 {
   "cross_validation": [
     {
-      "description": "Sum of parity fractions must equal 1.0",
+      "title": "Parity fractions sum to 1",
+      "description": "The parity fractions (animal.herd_information.parity_fractions.1 through .5) must add up to exactly 1.0. Adjust the fractions so their sum is 1.0.",
       "aliases": {
         "variables": {
           "p1": "animal.herd_information.parity_fractions.1",
@@ -33,7 +34,8 @@
       ]
     },
     {
-      "description": "Dry-off must occur before calving: days_in_preg_when_dry < avg_gestation_len",
+      "title": "Dry-off before calving",
+      "description": "Cows must be dried off before they calve: animal.animal_config.management_decisions.days_in_preg_when_dry must be less than animal.animal_config.farm_level.repro.avg_gestation_len.",
       "aliases": {
         "variables": {
           "days_in_preg_when_dry": "animal.animal_config.management_decisions.days_in_preg_when_dry",
@@ -59,7 +61,8 @@
       ]
     },
     {
-      "description": "Heifer culling must start after breeding: heifer_repro_cull_time > breeding_start_day_h",
+      "title": "Heifer repro culling after breeding start",
+      "description": "Heifers cannot be culled for reproduction before breeding starts: animal.animal_config.management_decisions.heifer_repro_cull_time must be greater than animal.animal_config.management_decisions.breeding_start_day_h.",
       "aliases": {
         "variables": {
           "heifer_repro_cull_time": "animal.animal_config.management_decisions.heifer_repro_cull_time",
@@ -85,7 +88,8 @@
       ]
     },
     {
-      "description": "When cow repro method is in ['ED', 'ED-TAI'], do_not_breed_time > voluntary_waiting_period",
+      "title": "Do-not-breed time after voluntary waiting period",
+      "description": "When animal.animal_config.management_decisions.cow_repro_method is 'ED' or 'ED-TAI', animal.animal_config.management_decisions.do_not_breed_time must be greater than animal.animal_config.farm_level.repro.voluntary_waiting_period.",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -133,7 +137,8 @@
       ]
     },
     {
-      "description": "Wean day must be before heifer breeding start: wean_day < breeding_start_day_h",
+      "title": "Weaning before heifer breeding",
+      "description": "Calves must be weaned before heifer breeding starts: animal.animal_config.farm_level.calf.wean_day must be less than animal.animal_config.management_decisions.breeding_start_day_h.",
       "aliases": {
         "variables": {
           "wean_day": "animal.animal_config.farm_level.calf.wean_day",
@@ -159,7 +164,8 @@
       ]
     },
     {
-      "description": "Days from calving at prefresh_day must be less than both gestation length (avg_gestation_length) and dry period duration (avg_gestation_len - days_in_preg_when_dry)",
+      "title": "Prefresh day within gestation and dry period",
+      "description": "animal.animal_config.farm_level.repro.prefresh_day must be less than animal.animal_config.farm_level.repro.avg_gestation_len and less than the dry period length (animal.animal_config.farm_level.repro.avg_gestation_len minus animal.animal_config.management_decisions.days_in_preg_when_dry).",
       "aliases": {
         "variables": {
           "prefresh_day": "animal.animal_config.farm_level.repro.prefresh_day",
@@ -201,7 +207,8 @@
       ]
     },
     {
-      "description": "Calving interval must exceed voluntary waiting period plus gestation length",
+      "title": "Calving interval length",
+      "description": "animal.animal_config.farm_level.repro.calving_interval must be greater than animal.animal_config.farm_level.repro.voluntary_waiting_period plus animal.animal_config.farm_level.repro.avg_gestation_len.",
       "aliases": {
         "variables": {
           "calving_interval": "animal.animal_config.farm_level.repro.calving_interval",
@@ -228,7 +235,8 @@
       ]
     },
     {
-      "description": "When heifer repro method is ED, repro_sub_protocol must be null",
+      "title": "Heifer ED sub-protocol",
+      "description": "When animal.animal_config.management_decisions.heifer_repro_method is 'ED', animal.animal_config.farm_level.repro.heifers.repro_sub_protocol must be 'N/A'.",
       "aliases": {
         "variables": {
           "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
@@ -275,7 +283,8 @@
       ]
     },
     {
-      "description": "When heifer repro method is TAI, repro_sub_protocol must be in ['5dCG2P', '5dCGP']",
+      "title": "Heifer TAI sub-protocol",
+      "description": "When animal.animal_config.management_decisions.heifer_repro_method is 'TAI', animal.animal_config.farm_level.repro.heifers.repro_sub_protocol must be '5dCG2P' or '5dCGP'.",
       "aliases": {
         "variables": {
           "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
@@ -323,7 +332,8 @@
       ]
     },
     {
-      "description": "When heifer repro method is SynchED, repro_sub_protocol must be in ['2P', 'CP']",
+      "title": "Heifer SynchED sub-protocol",
+      "description": "When animal.animal_config.management_decisions.heifer_repro_method is 'SynchED', animal.animal_config.farm_level.repro.heifers.repro_sub_protocol must be '2P' or 'CP'.",
       "aliases": {
         "variables": {
           "heifer_repro_method": "animal.animal_config.management_decisions.heifer_repro_method",
@@ -371,7 +381,8 @@
       ]
     },
     {
-      "description": "When cow repro method is ED: voluntary_waiting_period must be positive, presynch_program, presynch_program_start_day, ovsynch_program, ovsynch_program_start_day, and resynch_program must be null, and estrus_detection_rate and ED_conception_rate must be positive",
+      "title": "Cow ED reproduction settings",
+      "description": "Invalid settings for the 'ED' cow reproduction method (animal.animal_config.management_decisions.cow_repro_method). animal.animal_config.farm_level.repro.voluntary_waiting_period, animal.animal_config.farm_level.repro.cows.estrus_detection_rate and animal.animal_config.farm_level.repro.cows.ED_conception_rate must be greater than 0, and animal.animal_config.farm_level.repro.cows.presynch_program, animal.animal_config.farm_level.repro.cows.presynch_program_start_day and animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day must be null.",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -531,7 +542,8 @@
       ]
     },
     {
-      "description": "When cow repro method is TAI: voluntary_waiting_period must be 0, ovsynch_program must be set, ovsynch_program_start_day must be positive and exceed voluntary_waiting_period, and ovsynch_program_conception_rate must be positive",
+      "title": "Cow TAI reproduction settings",
+      "description": "Invalid settings for the 'TAI' cow reproduction method (animal.animal_config.management_decisions.cow_repro_method). animal.animal_config.farm_level.repro.voluntary_waiting_period must be 0, animal.animal_config.farm_level.repro.cows.ovsynch_program must be set, animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day must be greater than 0 and greater than animal.animal_config.farm_level.repro.voluntary_waiting_period, and animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate must be greater than 0.",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -627,7 +639,8 @@
       ]
     },
     {
-      "description": "When cow repro method is TAI and resynch_program is in ['PGFatPD', 'none']: estrus_detection_rate and ED_conception_rate must be positive (subsequent breedings rely on estrus detection under these resynch protocols)",
+      "title": "Cow TAI estrus detection for resynch",
+      "description": "When animal.animal_config.management_decisions.cow_repro_method is 'TAI' and animal.animal_config.farm_level.repro.cows.resynch_program is 'PGFatPD' or 'None', later breedings rely on estrus detection, so animal.animal_config.farm_level.repro.cows.estrus_detection_rate and animal.animal_config.farm_level.repro.cows.ED_conception_rate must be greater than 0.",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -639,7 +652,7 @@
           "TAI": "TAI",
           "zero": 0,
           "PGFatPD": "PGFatPD",
-          "none": "none"
+          "none": "None"
         }
       },
       "apply_when": [
@@ -708,7 +721,8 @@
       ]
     },
     {
-      "description": "When cow repro method is ED-TAI: voluntary_waiting_period must be positive, estrus_detection_rate and ED_conception_rate must be positive, ovsynch_program must be set, ovsynch_program_start_day must be positive, and ovsynch_program_conception_rate must be positive",
+      "title": "Cow ED-TAI reproduction settings",
+      "description": "Invalid settings for the 'ED-TAI' cow reproduction method (animal.animal_config.management_decisions.cow_repro_method). animal.animal_config.farm_level.repro.voluntary_waiting_period, animal.animal_config.farm_level.repro.cows.estrus_detection_rate, animal.animal_config.farm_level.repro.cows.ED_conception_rate, animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day and animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate must be greater than 0, and animal.animal_config.farm_level.repro.cows.ovsynch_program must be set.",
       "aliases": {
         "variables": {
           "cow_repro_method": "animal.animal_config.management_decisions.cow_repro_method",
@@ -836,7 +850,8 @@
       ]
     },
     {
-      "description": "Holstein birth weight std dev must be less than 20% of average birth weight: birth_weight_std_ho < 0.2 * birth_weight_avg_ho",
+      "title": "Holstein birth weight variability",
+      "description": "animal.animal_config.farm_level.bodyweight.birth_weight_std_ho must be less than 20% of animal.animal_config.farm_level.bodyweight.birth_weight_avg_ho.",
       "aliases": {
         "variables": {
           "birth_weight_std_ho": "animal.animal_config.farm_level.bodyweight.birth_weight_std_ho",
@@ -865,7 +880,8 @@
       ]
     },
     {
-      "description": "When presynch_program and ovsynch_program are both not null: ovsynch_program_start_day must exceed presynch_program_start_day",
+      "title": "Ovsynch starts after presynch",
+      "description": "When both animal.animal_config.farm_level.repro.cows.presynch_program and animal.animal_config.farm_level.repro.cows.ovsynch_program are set, animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day must be greater than animal.animal_config.farm_level.repro.cows.presynch_program_start_day.",
       "aliases": {
         "variables": {
           "presynch_program": "animal.animal_config.farm_level.repro.cows.presynch_program",
@@ -928,7 +944,8 @@
       ]
     },
     {
-      "description": "Target heifer pregnancy day must be after breeding start: target_heifer_preg_day > breeding_start_day_h",
+      "title": "Target heifer pregnancy after breeding start",
+      "description": "animal.animal_config.farm_level.bodyweight.target_heifer_preg_day must be greater than animal.animal_config.management_decisions.breeding_start_day_h.",
       "aliases": {
         "variables": {
           "target_heifer_preg_day": "animal.animal_config.farm_level.bodyweight.target_heifer_preg_day",
@@ -954,7 +971,8 @@
       ]
     },
     {
-      "description": "Average Holstein birth weight must be less than average mature body weight: birth_weight_avg_ho < mature_body_weight_avg",
+      "title": "Birth weight below mature body weight",
+      "description": "animal.animal_config.farm_level.bodyweight.birth_weight_avg_ho must be less than animal.animal_config.farm_level.bodyweight.mature_body_weight_avg.",
       "aliases": {
         "variables": {
           "mature_body_weight_avg": "animal.animal_config.farm_level.bodyweight.mature_body_weight_avg",
@@ -980,7 +998,8 @@
       ]
     },
     {
-      "description": "Pregnancy check days must be in ascending order, and last check must precede both calving and dry-off",
+      "title": "Pregnancy check timing",
+      "description": "Pregnancy checks must happen in order and before dry-off and calving: animal.animal_config.from_literature.repro.preg_check_day_1 must be less than animal.animal_config.from_literature.repro.preg_check_day_2, which must be less than animal.animal_config.from_literature.repro.preg_check_day_3; animal.animal_config.from_literature.repro.preg_check_day_3 must not be greater than animal.animal_config.management_decisions.days_in_preg_when_dry and must be less than animal.animal_config.farm_level.repro.avg_gestation_len.",
       "aliases": {
         "variables": {
           "preg_check_day_1": "animal.animal_config.from_literature.repro.preg_check_day_1",
@@ -1054,7 +1073,8 @@
       ]
     },
     {
-      "description": "Sum of parity death distribution fractions must equal 1.0",
+      "title": "Parity death distribution sums to 1",
+      "description": "The parity death distribution fractions in animal.animal_config.from_literature.culling.parity_death_dist must add up to exactly 1.0.",
       "aliases": {
         "variables": {
           "parity_death_dist": "animal.animal_config.from_literature.culling.parity_death_dist"
@@ -1083,7 +1103,8 @@
       ]
     },
     {
-      "description": "Sum of parity sale distribution fractions must equal 1.0",
+      "title": "Parity sale distribution sums to 1",
+      "description": "The parity sale distribution fractions in animal.animal_config.from_literature.culling.parity_sale_dist must add up to exactly 1.0.",
       "aliases": {
         "variables": {
           "parity_sale_dist": "animal.animal_config.from_literature.culling.parity_sale_dist"
@@ -1112,7 +1133,8 @@
       ]
     },
     {
-      "description": "The maximum days carried calf cannot be more than gestation length",
+      "title": "Max days carried calf within gestation",
+      "description": "animal.animal_config.management_decisions.cull_eligibility_maximum_days_carried_calf must not be greater than animal.animal_config.farm_level.repro.avg_gestation_len.",
       "aliases": {
         "variables": {
           "max_days_carried_calf": "animal.animal_config.management_decisions.cull_eligibility_maximum_days_carried_calf",
