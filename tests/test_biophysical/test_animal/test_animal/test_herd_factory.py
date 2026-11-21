@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, cast
 from unittest.mock import call, MagicMock
 
 import pytest
@@ -15,6 +15,7 @@ from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus, Breed
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.genetic_history import GeneticHistory
 
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.animal import Animal
@@ -23,6 +24,7 @@ from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.rufas_time import RufasTime
+from RUFAS.util import Utility
 
 
 @pytest.fixture
@@ -803,6 +805,7 @@ def test_generate_animals(
     mock_heiferIIs_update = mocker.patch.object(mock_herd_factory, "_heiferIIs_update")
     mock_heiferIIIs_update = mocker.patch.object(mock_herd_factory, "_heiferIIIs_update")
     mock_cows_update = mocker.patch.object(mock_herd_factory, "_cows_update")
+    mock_redraw_genetics = mocker.patch.object(mock_herd_factory, "_redraw_generated_animal_genetics")
 
     mock_calf = MagicMock(auto_spec=Animal)
     mock_calf.sold = is_calf_sold
@@ -818,11 +821,141 @@ def test_generate_animals(
     assert mock_heiferIIs_update.call_count == simulation_days
     assert mock_heiferIIIs_update.call_count == simulation_days
     assert mock_cows_update.call_count == simulation_days
+    mock_redraw_genetics.assert_called_once_with()
 
     if is_calf_sold:
         assert len(result.calves) == 0
     else:
         assert len(result.calves) == initial_animal_num
+
+
+def _generated_population(
+    calves: list[Animal],
+    heiferIs: list[Animal],
+    heiferIIs: list[Animal],
+    heiferIIIs: list[Animal],
+    cows: list[Animal],
+    replacement: list[Animal],
+) -> AnimalPopulation:
+    """Builds a population whose groups are set after init, so the global max animal ID is left untouched."""
+    population = AnimalPopulation(calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[], replacement=[])
+    population.calves = calves
+    population.heiferIs = heiferIs
+    population.heiferIIs = heiferIIs
+    population.heiferIIIs = heiferIIIs
+    population.cows = cows
+    population.replacement = replacement
+    return population
+
+
+def test_redraw_generated_animal_genetics(mock_herd_factory: HerdFactory, mocker: MockerFixture) -> None:
+    """
+    Every generated animal except the replacements gets new genetics for the birth year backtracked from its age,
+    and its genetic history restarts from those genetics.
+    """
+    mocker.patch.object(AnimalConfig, "simulate_genetics", True)
+    mock_genetics = mocker.patch("RUFAS.biophysical.animal.herd_factory.Genetics")
+    mock_time = MagicMock(auto_spec=RufasTime)
+    mock_time.current_date = datetime(2020, 1, 1)
+    mock_time.simulation_day = 0
+    mock_herd_factory.time = mock_time
+
+    days_born_and_birth_year_by_type = {
+        AnimalType.CALF: (30, 2019),
+        AnimalType.HEIFER_I: (200, 2019),
+        AnimalType.HEIFER_II: (500, 2018),
+        AnimalType.HEIFER_III: (700, 2018),
+        AnimalType.LAC_COW: (1500, 2015),
+    }
+    animals: dict[AnimalType, Animal] = {}
+    for animal_id, (animal_type, (days_born, _)) in enumerate(days_born_and_birth_year_by_type.items()):
+        animal = mock_animal(animal_type, animal_id, mocker)
+        animal.days_born = days_born
+        animal.genetic_history = [
+            GeneticHistory(start_day=0, end_day=0, id=animal_id, animal_type=animal_type, genetics={"TBV_fat": 0.0})
+        ]
+        animals[animal_type] = animal
+    replacement = mock_animal(AnimalType.HEIFER_III, 99, mocker)
+    replacement_genetics = replacement.genetics
+    mock_herd_factory.pre_animal_population = _generated_population(
+        calves=[animals[AnimalType.CALF]],
+        heiferIs=[animals[AnimalType.HEIFER_I]],
+        heiferIIs=[animals[AnimalType.HEIFER_II]],
+        heiferIIIs=[animals[AnimalType.HEIFER_III]],
+        cows=[animals[AnimalType.LAC_COW]],
+        replacement=[replacement],
+    )
+
+    mock_herd_factory._redraw_generated_animal_genetics()
+
+    assert mock_genetics.call_args_list == [
+        call(birth_year=birth_year, animal_type=animal_type)
+        for animal_type, (_, birth_year) in days_born_and_birth_year_by_type.items()
+    ]
+    for animal in animals.values():
+        assert animal.genetics is mock_genetics.return_value
+        assert animal.genetic_history == []
+        cast(MagicMock, animal.update_genetic_history).assert_called_once_with(simulation_day=0)
+    assert replacement.genetics is replacement_genetics
+
+
+def test_redraw_generated_animal_genetics_without_genetics(
+    mock_herd_factory: HerdFactory, mocker: MockerFixture
+) -> None:
+    """Nothing changes when genetics are not simulated."""
+    mocker.patch.object(AnimalConfig, "simulate_genetics", False)
+    mock_genetics = mocker.patch("RUFAS.biophysical.animal.herd_factory.Genetics")
+    cow = mock_animal(AnimalType.LAC_COW, 1, mocker)
+    cow_genetics = cow.genetics
+    mock_herd_factory.pre_animal_population = _generated_population(
+        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[cow], replacement=[]
+    )
+
+    mock_herd_factory._redraw_generated_animal_genetics()
+
+    mock_genetics.assert_not_called()
+    assert cow.genetics is cow_genetics
+    cast(MagicMock, cow.update_genetic_history).assert_not_called()
+
+
+def test_redraw_generated_animal_genetics_follows_birth_year_national_average(
+    mock_herd_factory: HerdFactory, mocker: MockerFixture
+) -> None:
+    """
+    A generated cow's TBV is centered on the national average breeding value of her backtracked birth year, not of
+    the simulation start year, and an average cow's phenotype is the mean phenotype of her birth year.
+    """
+    mocker.patch.object(AnimalConfig, "simulate_genetics", True)
+    mocker.patch.object(
+        AnimalConfig,
+        "average_phenotype",
+        {"fat_kg": {2015: 480.0, 2020: 500.0}, "protein_kg": {2015: 380.0, 2020: 390.0}},
+    )
+    mocker.patch.object(
+        AnimalConfig,
+        "national_average_breeding_value",
+        {"fat_kg": {2015: -45.0, 2020: 0.0}, "protein_kg": {2015: -30.0, 2020: 0.0}},
+    )
+    # Every random draw returns the mean of its distribution, so the values below are the distribution means.
+    mocker.patch.object(Utility, "generate_bivariate_random_numbers", side_effect=lambda mu_x, mu_y, *_: (mu_x, mu_y))
+    mock_time = MagicMock(auto_spec=RufasTime)
+    mock_time.current_date = datetime(2020, 1, 1)
+    mock_time.simulation_day = 0
+    mock_herd_factory.time = mock_time
+    cow = mock_animal(AnimalType.LAC_COW, 1, mocker)
+    cow.days_born = 1500
+    cow.genetic_history = []
+    mock_herd_factory.pre_animal_population = _generated_population(
+        calves=[], heiferIs=[], heiferIIs=[], heiferIIIs=[], cows=[cow], replacement=[]
+    )
+
+    mock_herd_factory._redraw_generated_animal_genetics()
+
+    assert cow.genetics is not None
+    assert cow.genetics.TBV_fat == -45.0
+    assert cow.genetics.TBV_protein == -30.0
+    assert cow.genetics.phenotype_fat == 480.0
+    assert cow.genetics.phenotype_protein == 380.0
 
 
 @pytest.mark.parametrize(
