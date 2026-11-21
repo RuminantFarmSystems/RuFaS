@@ -47,6 +47,7 @@ REQUIRED_FILE_BLOBS: set[str] = {
     "animal_population",
     "animal_mean_phenotype",
     "animal_top_listing_semen",
+    "animal_national_average_breeding_value",
     "lactation",
     "economy",
     "emission",
