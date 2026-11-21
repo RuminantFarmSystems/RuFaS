@@ -120,7 +120,7 @@ def test_add_units_to_constants(
     assert mock_logger.mock_calls == [
         mocker.call.warning(
             f"No matching GeneralConstant found for filter constant {name}.",
-            extra={"rufas_log_name": "report_generation_warning"},
+            extra={"rufas_log_name": "Report Generation Warning"},
         )
         for name in expected_warnings
     ]

@@ -186,12 +186,12 @@ def test_generate_report(
     start_logs = [
         call
         for call in mock_logger.info.call_args_list
-        if call.kwargs["extra"]["rufas_log_name"] == "start_generate_individual_report"
+        if call.kwargs["extra"]["rufas_log_name"] == "Start Generate Individual Report"
     ]
     assert start_logs == [
         mocker.call(
             f"Start generating individual report: {filter_content['name']}",
-            extra={"rufas_log_name": "start_generate_individual_report"},
+            extra={"rufas_log_name": "Start Generate Individual Report"},
         )
         for filter_content in filter_contents
     ]
@@ -209,7 +209,7 @@ def test_generate_report_with_untitled_report(report_generator: ReportGenerator,
     assert mock_logger.mock_calls == [
         mocker.call.info(
             "Start generating individual report: untitled_2023-01-01",
-            extra={"rufas_log_name": "start_generate_individual_report"},
+            extra={"rufas_log_name": "Start Generate Individual Report"},
         )
     ]
 
@@ -327,9 +327,9 @@ def test_generate_report_with_error(
     assert mock_logger.mock_calls == [
         mocker.call.info(
             "Start generating individual report: error_report",
-            extra={"rufas_log_name": "start_generate_individual_report"},
+            extra={"rufas_log_name": "Start Generate Individual Report"},
         ),
-        mocker.call.error(expected_error_message, extra={"rufas_log_name": "report_generation_error"}),
+        mocker.call.error(expected_error_message, extra={"rufas_log_name": "Report Generation Error"}),
     ]
 
 
@@ -516,7 +516,7 @@ def test_store_or_graph_report_data(
         assert mock_logger.mock_calls == [
             mocker.call.warning(
                 "Request to graph and report data not fulfilled - no graph_details present in report filter file.",
-                extra={"rufas_log_name": "report_generation_warning"},
+                extra={"rufas_log_name": "Report Generation Warning"},
             )
         ]
     else:

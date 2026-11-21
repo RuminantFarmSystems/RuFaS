@@ -70,7 +70,7 @@ class UnitHandler:
             else:
                 logger.warning(
                     f"No matching GeneralConstant found for filter constant {name}.",
-                    extra={"rufas_log_name": "report_generation_warning"},
+                    extra={"rufas_log_name": "Report Generation Warning"},
                 )
             unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
             constant_with_units = f"{name}_({unit_for_constant})"

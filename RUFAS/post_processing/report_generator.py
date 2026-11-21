@@ -83,7 +83,7 @@ class ReportGenerator:
 
         logger.info(
             f"Start generating individual report: {individual_report_name}",
-            extra={"rufas_log_name": "start_generate_individual_report"},
+            extra={"rufas_log_name": "Start Generate Individual Report"},
         )
 
         try:
@@ -102,7 +102,7 @@ class ReportGenerator:
             error_type = e.__class__.__name__
             logger.error(
                 f"Error generating report ({individual_report_name}) => {error_type}: {e}",
-                extra={"rufas_log_name": "report_generation_error"},
+                extra={"rufas_log_name": "Report Generation Error"},
             )
 
     def _add_cross_references_to_pool(
@@ -222,7 +222,7 @@ class ReportGenerator:
                 logger.warning(
                     "Request to graph and report data not fulfilled "
                     "- no graph_details present in report filter file.",
-                    extra={"rufas_log_name": "report_generation_warning"},
+                    extra={"rufas_log_name": "Report Generation Warning"},
                 )
 
     def _get_horizontal_first_value(
