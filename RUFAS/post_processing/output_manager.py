@@ -13,7 +13,7 @@ from RUFAS.post_processing.file_manager import FileManager
 from RUFAS.post_processing.graph_generator import GraphGenerator
 from RUFAS.post_processing.output_config_validator import OutputConfigValidator
 from RUFAS.post_processing.pool_manager import PoolManager
-from RUFAS.post_processing.report_generator import ReportGenerator, ReportGeneratorConfig
+from RUFAS.post_processing.report_generator import ReportGenerator
 from RUFAS.post_processing.rufas_logger import configure_logging, get_log_level, get_logger
 from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE, LogVerbosity
 from RUFAS.rufas_time import RufasTime
@@ -209,9 +209,7 @@ class OutputManager:
         info_map = self._info_map(self.save_results.__name__)
         self.add_log("exclude_info_maps", f"exclude_info_maps flag set to {exclude_info_maps}", info_map)
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
-        report_generator = ReportGenerator(
-            ReportGeneratorConfig(metadata_prefix=self.__metadata_prefix, time=self.time)
-        )
+        report_generator = ReportGenerator(time=self.time)
         if self.pool_manager.chunkification:
             self.pool_manager.save_current_variable_pool()
             self.pool_manager.load_saved_pools()
