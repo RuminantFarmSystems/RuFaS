@@ -105,53 +105,15 @@ of the branch you select, so select ``main``.
 Manual
 ~~~~~~
 
-To preview Sphinx's output locally before submitting a pull request,
-run these commands from the root of the project.
+To preview Sphinx's output locally before submitting a pull request:
 
-1. Create a separate environment for the documentation tools, and
-   install them together with the packages RuFaS uses. The code pages
-   import RuFaS, so its packages are needed. You only need to do this
-   once.
-
-   ::
-
-      python3 -m venv .venv-docs
-      .venv-docs/bin/pip install -e ".[build_docs]"
-
-2. Activate the environment.
-
-   ::
-
-      source .venv-docs/bin/activate
-
-   On MS Windows, use ``.venv-docs\Scripts\activate`` instead.
-
-3. Generate the reST files, as described in the "reStructuredText"
-   section.
-
-   ::
-
-      sphinx-apidoc -f -o docs/_src/_code/ . tests --maxdepth=1 --separate
-
-4. Build the HTML.
-
-   ::
-
-      cd docs
-      make html
-
-   On MS Windows, use ``./make html`` instead. Use ``make latexpdf`` to
-   produce Latex files.
-
-When you are done, remove the generated reST files so that they are not
-committed by mistake. The second command undoes the change to
-``modules.rst``, whose title is taken from the name of your project
-folder. Run these from the root of the project:
-
-::
-
-   git clean -f docs/_src/_code
-   git restore docs/_src/_code/modules.rst
+1. Install the documentation tools once, from the root of the project:
+   ``pip install -e ".[build_docs]"``.
+2. To include the code pages, run the ``sphinx-apidoc`` command from the
+   "reStructuredText" section first. Without it, only the wiki pages are
+   built.
+3. From the ``docs`` directory, run ``make html``. On MS Windows, run
+   ``./make html``. Use ``make latexpdf`` to produce Latex files.
 
 Where are the generated files?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
