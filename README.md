@@ -3,12 +3,14 @@
 > Este repositório é um fork de [RuminantFarmSystems/RuFaS](https://github.com/RuminantFarmSystems/RuFaS), criado a
 > partir da versão 1.0.5 (branch `dev`, commit `9af6eca`, de 05/11/2026).
 >
-> - **Motivo:** acrescentar um modelo de dieta de custo mínimo para vacas leiteiras, baseado nas exigências do
->   NRC (2001) e em preços de Goiás, que usa a biblioteca de alimentos do RuFaS. Veja
->   [`helpful_scripts/nrc2001_dieta_lp/`](helpful_scripts/nrc2001_dieta_lp/).
-> - **O que mudou:** apenas essa pasta nova e esta nota. Nenhum código, dado ou parâmetro do RuFaS foi alterado.
-> - **Comparabilidade:** as simulações do RuFaS dão os mesmos resultados do original. O modelo de dieta é
->   independente e não substitui a formulação de rações do RuFaS.
+> - **Motivo:** acrescentar modelos de dieta de custo mínimo para vacas leiteiras, com preços de Goiás, que
+>   usam a biblioteca de alimentos do RuFaS:
+>   - [`helpful_scripts/nrc2001_dieta_lp/`](helpful_scripts/nrc2001_dieta_lp/): exigências do NRC (2001);
+>   - [`helpful_scripts/nasem2021_dieta_lp/`](helpful_scripts/nasem2021_dieta_lp/): exigências do NASEM (2021),
+>     escrito com PuLP.
+> - **O que mudou:** apenas essas pastas novas e esta nota. Nenhum código, dado ou parâmetro do RuFaS foi alterado.
+> - **Comparabilidade:** as simulações do RuFaS dão os mesmos resultados do original. Os modelos de dieta são
+>   independentes e não substituem a formulação de rações do RuFaS.
 > - Este fork não é uma versão oficial nem endossada pelo projeto RuFaS. Assim como o original, é distribuído
 >   sob a licença GPLv3.
 
