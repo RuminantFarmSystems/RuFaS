@@ -168,6 +168,7 @@ class Animal:
     """
 
     nutrient_standard: NutrientStandard
+    om: OutputManager = OutputManager()
 
     def __init__(
         self,
@@ -184,7 +185,6 @@ class Animal:
         """
         Initializes an Animal object.
         """
-        self.om = OutputManager()
         initialize_animal_methods: dict[AnimalType, Callable[..., None]] = {
             AnimalType.CALF: self._initialize_calf_or_heiferI,
             AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
