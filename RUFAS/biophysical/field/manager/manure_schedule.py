@@ -107,12 +107,12 @@ class ManureSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
-        non_negative_parameters: list[tuple[str, list[Any]] | None] = [
+        non_negative_parameters: list[tuple[str, list[Any]]] = [
             ("nitrogen masses", self.nitrogen_masses),
             ("phosphorus masses", self.phosphorus_masses),
             ("manure application depths", self.application_depths),
         ]
-        fraction_parameters: list[tuple[str, list[Any]] | None] = [
+        fraction_parameters: list[tuple[str, list[Any]]] = [
             ("field coverages", self.field_coverages),
             ("surface remainder fractions", self.surface_remainder_fractions),
         ]

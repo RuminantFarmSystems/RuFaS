@@ -13,12 +13,10 @@ class TillageApplication:
 
     Parameters
     ----------
-    field_data : FieldData, optional
+    field_data : FieldData
         FieldData object that tracks attributes on the soil surface as they are updated by tillage applications.
-    soil_data : SoilData, optional
+    soil_data : SoilData
         SoilData object that tracks all attributes of the soil profile as they are updated by tillage applications.
-    field_size : float, optional
-        Size of the field (ha)
 
     Attributes
     ----------
@@ -38,34 +36,26 @@ class TillageApplication:
     -----
     This class was written to be as flexible as possible, because every attribute on the soil surface and in the soil
     profile gets incorporated and/or mixed with the same logic.
-    If no SoilData object is provided, one is created with the default configuration based on the field size.
     """
 
     def __init__(
         self,
-        field_data: FieldData | None = None,
-        soil_data: SoilData | None = None,
-        field_size: float | None = None,
+        field_data: FieldData,
+        soil_data: SoilData,
     ):
         """
         Creates a TillageApplication object based on a SoilData object.
 
         Parameters
         ----------
-        field_data : FieldData, optional
+        field_data : FieldData
             FieldData object that tracks attributes on the soil surface as they are updated by tillage applications.
-        soil_data : SoilData, optional
+        soil_data : SoilData
             SoilData object that tracks all attributes of the soil profile as they are updated by tillage applications.
-        field_size : float, optional
-            Size of the field (ha).
-
-        Notes
-        -----
-        If no SoilData object is provided, one is created with the default configuration based on the field size.
 
         """
-        self.field_data = field_data or FieldData(field_size=field_size or 1)
-        self.soil_data = soil_data or SoilData(field_size=self.field_data.field_size)
+        self.field_data = field_data
+        self.soil_data = soil_data
         self.om = OutputManager()
 
     def till_soil(

@@ -28,7 +28,10 @@ from RUFAS.simulation_engine import SimulationEngine, SimulationType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
+"""The file path to the pyproject.toml file with project-level information and settings."""
 PYPROJECT_FILE_PATH = Path("pyproject.toml")
+
+"""The current minimum python version allowed for RuFaS compatibility."""
 MINIMUM_PYTHON_VERSION = Version("3.12")
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
@@ -97,6 +100,16 @@ class TaskType(Enum):
             TaskType.END_TO_END_TESTING,
             TaskType.UPDATE_E2E_TEST_RESULTS,
         ]
+
+
+"""
+List of ``TaskType`` members that are exclusive, meaning a task configuration that has one of these
+task types cannot have any other task type.
+"""
+EXCLUSIVE_TASK_TYPES = [
+    TaskType.END_TO_END_TESTING,
+    TaskType.UPDATE_E2E_TEST_RESULTS,
+]
 
 
 class TaskManager:
@@ -253,15 +266,13 @@ class TaskManager:
                     }
                 )
 
-            e2e_processing_succeeded = self._process_e2e_results(
+            e2e_processing_succeeded, expected_results_random_seeds = self._process_e2e_results(
                 comparison_args=comparison_args,
                 produce_graphics=produce_graphics,
                 metadata_depth_limit=metadata_depth_limit,
                 workers=workers,
                 output_directory=output_directory,
                 verbosity=verbosity,
-                is_end_to_end_test_task=is_end_to_end_test_task,
-                is_update_end_to_end_test_task=is_update_end_to_end_test_task,
             )
 
             if is_end_to_end_test_task:
@@ -286,7 +297,11 @@ class TaskManager:
 
                 if e2e_processing_succeeded:
                     self.output_manager.summarize_e2e_test_results(
-                        json_output_directory, output_prefixes, e2e_random_seeds, failed_e2e_groups
+                        json_output_directory=json_output_directory,
+                        output_prefixes=output_prefixes,
+                        e2e_random_seeds=e2e_random_seeds,
+                        failed_e2e_groups=failed_e2e_groups,
+                        expected_results_random_seeds=expected_results_random_seeds,
                     )
 
             if is_update_end_to_end_test_task and e2e_processing_succeeded:
@@ -445,6 +460,8 @@ class TaskManager:
         ------
         ValueError
             - If ``SIMULATION_SINGLE_RUN`` task type and multiple random seeds specified in task inputs.
+            - If an exclusive task type is mixed with another task type in the same task configuration.
+            - If the task configuration has no tasks.
 
         Returns
         -------
@@ -456,7 +473,36 @@ class TaskManager:
         parsed_single_run_args: list[dict[str, Any]] = []
         parsed_multi_run_args: list[dict[str, Any]] = []
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
-        tasks_from_input: list[dict[str, Any]] = task_config.get("tasks")
+        tasks_from_input = task_config.get("tasks")
+        if not tasks_from_input:
+            self.output_manager.add_error(
+                "TaskManager Task Config Error",
+                "No tasks found in task input config.",
+                info_map={
+                    "class": TaskManager.__name__,
+                    "function": self._parse_input_tasks.__name__,
+                },
+            )
+            raise ValueError("No tasks found in task input config.")
+        task_types = {TaskType.from_string(task["task_type"]) for task in tasks_from_input}
+
+        for task_type in EXCLUSIVE_TASK_TYPES:
+            if task_type in task_types and len(task_types) > 1:
+                conflicting_task_types = sorted(other_type.name for other_type in task_types - {task_type})
+                error_message = (
+                    f"{task_type.name} tasks cannot be run with other task types "
+                    "in the same task configuration. "
+                    f"Conflicting task types: {', '.join(conflicting_task_types)}."
+                )
+                self.output_manager.add_error(
+                    "Task Type Conflict",
+                    error_message,
+                    info_map={
+                        "class": TaskManager.__name__,
+                        "function": self._parse_input_tasks.__name__,
+                    },
+                )
+                raise ValueError(error_message)
         task_manager_metadata_properties = self.input_manager.get_metadata("properties")
         export_input_data_to_csv = task_config.get("export_input_data_to_csv")
         input_data_csv_export_path = Path(task_config.get("input_data_csv_export_path"))
@@ -1070,9 +1116,7 @@ class TaskManager:
         workers: int,
         output_directory: Path,
         verbosity: LogVerbosity | None,
-        is_end_to_end_test_task: bool,
-        is_update_end_to_end_test_task: bool,
-    ) -> bool:
+    ) -> tuple[bool, dict[str, dict[str, list[int]]]]:
         """
         Runs all E2E result averaging and comparison tasks, in parallel if a process pool is available.
 
@@ -1091,15 +1135,12 @@ class TaskManager:
             Directory containing the E2E simulation outputs and where comparison outputs will be written.
         verbosity : LogVerbosity or None
             Log verbosity level for each E2E comparison.
-        is_end_to_end_test_task : bool
-            Whether the task is an e2e task.
-        is_update_end_to_end_test_task : bool
-            Whether the task is an e2e update expected results task.
 
         Returns
         -------
-        bool
-            True if all E2E result groups were successfully processed, False if any group failed.
+        tuple[bool, dict[str, dict[str, list[int]]]]
+            - True if all E2E result groups were successfully processed, False if any group failed.
+            - The list of random seeds used to generate the expected e2e results.
 
         Notes
         -----
@@ -1115,8 +1156,6 @@ class TaskManager:
             workers=workers,
             output_directory=output_directory,
             verbosity=verbosity,
-            is_end_to_end_test_task=is_end_to_end_test_task,
-            is_update_end_to_end_test_task=is_update_end_to_end_test_task,
         )
 
         if self.pool is not None:
@@ -1132,7 +1171,13 @@ class TaskManager:
                 )
             )
 
-        failed = [result for result in results if result is not None]
+        failed = [group_name for group_name, _ in results if group_name is not None]
+
+        expected_results_random_seeds = {
+            comparison_arg["e2e_group"]: random_seeds
+            for comparison_arg, (group_name, random_seeds) in zip(comparison_args, results)
+            if group_name is None and random_seeds is not None
+        }
 
         if failed:
             self.output_manager.add_error(
@@ -1140,12 +1185,12 @@ class TaskManager:
                 f"Failed E2E comparison task(s): {failed}",
                 {
                     "class": TaskManager.__name__,
-                    "function": (self._process_e2e_results.__name__),
+                    "function": self._process_e2e_results.__name__,
                 },
             )
-            return False
+            return False, expected_results_random_seeds
 
-        return True
+        return True, expected_results_random_seeds
 
     @staticmethod
     def _process_e2e_group_results(
@@ -1155,9 +1200,7 @@ class TaskManager:
         workers: int,
         output_directory: Path,
         verbosity: LogVerbosity | None,
-        is_end_to_end_test_task: bool,
-        is_update_end_to_end_test_task: bool,
-    ) -> str | None:
+    ) -> tuple[str | None, dict[str, list[int]] | None]:
         """
         Processes the completed simulation results for one E2E testing group.
 
@@ -1177,10 +1220,6 @@ class TaskManager:
         verbosity : LogVerbosity or None
             Log verbosity level for the E2E group. If ``None``, the verbosity configured in the E2E run arguments is
             used.
-        is_end_to_end_test_task : bool
-            Whether the task is an e2e task.
-        is_update_end_to_end_test_task : bool
-            Whether the task is an e2e update expected results task.
 
         Notes
         -----
@@ -1191,9 +1230,11 @@ class TaskManager:
 
         Returns
         -------
-        str or None
-            The E2E group name if input validation, averaging, comparison, or post-processing fails; otherwise
+        tuple[str | None, dict[str, list[int]] | None]
+            - The E2E group name if input validation, averaging, comparison, or post-processing fails; otherwise
             ``None``.
+            - The random seeds used to generate the expected e2e results, by e2e path-set domain or None if input data
+            is invalid.
         """
 
         e2e_group: str = comparison_args["e2e_group"]
@@ -1202,6 +1243,7 @@ class TaskManager:
 
         group_args = e2e_runs[0].copy()
         group_args["output_prefix"] = e2e_group
+        task_type = group_args["task_type"]
 
         output_manager = OutputManager()
         output_manager.run_startup_sequence(
@@ -1235,7 +1277,7 @@ class TaskManager:
                 },
             )
             TaskManager.handle_post_processing(comparison_args, input_manager, output_manager, task_id, False)
-            return e2e_group
+            return e2e_group, None
 
         try:
             averaged_results_path = E2ETestResultsHandler.process_test_result_averaging(
@@ -1245,12 +1287,16 @@ class TaskManager:
 
             output_manager.is_first_post_processing = False
 
-            if is_end_to_end_test_task:
-                must_change_variables, accepted_ranges = E2ETestResultsHandler.validate_comparison_configuration(
-                    group_args["output_prefix"],
-                    group_args["convert_variable_table_path"],
-                    group_args["filters_directory"],
-                    group_args["use_accepted_ranges"],
+            expected_results_random_seeds: dict[str, list[int]] | None = None
+
+            if task_type == TaskType.END_TO_END_TESTING:
+                must_change_variables, accepted_ranges, expected_results_random_seeds = (
+                    E2ETestResultsHandler.validate_comparison_configuration(
+                        group_args["output_prefix"],
+                        group_args["convert_variable_table_path"],
+                        group_args["filters_directory"],
+                        group_args["use_accepted_ranges"],
+                    )
                 )
 
                 E2ETestResultsHandler.compare_actual_and_expected_test_results(
@@ -1270,8 +1316,9 @@ class TaskManager:
                     produce_graphics=produce_graphics,
                     save_results=True,
                 )
-            elif is_update_end_to_end_test_task:
-                E2ETestResultsHandler.update_expected_test_results(averaged_results_path, e2e_group)
+            elif task_type == TaskType.UPDATE_E2E_TEST_RESULTS:
+                random_seeds: list[int] = [run["random_seed"] for run in e2e_runs]
+                E2ETestResultsHandler.update_expected_test_results(averaged_results_path, e2e_group, random_seeds)
                 output_manager.add_log(
                     "End-to-end testing",
                     "Completed generation of new set of end-to-end expected test results",
@@ -1291,9 +1338,9 @@ class TaskManager:
                         "units": MeasurementUnits.UNITLESS,
                     },
                 )
-                return e2e_group
+                return e2e_group, None
 
-            return None
+            return None, expected_results_random_seeds
 
         except Exception as e:
             info_map = {
@@ -1313,7 +1360,7 @@ class TaskManager:
                 "block",
             )
 
-            return e2e_group
+            return e2e_group, None
 
     @staticmethod
     def _run_e2e_simulation(

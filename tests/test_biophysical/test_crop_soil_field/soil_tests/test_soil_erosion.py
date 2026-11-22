@@ -432,5 +432,5 @@ def test_erode(
 def test_determine_support_practice_factor() -> None:
     """Test that the support factor is returned correctly"""
     data = SoilData(accumulated_runoff=13, field_size=1.33)
-    erosion = SoilErosion(data, field_size=0.65)
+    erosion = SoilErosion(data)
     assert erosion._determine_support_practice_factor() == 1
