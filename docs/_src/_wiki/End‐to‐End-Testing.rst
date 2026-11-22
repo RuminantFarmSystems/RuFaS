@@ -46,6 +46,15 @@ Key Terms
   - A results file is generated for each domain each time you run
     end-to-end testing
 
+- **Must-Change Variables** - variables that are expected to differ from
+  the expected results, for example after an intended change to the
+  model. See :ref:`Must-Change Variables <e2e-must-change-variables>`.
+
+- **Accepted Ranges** - a minimum and a maximum for a variable. A
+  variable with an accepted range is checked against that range and not
+  against the expected results. See
+  :ref:`Accepted Ranges <e2e-accepted-ranges>`.
+
 Why
 ~~~
 
@@ -84,6 +93,10 @@ For Each E2E test run:
 
 - **A domain’s E2E test fails if there are any differences.**
 
+- **Variables in the must-change list or with an accepted range are
+  checked differently.** See
+  :ref:`Must-Change Variables and Accepted Ranges <e2e-must-change-and-accepted-ranges>`.
+
 - **If an E2E test passes, the result is logged normally. If it fails,
   the result is logged as an error.**
 
@@ -102,6 +115,212 @@ This output file contains:
 - All differences between the actual and expected results.
 - A key that points to a boolean value indicating whether the E2E test
   passed or not.
+- ``changed_variables``: the names of the variables that differ from the
+  expected results. Variables in the must-change list or with an
+  accepted range are not included.
+- ``must_change_satisfied`` and ``must_change_violations``, if the
+  domain has must-change variables.
+- ``accepted_range_satisfied`` and ``accepted_range_violations``, if the
+  domain has variables with an accepted range.
+
+.. _e2e-must-change-and-accepted-ranges:
+
+Must-Change Variables and Accepted Ranges
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, every variable is compared against its expected value. This
+is the normal comparison. Each input set can have two optional files
+that change how a variable is checked:
+
+- The **must-change variables** file lists the variables that are
+  expected to change.
+- The **accepted ranges** file gives variables a minimum and a maximum.
+
+Both files are in the folder of their input set in
+``input/data/end_to_end_testing``. For example, the Free Stall files
+are:
+
+- ``input/data/end_to_end_testing/freestall/freestall_must_change_variables.json``
+- ``input/data/end_to_end_testing/freestall/freestall_accepted_ranges.json``
+
+Each file covers all the domains of its input set. The variable names
+are the keys of the ``expected_results`` in the E2E JSON filter files,
+for example
+``AnimalModuleReporter.report_305_day_milk_yield.milk_305_day_yield_herd_mean``.
+
+RuFaS finds the two files through the ``must_change_variables_path`` and
+``accepted_ranges_path`` keys in ``end_to_end_testing_result_paths.json``.
+See :ref:`E2E Testing Results Paths File <e2e-testing-results-paths-file>`.
+
+.. _e2e-must-change-variables:
+
+Must-Change Variables
+^^^^^^^^^^^^^^^^^^^^^
+
+Use this file when a change to the code is expected to change certain
+outputs. A listed variable passes only if its actual value differs from
+the expected value by more than the tolerance of its domain. If the
+value still matches, the domain fails.
+
+.. code:: json
+
+   {
+       "description": "Names of variables that must differ from the expected results. Empty this list after updating the expected results.",
+       "must_change_variables": [
+           "AnimalModuleReporter.report_enteric_methane_emission.enteric_methane_emission_for_LAC_COW_PEN_3",
+           "AnimalModuleReporter.report_manure_excretions.LAC_COW_PEN_3_manure_mass"
+       ]
+   }
+
+How to use it:
+
+1. Run E2E testing. The results file of each domain lists the variables
+   that differ from the expected results under ``changed_variables``.
+2. Review that list and add the variables that are expected to change to
+   ``must_change_variables``.
+3. Run E2E testing again. The listed variables now pass because they
+   changed, and they are no longer reported as differences.
+4. After the expected results are updated, empty the list. RuFaS does
+   not empty it for you. A variable that stays in the list fails the
+   next run, because it no longer differs from the new expected results.
+
+In the results file, ``must_change_satisfied`` lists the variables that
+changed, and ``must_change_violations`` gives the reason for each
+variable that failed:
+
+.. code:: json
+
+   {
+       "Animal.must_change_satisfied": {
+           "values": [
+               [
+                   "AnimalModuleReporter.report_manure_excretions.LAC_COW_PEN_3_manure_mass"
+               ]
+           ]
+       },
+       "Animal.must_change_violations": {
+           "values": [
+               {
+                   "AnimalModuleReporter.report_305_day_milk_yield.milk_305_day_yield_l1_mean": "Flagged as must change but the value still matches the expected results within the tolerance."
+               }
+           ]
+       }
+   }
+
+.. _e2e-accepted-ranges:
+
+Accepted Ranges
+^^^^^^^^^^^^^^^
+
+Use this file when a variable should be judged by a known range, for
+example a range accepted in the literature, and not by its previous
+value. A variable with an accepted range passes if all of its values are
+inside the range. It does not matter whether the values changed from the
+expected results.
+
+.. code:: json
+
+   {
+       "description": "Accepted 'min' and 'max' for each variable name. All values of a listed variable must fall within them.",
+       "accepted_ranges": {
+           "AnimalModuleReporter.report_305_day_milk_yield.milk_305_day_yield_herd_mean": {
+               "min": 10000,
+               "max": 13000
+           }
+       }
+   }
+
+- ``min`` and ``max`` are both required. They must be numbers, and
+  ``min`` cannot be greater than ``max``.
+- The bounds are inclusive.
+- Every number recorded for the variable is checked. For a daily
+  variable, this is the value of every day. For a variable that records
+  several fields, every numerical field is checked against the same
+  range.
+
+Accepted ranges are turned on or off for each task with
+``use_accepted_ranges`` in
+``input/data/tasks/end_to_end_testing_task.json``. The default is
+``true``. When it is ``false``, the accepted ranges file is not read.
+
+In the results file, ``accepted_range_satisfied`` and
+``accepted_range_violations`` show each range with the smallest and
+largest value that was found. A violation also gives the reason:
+
+.. code:: json
+
+   {
+       "Animal.accepted_range_violations": {
+           "values": [
+               {
+                   "AnimalModuleReporter.report_manure_excretions.LAC_COW_PEN_3_urine": {
+                       "min": 0,
+                       "max": 1500,
+                       "observed_min": 1244.110055144196,
+                       "observed_max": 1748.8818365567322,
+                       "reason": "191 of 366 values fall outside the accepted range."
+                   }
+               }
+           ]
+       }
+   }
+
+.. _e2e-check-interactions:
+
+How the Checks Work Together
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A variable can be in neither file, in one of them, or in both. The table
+below shows the checks a variable gets in each case, as of
+**11/22/2026**.
+
++-----------------------+-----------------------------+--------------------------------------------+
+| Variable is in        | Checks it gets              | Passes when                                |
++=======================+=============================+============================================+
+| Neither file          | Normal comparison           | It matches the expected value within the   |
+|                       |                             | tolerance.                                 |
++-----------------------+-----------------------------+--------------------------------------------+
+| Must-change file only | Must-change check           | It differs from the expected value by more |
+|                       |                             | than the tolerance.                        |
++-----------------------+-----------------------------+--------------------------------------------+
+| Accepted ranges file  | Range check                 | Every value is inside the range. A change  |
+| only                  |                             | from the expected value does not matter.   |
++-----------------------+-----------------------------+--------------------------------------------+
+| Both files            | Must-change check and range | It differs from the expected value by more |
+|                       | check                       | than the tolerance, and every value is     |
+|                       |                             | inside the range.                          |
++-----------------------+-----------------------------+--------------------------------------------+
+
+For a variable in both files, both checks must pass:
+
++----------------+-------------------+--------+
+| Value changed? | Inside the range? | Result |
++================+===================+========+
+| Yes            | Yes               | Pass   |
++----------------+-------------------+--------+
+| No             | Yes               | Fail   |
++----------------+-------------------+--------+
+| Yes            | No                | Fail   |
++----------------+-------------------+--------+
+| No             | No                | Fail   |
++----------------+-------------------+--------+
+
+Things to keep in mind:
+
+- The tolerance is the ``tolerance`` of the domain in
+  ``end_to_end_testing_result_paths.json``.
+- A variable in either file is left out of the normal comparison.
+- If ``use_accepted_ranges`` is ``false``, the ranges are ignored. A
+  variable with a range then gets the normal comparison, or only the
+  must-change check if it is also in the must-change file.
+- A domain passes only if all of its variables pass.
+- A listed variable that is missing from the actual results fails.
+- A variable with an accepted range that has no numbers to check fails.
+- A name that is not in the expected results of any domain of the input
+  set is a configuration error. So is a file that cannot be found or
+  read, and a range without a valid ``min`` and ``max``. RuFaS logs the
+  error and does not compare any domain of that input set. This is
+  checked after the simulation has run.
 
 Setting up E2E Testing
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -135,6 +354,15 @@ In the ``input/data/end_to_end_testing`` directory:
      - File name format: ``e2e_comparison_{domain}_differences.json``.
      - See :ref:`E2E Comparison filter file <e2e-comparison-filter-file>` for reference.
 
+   - **Must-Change Variables and Accepted Ranges Files (optional)**
+
+     - File name formats: ``{input set}_must_change_variables.json`` and
+       ``{input set}_accepted_ranges.json``. Keep these endings. RuFaS
+       uses them to tell these files apart from the filter files.
+     - Copy the two files from an existing input set. They start empty.
+     - See :ref:`Must-Change Variables and Accepted Ranges <e2e-must-change-and-accepted-ranges>`
+       for reference.
+
 3. **Update the ``end_to_end_testing_task.json`` file** in the ``input/data/tasks`` directory:
    - **Use the existing entries as examples.**, create a new object in the ``"tasks"`` array, specifying:
      - "task_type": "END_TO_END_TESTING"
@@ -143,6 +371,7 @@ In the ``input/data/end_to_end_testing`` directory:
        preferably following the patter ``{custom_name}_e2e``.
        **Please NOTE DOWN this output prefix name, it will be referenced later.**
      - "filters_directory": the directory path to the new directory conataining the two newly created filters.
+     - "use_accepted_ranges": true to check variables against the accepted ranges file, false to ignore that file.
      - "log_verbosity": the desired verbosity, the suggested verbosity is "logs" for an E2E testing run.
      - "exclude_info_maps": true. Please set this flag to true to exclude the info maps in the outputs,
        so that we can decrease the output file size and speed up the comparison process.
@@ -166,6 +395,9 @@ In the ``input/data/end_to_end_testing`` directory:
    - Specify the domains you’re testing, the path to the expected
      outputs, and the pattern used to find the actual outputs for the
      domain module.
+   - If you created the must-change variables and accepted ranges files
+     in step 2, add their paths with the ``must_change_variables_path``
+     and ``accepted_ranges_path`` keys.
    - **Use the existing entries as examples.**
    - See :ref:`E2E Testing Results Paths File <e2e-testing-results-paths-file>` for reference.
    - **Note:** *You will not create a new results paths file. Add your
@@ -263,6 +495,11 @@ How does it work?
 
 It is always good practice after running this automatic update to re-run
 end-to-end testing to ensure that the results were properly updated.
+
+The update does not read or change the must-change variables and
+accepted ranges files. If the must-change list of an input set is not
+empty, empty it before you re-run end-to-end testing. See
+:ref:`Must-Change Variables <e2e-must-change-variables>`.
 
 --------------
 
@@ -411,7 +648,9 @@ properly. This is accomplished in the
                    "domain": "FeedStorage",
                    "expected_results_path": "input/data/end_to_end_testing/e2e_json_feed_storage_filter.json",
                    "actual_results_path": "end-to-end-testing_saved_variables_e2e_feed_storage_",
-                   "tolerance": 0.1
+                   "tolerance": 0.1,
+                   "must_change_variables_path": "input/data/end_to_end_testing/freestall/freestall_must_change_variables.json",
+                   "accepted_ranges_path": "input/data/end_to_end_testing/freestall/freestall_accepted_ranges.json"
                }
            ]
         }
@@ -423,6 +662,12 @@ pattern that will start the file produced by the filter file containing
 the expected results. The "tolerance" is the percent tolerance allowed
 between the expected and actual results. It can be set individually for
 each domain to be more or less lenient.
+
+The "must_change_variables_path" and "accepted_ranges_path" entries are
+optional. They point to the must-change variables file and the accepted
+ranges file of the input set. All the domains of an input set point to
+the same two files. See
+:ref:`Must-Change Variables and Accepted Ranges <e2e-must-change-and-accepted-ranges>`.
 
 Some important things to note in the "actual_results_path":
 
