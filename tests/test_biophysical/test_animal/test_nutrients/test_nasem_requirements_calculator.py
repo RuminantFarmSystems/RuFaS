@@ -20,7 +20,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
     body_condition_score_5: int = 3
     days_in_milk: Optional[int] = 100
     average_daily_gain_heifer: Optional[float] = 0.8
-    tissue_weight_gain: float = 0.25
+    tissue_weight_change: float = 0.25
     animal_type: AnimalType = AnimalType.LAC_COW
     parity: int = 2
     calving_interval: Optional[int] = 365
@@ -87,7 +87,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
         body_condition_score_5,
         days_in_milk,
         average_daily_gain_heifer,
-        tissue_weight_gain,
+        tissue_weight_change,
         animal_type,
         parity,
         calving_interval,
@@ -119,7 +119,7 @@ def test_calculate_requirements(mocker: MockerFixture) -> None:
         body_weight, mature_body_weight, days_in_milk, lactating, 20.0, parity, body_condition_score_5, ndf_percentage
     )
     mock_calculate_protein_requirement.assert_called_once_with(
-        lactating, body_weight, 1.5, tissue_weight_gain, 1.2, 18.0, milk_true_protein, milk_production, ndf_percentage
+        lactating, body_weight, 1.5, tissue_weight_change, 1.2, 18.0, milk_true_protein, milk_production, ndf_percentage
     )
     mock_calculate_calcium_requirement.assert_called_once_with(
         body_weight, mature_body_weight, day_of_pregnancy, 0.7, 18.0, milk_true_protein, milk_production, parity
@@ -254,7 +254,7 @@ def test_calculate_pregnancy_energy_requirements(
 
 
 @pytest.mark.parametrize(
-    "lact, weight, frame_gain, tissue_gain, gravid_gain, dmi, true_protein, milk, ndf, expected",
+    "lact, weight, frame_gain, tissue_change, gravid_gain, dmi, true_protein, milk, ndf, expected",
     [
         (True, 490.0, 100.0, 0.0, 500.0, 45.0, 1.2, 25.0, 50.0, 190887.068472),
         (False, 490.0, 100.0, 0.0, 500.0, 45.0, 0.0, 0.0, 50.0, 190462.225718),
@@ -269,7 +269,7 @@ def test_calculate_protein_requirement(
     lact: bool,
     weight: float,
     frame_gain: float,
-    tissue_gain: float,
+    tissue_change: float,
     gravid_gain: float,
     dmi: float,
     true_protein: float,
@@ -279,7 +279,7 @@ def test_calculate_protein_requirement(
 ) -> None:
     """Test that the protein requirement is calculated correctly."""
     actual = NASEMRequirementsCalculator._calculate_protein_requirement(
-        lact, weight, frame_gain, tissue_gain, gravid_gain, dmi, true_protein, milk, ndf
+        lact, weight, frame_gain, tissue_change, gravid_gain, dmi, true_protein, milk, ndf
     )
 
     assert pytest.approx(actual) == expected
