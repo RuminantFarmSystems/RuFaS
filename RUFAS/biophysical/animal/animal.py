@@ -1321,6 +1321,27 @@ class Animal:
         """
         return self.days_in_milk == 0 and self.is_pregnant and self.days_in_pregnancy == self.gestation_length
 
+    @property
+    def days_since_calving(self) -> int:
+        """
+        Number of days since the animal last calved.
+
+        Returns
+        -------
+        int
+            Days elapsed since the most recent calving event (simulation days), or 0 if the animal has never calved.
+
+        Notes
+        -----
+        Calculated from the most recent calving event in the animal's event history, so no separate attribute needs
+        to be updated each day.
+
+        """
+        last_calving_day = self.events.get_most_recent_date(animal_constants.NEW_BIRTH)
+        if last_calving_day < 0:
+            return 0
+        return self.days_born - last_calving_day
+
     def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict, simulation_day: int) -> None:
         """
         Initialize a newborn calf with specific attributes and simulation variables.
@@ -1626,7 +1647,11 @@ class Animal:
         This method gathers the necessary animal attributes and performs the daily body weight update. It then updates
         attributes such as body weight, conceptual weight, and events of the animal accordingly.
 
+        Days since calving is only calculated for dry cows, the only animals that use it, to avoid searching the
+        event history of every animal every day.
+
         """
+        is_dry_cow = self.animal_type.is_cow and not self.is_milking
         growth_inputs = GrowthInputs(
             days_in_pregnancy=self.days_in_pregnancy,
             animal_type=self.animal_type,
@@ -1640,6 +1665,7 @@ class Animal:
             calf_birth_weight=self.calf_birth_weight,
             calves=self.calves,
             calving_interval=self.calving_interval,
+            days_since_calving=self.days_since_calving if is_dry_cow else 0,
         )
         growth_outputs: GrowthOutputs = self.growth.evaluate_body_weight_change(growth_inputs, time)
         self.body_weight = growth_outputs.body_weight

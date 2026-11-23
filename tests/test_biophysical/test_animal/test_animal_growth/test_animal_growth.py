@@ -479,69 +479,162 @@ def test_calculate_cow_target_daily_growth(
 
 
 @pytest.mark.parametrize(
-    "is_milking, calves, days_in_milk, days_in_pregnancy, gestation_length, tissue_changed,"
-    "expected_body_weight_tissue, expected_updated_tissue_changed",
+    "is_milking, calves, expected_p1, expected_p2",
     [
-        # Single calf, early lactation
-        (True, 1, 10, 100, 280, 0.0, pytest.approx(-0.606800483411535, abs=6.1e-03), 0.0),
-        # Single calf, mid-lactation
-        (True, 1, 40, 100, 280, 0.0, pytest.approx(-0.17385197560343396, abs=1.7e-03), 0.0),
-        # Single calf, late lactation
+        # Lactating primiparous cow
         (
             True,
             1,
-            60,
-            217,
-            280,
-            0.0,
-            pytest.approx(-0.02556115974977957, abs=2.6e-04),
-            pytest.approx(19.93770460482806, abs=2.0e-01),
+            AnimalModuleConstants.PRIMIPAROUS_TISSUE_CHANGE_P1,
+            AnimalModuleConstants.PRIMIPAROUS_TISSUE_CHANGE_P2,
         ),
-        # Twin calves, early lactation
-        (True, 2, 10, 100, 280, 0.0, pytest.approx(-1.1541641350450582, abs=1.2e-02), 0.0),
-        # Twin calves, mid-lactation
-        (True, 2, 40, 100, 280, 0.0, pytest.approx(-0.3759337981849493, abs=3.8e-03), 0.0),
-        # Twin calves, late lactation
+        # Lactating multiparous cow
         (
             True,
-            2,
-            60,
-            217,
-            280,
-            0.0,
-            pytest.approx(-0.09416857101184539, abs=9.4e-04),
-            pytest.approx(39.55079982497513, abs=4.0e-01),
+            3,
+            AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P1,
+            AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P2,
         ),
-        # Dry cow (not milking)
-        (False, 1, 0, 100, 280, 5.0, pytest.approx(0.08064516129032258, abs=8.1e-04), 5.0),
+        # Dry primiparous cow
+        (
+            False,
+            1,
+            AnimalModuleConstants.PRIMIPAROUS_TISSUE_CHANGE_P1,
+            AnimalModuleConstants.PRIMIPAROUS_TISSUE_CHANGE_P2,
+        ),
+        # Dry multiparous cow
+        (
+            False,
+            3,
+            AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P1,
+            AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P2,
+        ),
     ],
 )
 def test_calculate_cow_body_weight_tissue_change(
     mocker: MockerFixture,
     is_milking: bool,
     calves: int,
-    days_in_milk: int,
-    days_in_pregnancy: int,
-    gestation_length: int,
-    tissue_changed: float,
-    expected_body_weight_tissue: float,
-    expected_updated_tissue_changed: float,
+    expected_p1: float,
+    expected_p2: float,
 ) -> None:
+    """Lactating cows use the lactating calculation, dry cows use the dry calculation, both with parity P1/P2."""
     growth = Growth()
-    growth.tissue_changed = tissue_changed
+    growth.tissue_changed = 5.0
 
     mock_growth_inputs = mocker.MagicMock(spec=GrowthInputs)
     mock_growth_inputs.is_milking = is_milking
     mock_growth_inputs.calves = calves
-    mock_growth_inputs.days_in_milk = days_in_milk
-    mock_growth_inputs.days_in_pregnancy = days_in_pregnancy
-    mock_growth_inputs.gestation_length = gestation_length
+    mock_growth_inputs.days_in_milk = 120
+    mock_growth_inputs.days_since_calving = 330
+    mock_growth_inputs.days_in_pregnancy = 60
+    mock_growth_inputs.gestation_length = 280
+
+    mock_lactating = mocker.patch.object(Growth, "_calculate_lactating_cow_tissue_change", return_value=(-0.2, 6.0))
+    mock_dry = mocker.patch.object(Growth, "_calculate_dry_cow_tissue_change", return_value=0.1)
 
     result_body_weight_tissue, result_updated_tissue_changed = growth._calculate_cow_body_weight_tissue_change(
         mock_growth_inputs
     )
 
+    if is_milking:
+        mock_lactating.assert_called_once_with(120, 60, 5.0, expected_p1, expected_p2)
+        mock_dry.assert_not_called()
+        assert result_body_weight_tissue == -0.2
+        assert result_updated_tissue_changed == 6.0
+    else:
+        mock_dry.assert_called_once_with(330, 280, expected_p1, expected_p2)
+        mock_lactating.assert_not_called()
+        assert result_body_weight_tissue == 0.1
+        assert result_updated_tissue_changed == 5.0
+
+
+@pytest.mark.parametrize(
+    "calves, expected_parameters",
+    [
+        (
+            1,
+            (AnimalModuleConstants.PRIMIPAROUS_TISSUE_CHANGE_P1, AnimalModuleConstants.PRIMIPAROUS_TISSUE_CHANGE_P2),
+        ),
+        (
+            2,
+            (AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P1, AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P2),
+        ),
+        (
+            5,
+            (AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P1, AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P2),
+        ),
+    ],
+)
+def test_determine_tissue_change_parameters(calves: int, expected_parameters: tuple[float, float]) -> None:
+    """Primiparous cows use the primiparous P1/P2, all later parities use the multiparous P1/P2."""
+    assert Growth._determine_tissue_change_parameters(calves) == expected_parameters
+
+
+@pytest.mark.parametrize(
+    "days_in_milk, days_in_pregnancy, tissue_changed, p1, p2, expected_body_weight_tissue,"
+    "expected_updated_tissue_changed",
+    [
+        # Primiparous, early lactation, tissue changed carried forward
+        (10, 0, 0.0, 20.0, 65.0, -0.606800483411535, 0.0),
+        # Primiparous, mid-lactation, tissue changed carried forward
+        (40, 100, 3.0, 20.0, 65.0, -0.17385197560343396, 3.0),
+        # Primiparous, day before dry off, tissue changed recalculated
+        (60, 217, 0.0, 20.0, 65.0, -0.02556115974977957, 19.93770460482806),
+        # Multiparous, early lactation, tissue changed carried forward
+        (10, 0, 0.0, 40.0, 75.0, -1.0996117507124, 0.0),
+        # Multiparous, mid-lactation, tissue changed carried forward
+        (40, 100, 3.0, 40.0, 75.0, -0.39689558427015853, 3.0),
+        # Multiparous, day before dry off, tissue changed recalculated
+        (60, 217, 0.0, 40.0, 75.0, -0.13028296087041802, 39.084888261125435),
+    ],
+)
+def test_calculate_lactating_cow_tissue_change(
+    mocker: MockerFixture,
+    days_in_milk: int,
+    days_in_pregnancy: int,
+    tissue_changed: float,
+    p1: float,
+    p2: float,
+    expected_body_weight_tissue: float,
+    expected_updated_tissue_changed: float,
+) -> None:
+    """Daily lactation tissue change, with the tissue changed recalculated only on the day before dry off."""
+    mocker.patch.object(AnimalConfig, "dry_off_day_of_pregnancy", 218)
+
+    result_body_weight_tissue, result_updated_tissue_changed = Growth._calculate_lactating_cow_tissue_change(
+        days_in_milk, days_in_pregnancy, tissue_changed, p1, p2
+    )
+
     assert isinstance(result_body_weight_tissue, float)
     assert isinstance(result_updated_tissue_changed, float)
-    assert pytest.approx(result_body_weight_tissue, rel=1e-2) == expected_body_weight_tissue
-    assert pytest.approx(result_updated_tissue_changed, rel=1e-2) == expected_updated_tissue_changed
+    assert result_body_weight_tissue == pytest.approx(expected_body_weight_tissue)
+    assert result_updated_tissue_changed == pytest.approx(expected_updated_tissue_changed)
+
+
+@pytest.mark.parametrize(
+    "days_since_calving, gestation_length, p1, p2, expected_body_weight_tissue",
+    [
+        # Primiparous
+        (300, 280, 20.0, 65.0, 0.0400594161950243),
+        # Multiparous
+        (300, 280, 40.0, 75.0, 0.12848275707835857),
+        # Never calved, no tissue restored
+        (0, 280, 40.0, 75.0, 0.0),
+    ],
+)
+def test_calculate_dry_cow_tissue_change(
+    mocker: MockerFixture,
+    days_since_calving: int,
+    gestation_length: int,
+    p1: float,
+    p2: float,
+    expected_body_weight_tissue: float,
+) -> None:
+    """Dry period tissue change is the tissue change numerator spread over the length of the dry period."""
+    mocker.patch.object(AnimalConfig, "dry_off_day_of_pregnancy", 218)
+
+    result = Growth._calculate_dry_cow_tissue_change(days_since_calving, gestation_length, p1, p2)
+
+    assert isinstance(result, float)
+    assert result == pytest.approx(expected_body_weight_tissue)
