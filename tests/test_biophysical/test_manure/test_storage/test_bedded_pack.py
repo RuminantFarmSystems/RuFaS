@@ -30,6 +30,7 @@ def test_bedded_pack_init(mocker: MockerFixture) -> None:
         cover=StorageCover.NO_COVER,
         storage_time_period=dummy_storage_time_period,
         surface_area=10,
+        emptying_fraction=None,
     )
 
 
