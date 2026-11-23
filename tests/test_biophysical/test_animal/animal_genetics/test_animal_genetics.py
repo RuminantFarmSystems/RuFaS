@@ -1,3 +1,4 @@
+import copy
 from unittest.mock import call, MagicMock
 
 import numpy
@@ -5,6 +6,7 @@ import pytest
 from RUFAS.util import Utility
 from pytest_mock import MockerFixture
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_genetics.animal_genetics import Genetics
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -19,6 +21,53 @@ def genetics(mocker: MockerFixture) -> Genetics:
     )
     genetics = Genetics(animal_type=AnimalType.LAC_COW, birth_year=2020)
     return genetics
+
+
+def test_genetics_output_manager_is_class_attribute(genetics: Genetics) -> None:
+    """Test that OutputManager is shared rather than stored on Genetics instances."""
+    assert "om" not in vars(genetics)
+    assert Genetics.om is OutputManager()
+    assert genetics.om is Genetics.om
+
+
+def test_genetics_deepcopy_preserves_output_manager(genetics: Genetics) -> None:
+    """Test that deep copying Genetics preserves the shared OutputManager."""
+    copied = copy.deepcopy(genetics)
+
+    assert copied is not genetics
+    assert "om" not in vars(copied)
+
+    assert copied.om is genetics.om
+    assert copied.om is OutputManager()
+
+
+def test_genetics_deepcopy_preserves_independent_values(genetics: Genetics) -> None:
+    """Test that deep-copied genetic values are independent of the original."""
+    genetics.TBV_fat = 10.0
+    genetics.TBV_protein = 20.0
+    genetics.EBV_fat = 5.0
+    genetics.EBV_protein = 15.0
+    genetics.ranking_index = 2.5
+
+    copied = copy.deepcopy(genetics)
+
+    assert copied.TBV_fat == genetics.TBV_fat
+    assert copied.TBV_protein == genetics.TBV_protein
+    assert copied.EBV_fat == genetics.EBV_fat
+    assert copied.EBV_protein == genetics.EBV_protein
+    assert copied.ranking_index == genetics.ranking_index
+
+    copied.TBV_fat = 100.0
+    copied.TBV_protein = 200.0
+    copied.EBV_fat = 50.0
+    copied.EBV_protein = 150.0
+    copied.ranking_index = 25.0
+
+    assert genetics.TBV_fat == 10.0
+    assert genetics.TBV_protein == 20.0
+    assert genetics.EBV_fat == 5.0
+    assert genetics.EBV_protein == 15.0
+    assert genetics.ranking_index == 2.5
 
 
 @pytest.mark.parametrize(

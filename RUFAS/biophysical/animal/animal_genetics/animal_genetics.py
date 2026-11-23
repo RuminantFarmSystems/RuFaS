@@ -60,20 +60,22 @@ class Genetics:
         Estimated Breeding Value for protein, (kg).
     ranking_index : float
         Ranking index for animal performance.
-    top_semen_too_early_warning: bool
+    top_semen_too_early_warning : bool
         A flag indicating if a warning for animals born before the earliest available top semen data was raised.
-    top_semen_too_recent_warning: bool
+    top_semen_too_recent_warning : bool
         A flag indicating if a warning for animals born after the latest available top semen data was raised.
-    phenotype_too_early_warning: bool
+    phenotype_too_early_warning : bool
         A flag indicating if a warning for animals born before the earliest available phenotype data was raised.
-    phenotype_too_recent_warning: bool
+    phenotype_too_recent_warning : bool
         A flag indicating if a warning for animals born before the latest available phenotype data was raised.
-    national_average_too_early_warning: bool
+    national_average_too_early_warning : bool
         A flag indicating if a warning for animals born before the earliest available national average breeding
         value data was raised.
-    national_average_too_recent_warning: bool
+    national_average_too_recent_warning : bool
         A flag indicating if a warning for animals born after the latest available national average breeding
         value data was raised.
+    om : OutputManager
+        An instance of the OutputManager class.
     """
 
     TBV_fat: float
@@ -96,6 +98,8 @@ class Genetics:
     national_average_too_early_warning: bool = False
     national_average_too_recent_warning: bool = False
 
+    om = OutputManager()
+
     def __init__(
         self,
         birth_year: int,
@@ -107,7 +111,6 @@ class Genetics:
         birth_month: int | None = None,
     ) -> None:
         """Initialize genetic attributes."""
-        self.om = OutputManager()
         if initialize_new_born_calf:
             assert (
                 animal_type == AnimalType.CALF
