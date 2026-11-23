@@ -100,7 +100,7 @@ $$
 $$
 :::
 
-* Q = sensible heat generated in the hay (kJ/kg) based on bale density.
+* Q = sensible heat generated in the hay (kJ/kg) based on bale density
 
 :::{#eq-fs-hay-5}
 [[**FS.HAY.5**]]{.aside .content-visible when-format="html"}    
@@ -187,14 +187,15 @@ $$
 $$
 :::
 
-* d = number of days the alfalfa has been ensiled for, 
-* i = days since ensiling that dry matter loss is being calculated for, 
-* drymass<sub>i-1</sub> = dry matter mass of ensiled alfalfa on day i-1,
-* dryfrac<sub>i-1</sub> = fraction of ensiled alfalfa fresh mass that is dry matter on day i-1. 
-* When i is 1,
+* d = number of days the alfalfa has been ensiled for
+* i = days since ensiling that dry matter loss is being calculated for
+* drymass<sub>i-1</sub> = dry matter mass of ensiled alfalfa on day i-1
+* dryfrac<sub>i-1</sub> = fraction of ensiled alfalfa fresh mass that is dry matter on day i-1.
+* When i is 1:
    * drymass<sub>i-1</sub> = initial amount of ensiled alfalfa dry mass
-   * dryfrac<sub>i-1</sub> = initial dry matter fraction of the ensiled alfalfa. 
-* This equation is only appropriate for use if dryfrac<sub>i-1</sub> is in the range [0.2, 0.6] and the average temperature on day and i is in the range [5, 45] ($^∘$C).
+   * dryfrac<sub>i-1</sub> = initial dry matter fraction of the ensiled alfalfa.
+* This equation is only appropriate for use if dryfrac<sub>i-1</sub> is in the range [0.2, 0.6] and the average temperature on day and i is in the range [5, 45] ($^∘$C)
+
         
 Corn, grass, and small grain daily dry matter loss (fraction) is calculated with the equation:
 
@@ -208,11 +209,11 @@ $$
 * d = number of days the forage has been ensiled for 
 * i = days since ensiling that dry matter loss is being calculated for 
 * drymass<sub>i-1</sub> = dry matter mass of ensiled forage on day i-1
-* dryfrac<sub>i-1</sub> = fraction of ensiled forage fresh mass that is dry matter on day i-1.
-* When i is 1, 
+* dryfrac<sub>i-1</sub> = fraction of ensiled forage fresh mass that is dry matter on day i-1
+* When i is 1
    * drymass<sub>i-1</sub> = initial amount of ensiled forage dry mass 
    * dryfrac<sub>i-1</sub> = initial dry matter fraction of the ensiled forage. 
-* This equation is only appropriate for use if dryfrac<sub>i-1</sub> is in the range [0.15, 0.6] and the average temperature on day i is in the range [0, 40] ($^∘$C).
+* This equation is only appropriate for use if dryfrac<sub>i-1</sub> is in the range [0.15, 0.6] and the average temperature on day i is in the range [0, 40] ($^∘$C)
 
 ```{python}
 #| label: tbl-fs-silage-nutr
@@ -264,7 +265,7 @@ $$
 :::
 
 * mass<sub>fresh</sub> = fresh mass of the crop when it is ensiled (kg) 
-* dryfrac = fraction of the crop’s fresh mass which is dry matter when it is ensiled.
+* dryfrac = fraction of the crop’s fresh mass which is dry matter when it is ensiled
 
 Dry matter lost in effluent is preferentially from CP, water soluble carbohydrates, and non-protein nitrogen each of which is recalculated by the following equations:
 
@@ -334,6 +335,5 @@ $$
 \text{DL}_\text{fraction} = \frac{\text{DM}_\text{updated}}{\text{DM}_\text{updated}}
 $$
 :::
-
 
 ## References
