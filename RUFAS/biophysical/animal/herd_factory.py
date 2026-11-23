@@ -648,7 +648,10 @@ class HerdFactory:
 
         post_animals = []
         try:
-            random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
+            random_choices = random.choices(
+                range(len(pre_animals)),
+                k=animal_num,
+            )
             for choice in random_choices:
                 animal = copy.deepcopy(pre_animals[choice])
                 animal.id = AnimalPopulation.next_id()
