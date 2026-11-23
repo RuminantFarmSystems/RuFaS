@@ -324,7 +324,6 @@ class RationManager:
             return 0.0
         return AnimalModuleConstants.DMI_CONSTRAINT_FRACTION
 
-
     @classmethod
     def effective_dmi_retry_increase_factor(cls, animal_combination: AnimalCombination | None) -> float:
         """
