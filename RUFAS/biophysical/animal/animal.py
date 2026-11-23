@@ -168,6 +168,7 @@ class Animal:
     """
 
     nutrient_standard: NutrientStandard
+    om: OutputManager = OutputManager()
 
     def __init__(
         self,
@@ -184,7 +185,6 @@ class Animal:
         """
         Initializes an Animal object.
         """
-        self.om = OutputManager()
         initialize_animal_methods: dict[AnimalType, Callable[..., None]] = {
             AnimalType.CALF: self._initialize_calf_or_heiferI,
             AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
@@ -1480,6 +1480,11 @@ class Animal:
         if self.calves > 0:
             wood_parameters = LactationCurve.get_wood_parameters(self.calves)
             self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
+
+        if self.is_pregnant:
+            self.reproduction.repro_state_manager.enter(ReproStateEnum.PREGNANT)
+        else:
+            self.reproduction.repro_state_manager.enter(ReproStateEnum.ENTER_HERD_FROM_INIT)
 
     def reduce_milk_production(self) -> bool:
         """
