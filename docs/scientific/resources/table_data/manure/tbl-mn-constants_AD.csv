@@ -1,0 +1,5 @@
+Variable, Value, Definition
+CARBON_DIOXIDE_MOLAR_MASS , 44.01 g/mol , Molar mass of CO<sub>2</sub>
+CARBON_DIOXIDE_TO_METHANE_RATIO , 4-6 , Volumetric ratio of CO<sub>2</sub> to CH<sub>4</sub> during digestion
+METHANE_MOLAR_MASS , 16.04 g/mol , Molar mass of CH<sub>4</sub> 
+TAN_INCREASE_FACTOR ,1.6, TAN increase from anaerobic digestion (unitless)

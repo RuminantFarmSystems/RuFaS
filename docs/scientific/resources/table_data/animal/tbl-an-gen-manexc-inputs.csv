@@ -1,0 +1,4 @@
+﻿ Variable , Definition , Units 
+ body_weight , Body weight of the current animal , kg 
+ dry_matter_intake , Dry matter intake from pen ration , kg 
+ nutrient_amounts,An instance of the NutritionSupply that includes all nutrients supplied by the diet,"kg, g, or Mcal"

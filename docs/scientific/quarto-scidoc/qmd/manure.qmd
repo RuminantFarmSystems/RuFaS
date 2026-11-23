@@ -186,9 +186,9 @@ $$
 
 *Where*:
 
-* `num_animals` = the number of animals in the pen assigned to the handler
-* `cleaning_water_use_rate` (L/animal/d) = the user-provided cleaning water use rate for the handler
-* `cleaning_water_recycle_fraction` = the proportion of cleaning water that is from recycled, non-fresh sources
+* num_animals = the number of animals in the pen assigned to the handler
+* cleaning_water_use_rate (L/animal/d) = the user-provided cleaning water use rate for the handler
+* cleaning_water_recycle_fraction = the proportion of cleaning water that is from recycled, non-fresh sources
 
 Total fresh water added to manure (L) each day is calculated as follows:
 
@@ -204,7 +204,7 @@ $$
 
 *Where*:
 
-* `LITERS_TO_CUBIC_METERS` = a constant set to 0.997 kg/m$^3$
+* LITERS_TO_CUBIC_METERS = a constant set to 0.997 kg/m$^3$
 
 **Calculate milking parlor fresh water addition**
 
@@ -222,8 +222,8 @@ $$
 
 *Where*:
 
-* `num_animals` = the number of animals in the pen assigned to the handler
-* `MILKING_FRESH_WATER_USE_RATE` (30.0 L/animal/d) = the default fresh water use rate for cleaning equipment/floors in the milking parlor
+* num_animals = the number of animals in the pen assigned to the handler
+* MILKING_FRESH_WATER_USE_RATE (30.0 L/animal/d) = the default fresh water use rate for cleaning equipment/floors in the milking parlor
 
 #### Calculate housing emissions
 
@@ -252,8 +252,8 @@ $$
 
 *Where*:
 
-* `num_stalls` = the number of stalls in the pen assigned to the handler
-* `surface_area` (m^2/animal) = surface area per stall, provided in @tbl-mn-surface-area
+* num_stalls = the number of stalls in the pen assigned to the handler
+* surface_area (m$^2$/animal) = surface area per stall, provided in @tbl-mn-surface-area
 
 ```{python}
 #| label: tbl-mn-surface-area
@@ -276,8 +276,8 @@ $$
 
 *Where*:
 
-* `barn_temperature` (°C) = ambient air temperature in the barn. Note that the max notation ensures that the temperature scaling parameter cannot be less than 0.13.
-* `soiled_surface_area` (m$^2$) = the total surface area soiled with manure
+* barn_temperature (°C) = ambient air temperature in the barn. Note that the max notation ensures that the temperature scaling parameter cannot be less than 0.13.
+* soiled_surface_area (m$^2$) = the total surface area soiled with manure
 
 **Calculate housing CO<sub>2</sub> emissions**
 
@@ -292,8 +292,8 @@ $$
 
 *Where*:
 
-* `barn_temperature` (°C) = ambient air temperature in the barn. Note that the max notation ensures that the temperature scaling parameter cannot be less than 0.13.
-* `soiled_surface_area` (m^2) = the total surface area soiled with manure
+* barn_temperature (°C) = ambient air temperature in the barn. Note that the max notation ensures that the temperature scaling parameter cannot be less than 0.13.
+* soiled_surface_area (m^2) = the total surface area soiled with manure
 
 **Calculate volatile solids losses**
 
@@ -308,8 +308,8 @@ $$
 
 *Where*:
 
-* `housing_CH4` (kg) = daily emissions of CH<sub>4</sub> from manure on barn floors, calculated in [MN.MET.1](#eq-mn-met-1).
-* `VS_TO_METHANE_LOSS_RATIO` (kg) = a constant set to 6.665 representing the kg of total VS degraded per kg of CH<sub>4</sub> emitted from manure. See the Slurry Storage section for more information on derivation of this constant.
+* housing_CH4 (kg) = daily emissions of CH<sub>4</sub> from manure on barn floors, calculated in [MN.MET.1](#eq-mn-met-1).
+* VS_TO_METHANE_LOSS_RATIO (kg) = a constant set to 6.665 representing the kg of total VS degraded per kg of CH<sub>4</sub> emitted from manure. See the Slurry Storage section for more information on derivation of this constant.
 
 The fraction of volatile solids lost from the manure degradable (VSd) and non-degradable VS (VSnd) fractions is assumed to be equal to the proportion of these fractions in manure entering the processor. No VS losses are attributed to bedding VSnd in manure handlers.
 
@@ -370,8 +370,8 @@ $$
 
 *Where*:
 
-* K<sub>h</sub>: Henry's law coefficient, calculated in [MN.AMM.1](#eq-mn-amm-1).
-* K_<sub>a</sub>: Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#eq-mn-amm-2).
+* K<sub>h</sub>: Henry's law coefficient, calculated in [MN.AMM.1](#eq-mn-amm-1)
+* K_<sub>a</sub>: Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#eq-mn-amm-2)
 
 Second, we determine the effective total resistance value of NH<sub>3</sub> transport from manure solution to the surface and from the manure surface to the atmosphere.
 
@@ -387,7 +387,7 @@ $$
 
 *Where*:
 
-* `HOUSING_SPECIFIC_CONSTANT` = a housing-specific constant value, set to 260 s/m.
+* HOUSING_SPECIFIC_CONSTANT = a housing-specific constant value, set to 260 s/m
 * Barn temperature (°C) = ambient air temperature in the barn.
 
 Next, the rate of NH<sub>3</sub>-N loss in kg N/m$^2$ from manure on the barn floor is calculated:
@@ -420,7 +420,7 @@ $$
 *Where*:
 
 * NH<sub>3</sub>N_rate (kg N/m$^2$) = Rate of NH<sub>3</sub>-N loss (kg/m^2) from manure, calculated in [MN.AMM.5](#eq-mn-amm-5)
-* `soiled_surface_area` (m$^2$) = the total surface area soiled with manure
+* soiled_surface_area (m$^2$) = the total surface area soiled with manure
 
 ### Manure Composition Update
 
@@ -441,7 +441,7 @@ import_table(
 )
 ```
 
-* `WATER_DENSITY_KG_PER_M3`: a constant with a value of 0.997 kg/m$^3$
+* WATER_DENSITY_KG_PER_M3 = constant with a value of 0.997 kg/m$^3$
 
 ::: {.callout-note}
 Note that for parlor cleaning handlers, the value of all housing emissions variables will be reported as 0.
@@ -558,7 +558,6 @@ import_table(
 ```
 [@Jorgensen2009; @Fournel2019]
 
-
 **Calculate Total Mass and Water**
 
 *Separated solids fraction*
@@ -615,8 +614,8 @@ $$
 
 *Where*:
 
-* `SOLID_MANURE_DENSITY` (kg/m$^3$) = The default density of solid manure, set to 700 kg/m$^3$
-* `LIQUID_MANURE_DENSITY` (kg/m$^3$) = The default density of liquid manure, set to 900 kg/m$^3$
+* SOLID_MANURE_DENSITY (kg/m$^3$) = The default density of solid manure, set to 700 kg/m$^3$
+* LIQUID_MANURE_DENSITY (kg/m$^3$) = The default density of liquid manure, set to 900 kg/m$^3$
 
 ### Manure Composition Update
 
@@ -633,7 +632,6 @@ import_table(
 )
 ```
 
-
 ## Anaerobic Digestion
 
 ### Introduction
@@ -644,6 +642,10 @@ Manure can undergo anaerobic digestion in a specialized anaerobic digestion cham
 
 **Implementation in RuFaS**
 
+::: {.callout-note}
+The anaerobic digestion submodule is a relatively simplistic representation of an anaerobic digester. Its methods are currently not responsive to manure composition (beyond VS content), digestion temperature, digester type, retention time, or other factors that influence outcomes of anaerobic digestion on actual dairy farms. Accordingly, please review the implementation and assumption sections below carefully.
+:::
+
 The anaerobic digestion submodule in RuFaS currently represents anaerobic digestion within an enclosed, mechanical digester system. The following assumptions are made in the RuFaS anaerobic digestion submodule:
 
 * The digester represented is assumed to be a mesophilic, continuous stirred-tank reactor (CSTR).
@@ -652,12 +654,11 @@ The anaerobic digestion submodule in RuFaS currently represents anaerobic digest
 * Residence time of manure in the digester is not modeled. As a result, the composition of effluent exiting the digester each day is identical to the influent composition, with the exception of nutrient losses or transformations that occur in the digester.
 * At this time, CH<sub>4</sub> generation and volatile solids destruction is based strictly on the quantity of manure volatile solids loaded; other factors are not considered at this time.
 
-
-The anaerobic submodule has two primary functions in RuFaS: 
+The anaerobic digestion submodule has two primary functions in RuFaS: 
 
 * Estimate daily methane production (kg/d) based on the daily mass of manure volatile solids (VS) loaded into the digester.
     * VS loading is dependent on the number and type of animals contributing manure to the digester, the diet of the animals, quantity and type of bedding, and any upstream manure handling processes, e.g., solid liquid separation, water addition, etc.
-* Update the composition of the liquid manure effluent leaving the digester, which enters the anaerobic lagoon. 
+* Update the composition of the liquid manure effluent leaving the digester. 
     * Reflecting VS loss in effluent exiting the digester is essential to capture the reduction in methane emissions from digestate compared to undigested, liquid manure, as well as changes in proportion of inorganic (ammoniacal) to total nitrogen.
 
 **Classes**
@@ -684,36 +685,36 @@ import_table(
 
 **Other Inputs**
 
-Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kgVS):
+Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kg VS):
 
-* water
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
 
 * `captured_biogas_volume` (m$^3$): Captured biogas (assumed to be composed of 40% CO<sub>2</sub>, 60% CH<sub>4</sub>) volume after accounting for leakage on the current day
 * `captured_methane_volume` (m$^3$): Captured methane volume on the current day, after accounting for leakage
-* `methane_leakage_mass` (kg): Mass of CH<sub>4</sub> lost to the atmosphere through unintended leakage on the current day. This variable is expressed as mass as opposed to volume as CH<sub>4</sub> emissions are reported in kg in the rest of the manure module and other RuFaS modules
+* `methane_leakage_mass` (kg): Mass of CH<sub>4</sub> lost to the atmosphere through unintended leakage on the current day. This variable is expressed as mass rather than volume for consistency with CH<sub>4</sub> emissions (kg) reporting in the rest of the manure module and other RuFaS modules
 
 ### Methodology
 
 **Calculate Daily Methane Generation**
 
-Calculates volume of methane (CH<sub>4</sub>) generated from a CSTR digester. Methane generation is estimated from the daily loading of manure volatile solids (VS). Degradable (VSd) and non-degradable (VSnd) VS are tracked separately but the ratio of VSd : VSnd does not affect CH<sub>4</sub> estimation; only the total quantity of VS is considered. To perform this calculation, we make several assumptions/simplifications: 
+Calculates volume of methane (CH<sub>4</sub>) generated from a CSTR digester. Methane generation is estimated from the daily loading of manure volatile solids (VS). Degradable (VS<sub>d</sub>) and non-degradable (VS<sub>nd</sub>) VS are tracked separately but the ratio of VS<sub>d</sub> : VS<sub>nd</sub> does not affect CH<sub>4</sub> estimation; only the total quantity of VS is considered. To perform this calculation, we make several assumptions/simplifications: 
 
-* The ratio of chemical oxygen demand (COD): VS in dairy manure is assumed to be 1.2 to 1. 1 kg of COD can generate 0.4 kg of methane. Therefore, 1 kg VS reduction/degradation in the anaerobic digester = 1.2 kg COD = 480 L CH<sub>4</sub>. In other words, each kg VS of reduced is assumed to generate 480 L of CH<sub>4</sub>. 
+* The ratio of chemical oxygen demand (COD): VS in dairy manure is assumed to be 1.2 to 1, and 1 kg of COD can generate 0.4 m$^3$ of methane (Wei Liao, Michigan State University, personal communications). Therefore, 1 kg VS reduction/degradation in the anaerobic digester = 1.2 kg COD = 480 L CH<sub>4</sub>. In other words, each kg VS of reduced in the anaerobic digester is assumed to generate 480 L of CH<sub>4</sub>. 
 * A CSTR reduces manure VS content by approximately 50%. This is a generalization across CSTR digesters of varying efficiencies, based on expert opinion from W. Liao (MSU) and A. Leytem (USDA-ARS). 
 * Considering that 480 L of CH<sub>4</sub> are generated per kg of VS destroyed, and approximately 50% of VS loaded are anticipated to be destroyed, we estimate CH<sub>4</sub> generation by assuming 240 L CH<sub>4</sub> are generated per VS kg loaded into the digester; this is also in alignment with the @IPCC2019 Tier II manure CH<sub>4</sub> B$_0$ value.
 * Lastly, the volumetric ratio of CH<sub>4</sub> to CO<sub>2</sub> generation in the CSTR is assumed to be 6:4 (e.g. generation of 60% CH<sub>4</sub>, 40% CO<sub>2</sub>biogas) based on commonly cited digester performance metrics (e.g., EPA, [@Fernandez2015]). The total quantity of VS destroyed in anaerobic digestion is then assumed to be equal to the quantity of CH<sub>4</sub> and CO<sub>2</sub> generated in the digester. This assumption is made due to a lack of data on destruction of degradable vs. non-degradable VS in anaerobic digestion.
@@ -730,8 +731,8 @@ $$
 
 *Where*:
 
-* `ACHIEVABLE_METHANE_EMISSION` = achievable methane generation constant (m$^3$ CH<sub>4</sub> per kg VS loaded into digester); Constant Value: 0.24 m$^3$ CH<sub>4</sub>/kg VS
-* `total_volatile_solids` = daily mass (kg) of manure total volatile solids loaded into the digester, received from `ManureStream(s)`
+* ACHIEVABLE_METHANE_EMISSION = achievable methane generation constant (m$^3$ CH<sub>4</sub> per kg VS loaded into digester); Constant Value: 0.24 m$^3$ CH<sub>4</sub>/kg VS
+* total_volatile_solids = daily mass (kg) of manure total volatile solids loaded into the digester, received from `ManureStream(s)`
 
 Lastly, we need to convert daily CH<sub>4</sub> volume (`generated_methane_volume`) to CH<sub>4</sub> mass. First we calculate CH<sub>4</sub> density according to the user-provided digestion setpoint temperature, then we apply the density value to the volume of CH<sub>4</sub> generated.
 
@@ -744,10 +745,10 @@ $$
 
 *Where*:
 
-* `METHANE_MOLAR_MASS` (16.04 g/mol) = molar mass of CH<sub>4</sub>
-* `IDEAL_GAS_LAW_R` (0.0821 L atm/mol K) = ideal gas law R value 
-* `temperature_set_point` (℃) = user-provided digestion set point temperature
-* `CELSIUS_TO_KELVIN` (273.15) = value to convert ℃ temperature values to K
+* METHANE_MOLAR_MASS (16.04 g/mol) = molar mass of CH<sub>4</sub>
+* IDEAL_GAS_LAW_R (0.0821 L atm/mol K) = ideal gas law R value 
+* temperature_set_point (℃) = user-provided digestion set point temperature
+* CELSIUS_TO_KELVI` (273.15) = value to convert ℃ temperature values to K
 
 ::: {#eq-mn-adg-3}
 [[**MN.ADG.3**]]{.aside .content-visible when-format="html"}
@@ -758,7 +759,7 @@ $$
 
 *Where*:
 
-* `generated_methane_volume` (m$^3$): volume of CH<sub>4</sub> generated in the digester on a single day, calculated in [MN.ADG.1]{#eq-mn-adg-1}.
+* generated_methane_volume (m$^3$): volume of CH<sub>4</sub> generated in the digester on a single day, calculated in [MN.ADG.1](#eq-mn-adg-1)
 
 **Calculate Destroyed Volatile Solids `_destroy_volatile_solids`**
 
@@ -775,10 +776,10 @@ $$
 
 *Where*:
 
-* `CARBON_DIOXIDE_MOLAR_MASS` (44.01 g/mol) = molar mass of CO<sub>2</sub>
-* `IDEAL_GAS_LAW_R` (0.0821 L atm/mol K) = ideal gas law R value 
-* `temperature_set_point` (℃) = user-provided digestion set point temperature
-* `CELSIUS_TO_KELVIN` (273.15) = value to convert ℃ temperature values to K
+* CARBON_DIOXIDE_MOLAR_MASS (44.01 g/mol) = molar mass of CO<sub>2</sub>
+* IDEAL_GAS_LAW_R (0.0821 L atm/mol K) = ideal gas law R value 
+* temperature_set_point (℃) = user-provided digestion set point temperature
+* CELSIUS_TO_KELVIN (273.15) = value to convert ℃ temperature values to K
 
 Second, we determine the quantity of CO<sub>2</sub> volume and mass generated, assuming digester biogas contains a 60:40 volumetric ratio of CH<sub>4</sub> to CO<sub>2</sub>. 
 
@@ -795,8 +796,8 @@ $$
 
 *Where*:
 
-* `CARBON_DIOXIDE_MOLAR_MASS` (44.01 g/mol) = molar mass of CO<sub>2</sub>; Constant Value: = 4/6 L/L (0.667) 
-* `carbon_dioxide_density` (kg per m$^3$) = ideal gas law value to convert CO<sub>2</sub> from mass to volume
+* CARBON_DIOXIDE_MOLAR_MASS`(44.01 g/mol) = molar mass of CO<sub>2</sub>; Constant Value: = 4/6 L/L (0.667) 
+* carbon_dioxide_density (kg per m$^3$) = ideal gas law value to convert CO<sub>2</sub> from mass to volume
 
 Third, we calculate the total destruction of total VS. 
 
@@ -807,9 +808,9 @@ $$
 $$
 :::
 
-We then utilize the value of `total_volatile_solids_destruction` (kg) to update VSd, manure VSnd, and bedding VSnd. As mentioned above, the total quantity of VS destroyed is partitioned between the three VS fractions according to the proportion of each fraction in manure entering the digester. E.g., if manure entering contained 60% VSd, 10% manure VSnd, and 30% bedding VSnd, 60% of destroyed VS will be subtracted from VSd, 10% from manure VSnd, and 30% from bedding VSnd.
+We then utilize the value of `total_volatile_solids_destruction` (kg) to update VS<sub>d</sub>, manure VS<sub>nd</sub>, and bedding VS<sub>nd</sub>. As mentioned above, the total quantity of VS destroyed is partitioned between the three VS fractions according to the proportion of each fraction in manure entering the digester. E.g., if manure entering contained 60% VS<sub>d</sub>, 10% manure VS<sub>nd</sub>, and 30% bedding VS<sub>nd</sub>, 60% of destroyed VS will be subtracted from VS<sub>d</sub>, 10% from manure VS<sub>nd</sub>, and 30% from bedding VS<sub>nd</sub>.
 
-To do this, we calculate the ratio of VSd to VS (`degradable_volatile_solids_frac`) and manure VSd to VS and apply these fractions to the `total_volatile_solids_destruction` value to determine the updated VS fraction values.
+To do this, we calculate the ratio of VS<sub>d</sub> to VS (`degradable_volatile_solids_frac`) and manure VS<sub>d</sub> to VS and apply these fractions to the `total_volatile_solids_destruction` value to determine the updated VS fraction values.
 
 ::: {#eq-mn-adg-7}
 [[**MN.ADG.7**]]{.aside .content-visible when-format="html"}
@@ -854,7 +855,7 @@ $$
 
 **Calculate Methane Leakage `_calculate_methane_leakage`**
 
-Calculates the volume of CH<sub>4</sub> generated that is lost to the atmosphere via leakage. The leakage fraction is currently a user input with a default value of 1\%, which represents a conservative leakage rate. Leakage is largely dependent on the age and type of digester and should ideally be provided by the user for specificity.
+Calculates the volume of CH<sub>4</sub> generated that is lost to the atmosphere via leakage. The leakage fraction is currently a user input with a default value of 1%, which represents a conservative leakage rate. Leakage is largely dependent on the age and type of digester and should ideally be provided by the user for specificity.
 
 ::: {#eq-mn-adg-12}
 [[**MN.ADG.12**]]{.aside .content-visible when-format="html"}
@@ -865,10 +866,10 @@ $$
 
 *Where*:
 
-* `generated_methane_volume` (m$^3$) = volume of CH<sub>4</sub> generated in the digester on a single day, calculated in [MN.ADG.1](#eq-mn-adg-1)
-* `biogas_leakage_fraction` (%) = fraction of biogas generated in the anaerobic digester that escapes to the atmosphere through unintended leakage; Default Value: 0.01 (1%)
+* generated_methane_volume (m$^3$) = volume of CH<sub>4</sub> generated in the digester on a single day, calculated in [MN.ADG.1](#eq-mn-adg-1)
+* biogas_leakage_fraction (%) = fraction of biogas generated in the anaerobic digester that escapes to the atmosphere through unintended leakage; Default Value: 0.01 (1%)
 
-**Update Digestor Effluent Composition `_report_anaerobic_digestor_outputs`**
+**Update Digester Effluent Composition `_report_anaerobic_digester_outputs`**
 
 The calculations below are some additional prerequisites to generating anaerobic digestion-specific outputs.
 
@@ -883,8 +884,8 @@ $$
 
 *Where*:
 
-* `generated_methane_volume` (m$^3$) = total volume of CH<sub>4</sub> generated in the digester on a specific day
-* `methane_leakage_volume` (m$^3$) = the volume of CH<sub>4</sub> generated that is lost to the atmosphere via leakage
+* generated_methane_volume (m$^3$) = total volume of CH<sub>4</sub> generated in the digester on a specific day
+* methane_leakage_volume (m$^3$) = the volume of CH<sub>4</sub> generated that is lost to the atmosphere via leakage
         
 The equation below is used to calculate the updated volume of manure in the digester, accounting for the volume of destroyed VS.
 
@@ -895,7 +896,7 @@ $$
 $$
 :::
 
-Microbial processes during anaerobic digestion are known to increase the proportion/mass of total ammoniacal N (TAN), though the total mass of N is generally not different pre and post-digestion [@AguirreVillegas2019]. To reflect this, the proportion of TAN in manure in the digester is multiplied by a fixed factor. The factor (`TAN_INCREASE_FACTOR`, 1.60) was chosen based on a target of ~50% loss of total N via NH<sub>3</sub>-N emissions from a subsequent digestate lagoon, as reported by the USDA GHG estimation guidelines for uncovered digestate storage [@Hanson2024].
+Microbial processes during anaerobic digestion are known to increase the proportion/mass of total ammoniacal N (TAN), though the total mass of N is generally not different pre and post-digestion [@AguirreVillegas2019]. To reflect this, the proportion of TAN in manure in the digester is multiplied by a fixed factor. The factor (TAN_INCREASE_FACTOR, 1.60) was chosen based on a target of ~50% loss of total N via NH<sub>3</sub>-N emissions from a subsequent digestate lagoon, as reported by the USDA GHG estimation guidelines for uncovered digestate storage [@Hanson2024].
 
 ::: {#eq-mn-adg-15 style="font-size:80%"}
 [[**MN.ADG.15**]]{.aside .content-visible when-format="html"}
@@ -906,8 +907,8 @@ $$
 
 *Where*:
         
-* `ammoniacal_nitrogen` (kg) = the mass of ammoniacal N in manure loaded into the digester on a single day
-* `TAN_INCREASE_FACTOR` = factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process, set to 1.60
+* ammoniacal_nitrogen (kg) = the mass of ammoniacal N in manure loaded into the digester on a single day
+* TAN_INCREASE_FACTOR = factor by which total ammoniacal nitrogen content is increased by the anaerobic digestion process, set to 1.60
 * Note that the “min” notation prevents manure TAN from exceeding manure total N
 
 
@@ -978,19 +979,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$, and manure methane production potential, m$^3$/kgVS):
 
-* water 
+* `water` 
 * `ammoniacal_nitrogen`
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
+* `mass` (equal to sum of water and total solids)
 * `total volatile solids` (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -1010,7 +1011,7 @@ Temperature of stored manure is assumed to be equal throughout the entire mass o
 
 *Slurry Storage Outdoor* `_determine_outdoor_storage_temperature`
 
-Daily temperature of manure in slurry storage outdoors is determined using a sine/cosine least squares fit to user-provided weather data, with a fixed amplitude damping and lag (phase shift) factor. For more information, see the Calculate Stored Manure Temperature in the Anaerobic Lagoon section.
+Daily temperature of manure in slurry storage outdoors is determined using a sine/cosine least squares fit to user-provided weather data, with a fixed amplitude damping and lag (phase shift) factor. For more information, see the Calculate Manure Temperature section in the Anaerobic Lagoon section.
 
 **Calculate Storage Surface Area**
 
@@ -1032,12 +1033,12 @@ $$
 
 *Where*:
 
-* `cow_num` = user-inputted number of mature cows housed on the farm
-* `MANURE_CONVERSION_CONSTANT` = Factor to estimate m$^3$ of herd-wide manure produced per day per mature cow housed on the farm, set to 0.1175 m$^3$.
-* `storage_time` (days) = user-inputted number of days that manure is stored in this storage for before being emptied.
-* `FREEBOARD_CONSTANT` = the volume allowance above the maximum volume of a slurry or liquid manure storage, set to 1.20 (20%).
-* `DEPTH_CONSTANT` = value for slurry or liquid manure storage depth, set to 4.572 m (15 feet). 
-* `PRECIPITATION_CONSTANT` = The annual precipitation constant value, used only in determination of storage surface area if surface area is not provided by the user, set to 0.25 m.
+* cow_num = user-inputted number of mature cows housed on the farm
+* MANURE_CONVERSION_CONSTANT = Factor to estimate m$^3$ of herd-wide manure produced per day per mature cow housed on the farm, set to 0.1175 m$^3$
+* storage_time (days) = user-inputted number of days that manure is stored in this storage for before being emptied
+* FREEBOARD_CONSTANT = the volume allowance above the maximum volume of a slurry or liquid manure storage, set to 1.20 (20%)
+* DEPTH_CONSTANT = value for slurry or liquid manure storage depth, set to 4.572 m (15 feet).
+* PRECIPITATION_CONSTANT`= The annual precipitation constant value, used only in determination of storage surface area if surface area is not provided by the user, set to 0.25 m
 
 **Calculate Precipitation Volume**
 
@@ -1061,8 +1062,8 @@ $$
 
 *Where*:
 
-* `storage_surface_area` = the user-defined or model-estimated storage surface area (m$^2$). 
-* Precipitation = the daily amount of precipitation (m).
+* storage_surface_area = the user-defined or model-estimated storage surface area (m$^2$).
+* precipitation = the daily amount of precipitation (m)
 
 **Calculate Methane Emissions** `_calculate_methane_emissions`
 
@@ -1075,16 +1076,16 @@ First, we must calculate the value of the Arrhenius exponent (`_calculate_arrhen
 ::: {#eq-mn-met-2}
 [[**MN.MET.2**]]{.aside .content-visible when-format="html"}
 $$
-\text{Arrh\_exp g}(\text{CH}_4\text{ kg}^{-1}\text{VS h}^{-1}) = e^{\text{Ln(A)} - \frac{\text{ACTIVATION\_ENERGY}}{\text{Gas constant} \times \text{manure temperature}}}
+\text{Arrh\_exp g}(\text{CH}_4\text{ kg}^{-1}\text{VS h}^{-1}) = e^{\text{Ln(A)} - \frac{\text{ACTIVATION\_ENERGY}}{\text{gas\_constant} \times \text{manure\_temperature}}}
 $$
 :::
 
 *Where*:
 
-* Ln(A) = The natural log of the Arrhenius parameter (`NATURAL_LOG_ARRHENIUS_CONSTANT`), set at 30.7 based on @Petersen2024. This is an empirically-derived value determined based on observed manure CH<sub>4</sub> emission values.
-* `ACTIVATION_ENERGY` = the apparent activation energy of methanogenesis in cattle slurry (J/mol), set at 81,000 J/mol, based on @Elsgaard2016. 
-* Gas constant = ideal gas constant, set at 8.314 J K/mol.
-* Manure temperature (K) = temperature of manure in storage. 
+* Ln(A) = The natural log of the Arrhenius parameter (NATURAL_LOG_ARRHENIUS_CONSTANT), set at 30.7 based on @Petersen2024. This is an empirically-derived value determined based on observed manure CH<sub>4</sub> emission values
+* ACTIVATION_ENERGY = the apparent activation energy of methanogenesis in cattle slurry (J/mol), set at 81,000 J/mol, based on @Elsgaard2016
+* gas_constant = ideal gas constant, set at 8.314 J K/mol
+* manure_temperature (K) = temperature of manure in storage
 
 Now we can calculate actual daily CH<sub>4</sub> emission, based on the total quantity of VSd and VSnd in stored manure. The basic equation, used to calculate CH<sub>4</sub> emissions for each VS fraction, is as follows:
 
@@ -1097,28 +1098,29 @@ $$
 
 *Where*:
 
-* 24 = conversion factor from hours to day. 
-* `Arrh_exp` = Arrhenius parameter for CH<sub>4</sub> emission rate (g CH<sub>4</sub> kg$^{-1}$ VS h$^{-1}$), calculated in [MN.MET.2](#eq-mn-met-2). 
-* `VSd_or_nd` = The mass (kg) of VSd or VSnd in manure in slurry storage.
-* `rate_factor` = The unitless rate-correcting factor, set to 1 for VS$_d$ and 0.01 for VS$_{nd}$. 
+* 24 = conversion factor from hours to day
+* Arrh_exp = Arrhenius parameter for CH<sub>4</sub> emission rate (g CH<sub>4</sub> kg$^{-1}$ VS h$^{-1}$), calculated in [MN.MET.2](#eq-mn-met-2)
+* VS<sub>d_or_nd</sub> = The mass (kg) of VSd or VSnd in manure in slurry storage
+* rate_factor = The unitless rate-correcting factor, set to 1 for VS$_\text{d}$ and 0.01 for VS$_{\text{nd}}$
 
 The total daily CH<sub>4</sub> emission is equal to the sum of emissions from the VS<sub>d</sub> and VS<sub>nd</sub> fractions.
 
 **Calculate Cover and Flare Emissions** `_calculate_cover_and_flare_emissions`
 
-The cover and flare option is applicable to slurry storage outdoor only (i.e., not usable with slurry storage underfloor). If the cover and flare option is selected, daily CH<sub>4</sub> emission from slurry storage is multiplied by a methane destruction efficiency value. The set value for methane destruction efficiency is 81%, based on a white paper commissioned by Dairy Management, Inc. on cover and flare efficiency [@wallaceDMI]. The updated daily CH<sub>4</sub> emission (kg) from a cover and flare slurry storage is as follows:
+The cover and flare option is applicable to slurry storage outdoor only (i.e., not usable with slurry storage underfloor). If the cover and flare option is selected, daily CH<sub>4</sub> emission from slurry storage is multiplied by a methane destruction efficiency value. The set value for methane destruction efficiency is 81%, based on a white paper commissioned by Dairy Management, Inc. on cover and flare efficiency [@wallaceDMI] and published in [@afshar2026]. The updated daily CH<sub>4</sub> emission (kg) from a cover and flare slurry storage is as follows:
 
 ::: {#eq-mn-met-4}
 [[**MN.MET.4**]]{.aside .content-visible when-format="html"}
 $$
-\text{Daily storage CH}_4 (\text{kg}) = \text{storage CH}_4 \times (1 - \text{METHANE\_DESTRUCTION\_EFFICIENCY})
+\text{emitted\_storage\_CH}_4 (\text{kg}) = \text{total\_storage\_CH}_4 \times (1 - \text{METHANE\_DESTRUCTION\_EFFICIENCY})
 $$
 :::
 
 *Where*:
 
-* Storage CH<sub>4</sub> (kg) = total daily kg of CH<sub>4</sub> emitted from stored manure, calculated in [MN.MET.3](#eq-mn-met-3).
-* `METHANE_DESTRUCTION_EFFICIENCY` = coefficient for destruction of methane by the flare, set to 0.81.
+* emitted_storage_CH<sub>4</sub> (kg) = daily kg of CH<sub>4</sub> emitted from stored manure
+* total_storage_CH<sub>4</sub> (kg) = daily kg of CH<sub>4</sub> generated, calculated in [MN.MET.3](#eq-mn-met-3)
+* METHANE_DESTRUCTION_EFFICIENCY = coefficient for destruction of methane by the flare, set to 0.81
 
 **Calculate Volatile Solids Loss** `_apply_methane_emissions`
 
@@ -1148,24 +1150,24 @@ First, we need to derive the value of the equilibrium coefficient Q for the NH<s
 
 [See [MN.AMM.1](#eq-mn-amm-1)]{.aside .content-visible when-format="html"}
 $$
-\text{K}_\text{h} = 10^{\frac{1478}{\text{manure temperature}}} - 1.69
+\text{K}_\text{h} = 10^{\frac{1478}{\text{manure\_temperature}}} - 1.69
 $$
 
 *Where*:
 
-* Manure temperature (K) = temperature of manure storage.
+* manure_temperature (K) = temperature of manure storage
 
 *Dissociation coefficient of ammonium (K<sub>a</sub>)*
 
 [See [MN.AMM.2](#eq-mn-amm-2)]{.aside .content-visible when-format="html"}
 $$
-\text{K}_\text{h} = 1 + 10^{(0.09018 + \frac{2729.9}{\text{manure temperature}} - \text{pH})}
+\text{K}_\text{h} = 1 + 10^{(0.09018 + \frac{2729.9}{\text{manure\_temperature}} - \text{pH})}
 $$
 
 *Where*:
 
-* Manure temperature (K) = temperature of stored manure.
-* `DEFAULT_STORED_MANURE_PH` = the pH of the manure in storage, set to 7.5 by default
+* manure_temperature (K) = temperature of stored manure
+* DEFAULT_STORED_MANURE_PH = the pH of the manure in storage, set to 7.5 by default
 
 *Equilibrium coefficient (Q)*
 
@@ -1176,8 +1178,8 @@ $$
 
 *Where*:
 
-* K<sub>h</sub> = Henry’s law coefficient, calculated in [MN.AMM.1](#eq-mn-amm-1).
-* K<sub>a</sub> = Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#-eq-mn-amm-2).
+* K<sub>h</sub> = Henry’s law coefficient, calculated in [MN.AMM.1](#eq-mn-amm-1)
+* K<sub>a</sub> = Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#-eq-mn-amm-2)
 
 Next, the rate of NH<sub>3</sub>-N loss in kg N/m$^2$ from stored manure is calculated:
 
@@ -1191,7 +1193,7 @@ $$
 * TAN (kg) = Mass of ammoniacal N in stored manure
 * c = time conversion constant (86400 s per d)
 * y = manure density, set to 990 kg/m$^3$ 
-* `STORAGE_RESISTANCE` = A constant value representing the sum of resistance of NH<sub>3</sub> transfer from solution to manure surface, and from manure surface to atmosphere, set at 23.1 s/m.
+* STORAGE_RESISTANCE = A constant value representing the sum of resistance of NH<sub>3</sub> transfer from solution to manure surface, and from manure surface to atmosphere, set at 23.1 s/m
 * M (kg) = Total mass of stored manure
 * Q = Equilibrium coefficient calculated in [MN.AMM.3](#eq-mn-amm-3)
 
@@ -1204,24 +1206,24 @@ $$
 
 *Where*:
 
-* `NH3N_rate` (kg N/m$^2$) = Rate of NH<sub>3</sub>-N loss (kg/m$^2$) from manure, calculated in [MN.AMM.5](#eq-m-amm-5).
-* `surface_area` (m$^2$) = Total manure storage surface area.
+* NH$_3$N_rate (kg N/m$^2$) = Rate of NH<sub>3</sub>-N loss (kg/m$^2$) from manure, calculated in [MN.AMM.5](#eq-m-amm-5)
+* surface_area (m$^2$) = Total manure storage surface area
 
 **Calculate Nitrous Oxide Emissions** `_calculate_nitrous_oxide_emissions`
 
-N<sub>2</sub>O emissions (kg N<sub>2</sub>O-N) are based on the daily quantity of manure N loaded into storage, whether the manure storage is covered or uncovered. This method is based on @IPCC2019; however, it should be noted that the original @IPCC2006 method is based on daily manure N excretion by animals, whereas the current method is based on manure N loading into storage, which may reflect upstream N losses from NH<sub>3</sub> emissions in housing, solid liquid separation, etc. The calculation is as follows:
+N<sub>2</sub>O emissions (kg N<sub>2</sub>O-N) are based on the daily quantity of manure N loaded into storage, and depends on whether the manure storage is covered or uncovered. This method is based on @IPCC2019; however, it should be noted that the original @IPCC2006 method is based on daily manure N excretion by animals, whereas the current method is based on manure N loading into storage, which may reflect upstream N losses from NH<sub>3</sub> emissions in housing, solid liquid separation, etc. The calculation is as follows:
 
 ::: {#eq-mn-nit-1}
 [[**MN.NIT.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{N}_2\text{O-N emissions (kg)} = \text{Received\_N} \times \text{N}_2\text{O factor}
+\text{N}_2\text{O-N emissions (kg)} = \text{Received\_N} \times \text{N}_2\text{O\_factor}
 $$
 :::
 
 *Where*:
 
-* `Received_N` (kg) = Quantity of manure total N loaded into storage on the current day
-* N<sub>2</sub>O factor = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to storage, based on the following logic:
+* Received_N (kg) = Quantity of manure total N loaded into storage on the current day
+* N<sub>2</sub>O_factor = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to storage, based on the following logic:
     * Cover type = crust OR cover; 0.005
     * Cover type = no cover; 0 (no N<sub>2</sub>O emissions)
 
@@ -1285,7 +1287,7 @@ anaerobic lagoons have specific design and management requirements to facilitate
 
 **Implementation in RuFaS**
 
-In RuFaS, the underlying biological and gas emission methods are identical for slurry storages vs. anaerobic lagoons, as the biological process of organic matter breakdown is very similar between the two in reality. However, the differences in size, dilution, management, and other factors differ between the two in reality, leading to generally greater GHG emissions from lagoons compared to slurry storages. In the anaerobic lagoon submodule, accumulated manure in storage (i.e., held in the lagoon) is modeled on a daily timestep. Nutrient/mass gains from daily addition of manure (feces/urine, bedding, wash water) to storage, and precipitation volume entering storage, are tracked. Gas emissions are calculated daily based on the quantity of nutrients in stored manure, manure temperature, storage type, use of a cover, and storage duration. Manure composition is then updated according to net nutrient losses/gains. Manure accumulates in storage until the end of the user-defned storage interval is reached. However, quantities of manure may additionally be removed from storage according to the user-defined manure application schedule. 
+In RuFaS, the underlying biological and gas emission methods are identical for slurry storages vs. anaerobic lagoons, as the biological process of organic matter breakdown is very similar between the two in reality. However, the differences in size, dilution, management, and other factors differ between the two in reality, leading to generally greater GHG emissions from lagoons compared to slurry storages. In the anaerobic lagoon submodule, the basic methods for nutrient addition, accumulation, and removal remain the same as in slurry storage. Specifically, accumulated manure in storage (i.e., held in the lagoon) is modeled on a daily timestep. Nutrient/mass gains from daily addition of manure (feces/urine, bedding, wash water) to storage, and precipitation volume entering storage, are tracked. Gas emissions are calculated daily based on the quantity of nutrients in stored manure, manure temperature, storage type, use of a cover, and storage duration. Manure composition is then updated according to net nutrient losses/gains. Manure accumulates in storage until the end of the user-defned storage interval is reached. Quantities of manure may additionally be removed from storage according to the user-defined manure application schedule. The primary difference in implementation of the anaerobic lagoon from that of slurry storage is that lagoons are not fully emptied to reflect that, in practice, lagoons often accumulate a sludge like manure that is not removed on an annual basis.
 
 **Classes**
 
@@ -1312,24 +1314,24 @@ import_table(
 
 Instance(s) of ManureStream for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$/kgVS):
 
-* water 
+* `water` 
 * `ammoniacal_nitrogen`
-* nitrogen
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
+* `mass` (equal to sum of water and total solids)
 * `total volatile solids` (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
 
-* ManureStream variables representing manure loaded (received) into storage each day, and accumulated manure after accounting for nutrient and mass gains/losses
+* `ManureStream` variables representing manure loaded (received) into storage each day, and accumulated manure after accounting for nutrient and mass gains/losses
 * `storage_methane`(kg): Daily emission of CH<sub>4</sub> from accumulated manure in an anaerobic lagoon. 
 * `storage_ammonia`(kg): Daily emission of NH<sub>3</sub> from accumulated manure in an anaerobic lagoon. 
 * `storage_nitrous_oxide`(kg): Daily emission of N<sub>2</sub>O from accumulated manure in an anaerobic lagoon. 
@@ -1352,7 +1354,7 @@ $$
 *Where*:
 
 * amplitude = modeled amplitude of the seasonal air temperature function, calculated from user-supplied, simulation-wide weather data
-* `MANURE_DAMPING_FACTOR` = a fixed damping factor applied to the air temperature amplitude, set to 0.65
+* MANURE_DAMPING_FACTOR = a fixed damping factor applied to the air temperature amplitude, set to 0.65
 
 Second, we use this amplitude in the following function to determine modeled manure temperature (℃) each simulation day. Note the function includes a 'max' term to implement a lower temperature bound for manure temperature. 
 
@@ -1369,124 +1371,35 @@ $$
 *Where*:
 
 * mean_temp (℃) = simulation_wide mean air temperature
-* `manure_amplitude` = amplitude of the manure temperature function, determined in [MN.STO.13](#eq-mn-sto-13)
+* manure_amplitude = amplitude of the manure temperature function, determined in [MN.STO.13](#eq-mn-sto-13)
 * jday = Julian day of the simulation [MN.MET.3](#eq-mn-met-3) temperature in the simulation
-* `MANURE_TEMPERATURE_LAG` (days) = fixed lag constant representing the delayed thermal response of manure temperature relative to air temperature, set to 30. 
-* `min_temp` (℃) = A fixed minimum temperature constant, dependent on the type of storage: 
+* MANURE_TEMPERATURE_LAG (days) = fixed lag constant representing the delayed thermal response of manure temperature relative to air temperature, set to 30 
+* min_temp (℃) = A fixed minimum temperature constant, dependent on the type of storage: 
    * Anaerobic lagoon = 1℃
    * Slurry storage outdoor = -20℃
 
 **Calculate Storage Surface Area** 
 
-Exposed surface area (m$^2$) of the manure in storage is important in determining NH<sub>3</sub>-N emissions, as well as in determining precipitation volume added to storage if the storage is not covered or indoors. Wherever possible, this value should be provided by the user if modeling a real farm. If farm-specific information is unavailable or the farm being modeled is theoretical, the surface area should be estimated using tools like the USDA's Animal Waste Management Version 2.4.1. However, the RuFaS team recognizes that minimizing required inputs is desirable, though a fixed storage surface area is undesirable due to the variability in storage structure size and surface area. With this, an equation was developed that estimates storage surface area based on the following assumptions:
-
-* All manure excreted by animals on the farm enters the specified storage. At this time, the Manure module is not capable of assessing the proportion of manure excreted that is stored in the defined storages, therefore, all manure is assumed to be stored in the current storage, for the purposes of surface are estimation. 
-* The storage is 15 ft deep, with vertical walls. 
-* The storage receives 2500 mm of precipitation per year. 
-* Herd composition, and thus manure excretion, is fixed, and the number of animals in each life stage class is proportional to the number of mature cows. 
-
-A constant value was derived to calculate estimated manure excretion based on the number of mature cows housed on the farm (a user input). The average number of animals in each class was determined according to default RuFaS animal life cycle inputs, and the total mass and volume of manure excreted by the herd was calculated. This resulted in an estimated daily herd-wide manure excretion of 168.6 kg or 0.118 m$^3$ of manure per mature cow housed on the farm. The resulting equation is used to calculate storage surface area (m$^2$). 
-
-:::{style="font-size:75%"}
-[See [MN.STO.1](#eq-mn-sto-1)]{.aside .content-visible when-format="html"}
-$$
-\text{surface\_area}(\text{m}^2) = \frac{\text{cow\_num} \times \text{MANURE\_CONVERSION\_CONSTANT} \times \text{storage\_time} \times \text{FREEBOARD\_CONSTANT}}{\text{DEPTH\_CONSTANT} - \text{PRECIPITATION\_CONSTANT}}
-$$
-:::
-
-*Where*:
-
-* `cow_num` = user-inputted number of mature cows housed on the farm
-* `MANURE_CONVERSION_CONSTANT` = Factor to estimate m$^3$ of herd-wide manure produced per day per mature cow housed on the farm, set to 0.1175 m$^3$. 
-* `storage_time` (days) = user-inputted number of days that manure is stored in this storage for before being emptied
-* `FREEBOARD_CONSTANT` = the volume allowance above the maximum volume of a slurry or liquid manure storage, set to 1.20 (20%). 
-* `DEPTH_CONSTANT` = value for slurry or liquid manure storage depth, set to 4.572 m (15 feet)
-* `PRECIPITATION_CONSTANT` = the annual precipitation constant value, used only in determination of storage surface area if surface area is not provided by the user, set to 0.25m. 
+The methods for estimating lagoon surface area are the same as those for slurry storage. See [MN.STO.1](#eq-mn-sto-1) and relevant section in the Slurry Storage methodology. 
 
 **Calculate Precipitation Volume**
 
-The use of covers has implications for inclusion or exclusion of precipitation volume, as well as for N<sub>2</sub>O emissions. Four cover options exist for anaerobic lagoons: 
-
-* Cover
-* Cover and flare
-* Crust
-* No cover 
-
-Detailed descriptions are outlined in the Slurry Storage section of this module. Precipitation volume for anaerobic lagoons that are uncovered or have a crust is calculated as follows: 
-
-[See [MN.STO.2](#eq-mn-sto-2)]{.aside .content-visible when-format="html"}
-$$
-\text{Daily\_precipitation\_volume}(\text{m}^3) = \text{storage\_surface\_area} \times \text{precipitation}
-$$
-
-*Where*:
-
-* `storage_surface_area` = the user-defined or model-estimated storage surface area (m$^2$). 
-* Precipitation = the daily amount of precipitation (m).
+The methods for estimating precipitation volume added to anaerobic lagoons are the same as those for slurry storage. See [MN.STO.2](#eq-mn-sto-2) and relevant section in the Slurry Storage methodology. 
 
 **Calculate Methane Emissions `_calculate_methane_emissions`**
 
-We use an adaptation of a method originally conceived by @Sommer2004 to calculate daily emissions of CH<sub>4</sub> from degradable and non-degradable VS in anaerobic lagoons. These equations focus on the degradation of degradable and non-degradable volatile solids (VS) present in the manure. Factors like degradable and non-degradable VS (VSd and VSnd) content in storage, temperature, and location (indoor/outdoor) affect estimated CH<sub>4</sub> emissions. We apply the original method from @Sommer2022 with updated dairy manure Arrhenius and activation energy values from @Elsgaard2016 and @Petersen2024. The same equation is utilized to calculate CH<sub>4</sub> emissions from VSd and VSnd (from both manure and bedding sources), though the rate-correcting factor differs between the two.
+The methods for estimating methane emission from anaerobic lagoons are the same as those for slurry storage. See [MN.MET.2](#eq-mn-met-2), [MN.MET.3](#eq-mn-met-3), and relevant section in the Slurry Storage methodology. 
 
-First, we must calculate the value of the Arrhenius exponent (`_calculate_arrhenius_exponent`). This value directly represents the responsiveness of biological reaction speed to temperature, and in the context of this empirical equation, may also be related to the methane potential of manure in storage and activity of the microbial population:
-
-[See [MN.MET.2](#eq-mn-met-2)]{.aside .content-visible when-format="html"}
-$$
-\text{Arrh\_exp g}(\text{CH}_4\text{ kg}^{-1}\text{VS h}^{-1}) = e^{\text{Ln(A)} - \frac{\text{ACTIVATION\_ENERGY}}{\text{Gas constant} \times \text{manure temperature}}}
-$$
-
-*Where*:
-
-* Ln(A) = The natural log of the Arrhenius parameter (`NATURAL_LOG_ARRHENIUS_CONSTANT` constant), set at 30.6 based on @Petersen2024. This is an empirically-derived value determined based on observed manure CH<sub>4</sub> emission values.
-* `ACTIVATION_ENERGY` = the apparent activation energy of methanogenesis in cattle slurry (J/mol), set at 81,000 J/mol, based on @Elsgaard2016. 
-* Gas constant = ideal gas constant, set at 8.314 J K/mol.
-* Manure temperature (K) = temperature of manure in storage. 
-
-Now we can calculate actual daily CH<sub>4</sub> emission, based on the total quantity of VSd and VSnd in stored manure. The basic equation, used to calculate CH<sub>4</sub> emissions for each VS fraction, is as follows:
-
-[See [MN.MET.3](#eq-mn-met-3)]{.aside .content-visible when-format="html"}
-$$
-\text{CH}_4 \text{ emission from VS}_{\text{d or nd}} (\text{kg d}^{-1}) = 24 \times \text{Arrh\_exp} \times \text{VS}_{\text{d or nd}} \times \text{rate\_factor}
-$$
-
-*Where*:
-
-* 24 = conversion factor from hours to day. 
-* `Arrh_exp` = Arrhenius parameter for CH<sub>4</sub> emission rate (g CH<sub>4</sub> kg$^{-1}$ VS h$^{-1}$), calculated in [MN.MET.2](#eq-mn-met-2). 
-* VS<sub>d or nd</sub> = The mass (kg) of VS~d~ or VS~nd~ in manure in slurry storage.
-* `rate_factor` = The unitless rate-correcting factor, set to 1 for VSd and 0.01 for VSnd. 
-
-The total daily CH<sub>4</sub> emission is equal to the sum of emissions from the VS~d~ and VS~nd~ fractions.
 
 **Calculate Cover and Flare Emissions** `_calculate_cover_and_flare_methane`
 
-If the cover and flare option is selected, daily CH<sub>4</sub> emission from an anaerobic lagoon is multiplied by a methane destruction efficiency value. The set value for methane destruction efficiency is 81%, based on a white paper commissioned by Dairy Management, Inc. on cover and flare efficiency [@wallaceDMI]. The updated daily CH<sub>4</sub> emission (kg) from a cover and flare lagoon is as follows:
+The methods for estimating avoided methane emission from a cover and flare in anaerobic lagoons are the same as those for slurry storage. See [MN.MET.4](#eq-mn-met-4) and relevant section in the Slurry Storage methodology. 
 
-[See [MN.MET.4](#eq-mn-met-4)]{.aside .content-visible when-format="html"}
-$$
-\text{Daily storage CH}_4 (\text{kg}) = \text{storage CH}_4 \times (1 - \text{METHANE\_DESTRUCTION\_EFFICIENCY})
-$$
-
-*Where*:
-
-* Storage CH<sub>4</sub> (kg) = total daily kg of CH<sub>4</sub> emitted from stored manure, calculated in [MN.MET.3](#eq-mn-met-3).
-* `METHANE_DESTRUCTION_EFFICIENCY` = coefficient for destruction of methane by the flare, set to 0.81.
 
 **Calculate Volatile Solids Losses** `_apply_methane_emissions`
 
-Daily emissions of CH<sub>4</sub> and CO<sub>2</sub> from anaerobic lagoons occur through microbial degradation of VS in manure, among other processes [@Petersen2024]. Therefore, gaseous emissions from slurry storage result in a decrease in the quantity of VS in stored slurry. VS<sub>d</sub> and VS<sub>nd</sub> remaining in manure are updated separately according to their respective loss via CH<sub>4</sub> [MN.STO.4](#eq-mn-sto-4). Here, we assume a fixed 1:3 molar ratio of CH<sub>4</sub>-C to CO<sub>2</sub>-C emissions from stored slurry from @Petersen2024. This enables calculation of the total amount of C and thus VS<sub>d</sub> and VS<sub>nd</sub> lost through CH<sub>4</sub> and CO<sub>2</sub> emissions based on the quantity of CH<sub>4</sub> emitted from each VS fraction.
+The methods for calculating the reduction in VS in anaerobic lagoons are the same as those for slurry storage. See [MN.STO.3](#eq-mn-sto-3) and relevant section in the Slurry Storage methodology. 
 
-Given that C is assumed to be lost via CH<sub>4</sub> and CO<sub>2</sub> emissions in a ratio of 1:3, we assume for each C lost as CH<sub>4</sub>, 3 C are lost as CO<sub>2</sub>. CH<sub>4</sub> is ~75% C by mass, thus for each kg of CH<sub>4</sub> emitted, 0.7498 C are lost via CH<sub>4</sub> and (3 x 0.7498) are lost from CO<sub>2</sub>, for a total of 2.992 kg C per kg of CH<sub>4</sub> emitted. We assume manure VS are 45% C [@Petersen2024]; therefore, 2.9992 kg C / 45% C = 6.665 kg VS are lost per kg of CH<sub>4</sub> emitted.
-
-[See [MN.STO.3](#eq-mn-sto-3)]{.aside .content-visible when-format="html"}
-$$
-\text{VS}_\text{d or nd}\text{loss (kg)} = \text{CH}_4\text{ emission from VS}_\text{d or nd} \times \text{VS\_TO\_METHANE\_LOSS\_RATIO}
-$$
-
-*Where*:
-
-* CH<sub>4</sub> emission from VS<sub>d or nd</sub> (kg) = total daily kg of CH<sub>4</sub> emitted from VS<sub>d or nd</sub>, calculated in [MN.MET.3](#eq-mn-met-3)
-* `VS_TO_METHANE_LOSS_RATIO` = default ratio of VS degraded per kg of CH<sub>4</sub> emitted from slurry storage, set to 6.665
 
 **Calculate manure retention at emptying** `_emptying_fraction`
 
@@ -1502,97 +1415,17 @@ $$
 *Where:*
 
 * i = manure constituent *i*
-* `accumulated_manure_i` = quantity of manure constituent *i* present in the accumulate anaerobic lagoon manure when the storage time interval is reached
-* `ANAEROBIC_LAGOON_MANURE_RETENTION` = constant fraction of the accumulated stored manure that is retained in the anaerobic lagoon when the storage time interval is reached, set to 0.10 
+* accumulated_manure_i = quantity of manure constituent *i* present in the accumulate anaerobic lagoon manure when the storage time interval is reached
+* ANAEROBIC_LAGOON_MANURE_RETENTION = constant fraction of the accumulated stored manure that is retained in the anaerobic lagoon when the storage time interval is reached, set to 0.10 
 
 **Calculate ammonia emissions** `_calculate_ammonia_emissions` 
 
-Emission of NH<sub>3</sub>-N from anaerobic lagoons is determined using equations from @Rotz2006, which are also utilized in the IFSM [@Rotz2023]. Ammonia emissions are influenced by the quantity of TAN accumulated in manure storage, manure temperature, and manure storage surface area. First, we must derive the various parameters utilized in the calculation.
+The methods for estimating ammonia emissions from anaerobic lagoons are the same as those for slurry storage. See [MN.AMM.1](#eq-mn-amm-1) through [MN.AMM.7](#eq-mn-amm-7) and relevant section in the Slurry Storage methodology. 
 
-First, we need to derive the value of the equilibrium coefficient Q for the NH<sub>3</sub> gas in the air for a given concentration of TAN in stored manure using Henry’s law. Note that the concentration of NH<sub>3</sub> in the free atmosphere is assumed to be zero. Since Q is a function of the Henry’s law coefficient K<sub>h</sub> and a dissociation of ammonium coefficient K<sub>a</sub>, we will calculate those first. 
- 
-*Henry’s law coefficient (K<sub>h</sub>)*:
-
-[See [MN.AMM.1](#eq-mn-amm-1)]{.aside .content-visible when-format="html"}
-$$
-\text{K}_\text{h} = 10^{\frac{1478}{\text{manure temperature}}} - 1.69
-$$
-
-*Where*:
-
-* Manure temperature (K) = temperature of manure storage.
-
-*Dissociation coefficient of ammonium (K<sub>a</sub>)*
-
-[See [MN.AMM.2](#eq-mn-amm-2)]{.aside .content-visible when-format="html"}
-$$
-\text{K}_\text{h} = 1 + 10^{(0.09018 + \frac{2729.9}{\text{manure temperature}} - \text{pH})}
-$$
-
-*Where*:
-
-* Manure temperature (K) = temperature of stored manure.
-* `DEFAULT_STORED_MANURE_PH` = the pH of the manure in storage, set to 7.5 by default
-
-*Equilibrium coefficient (Q)*
-
-[See [MN.AMM.3](#eq-mn-amm-3)]{.aside .content-visible when-format="html"}
-$$
-\text{Q} = \text{K}_\text{h} \times \text{K}_\text{a}
-$$
-
-*Where*:
-
-* K<sub>h</sub> = Henry’s law coefficient, calculated in [MN.AMM.1](#eq-mn-amm-1).
-* K<sub>a</sub> = Dissociation coefficient of ammonium, calculated in [MN.AMM.2](#eq-mn-amm-2).
-
-Next, the rate of NH<sub>3</sub>-N loss in kg N/m$^2$ from stored manure is calculated:
-
-[See [MN.AMM.5](#eq-mn-amm-5)]{.aside .content-visible when-format="html"}
-$$
-\text{NH}_3\text{N emission rate} (\text{kg N/m}^2) = \frac{\text{TAN} \times \text{c} \times \text{y}}{\text{STORAGE\_RESISTANCE} \times \text{M} \times \text{Q}}
-$$
-
-*Where*:
-
-* TAN (kg) = Mass of ammoniacal N in stored manure
-* c = time conversion constant (86400 s per d)
-* y = manure density, set to 990 kg/m$^3$ 
-* `STORAGE_RESISTANCE`: A constant value representing the sum of resistance of NH<sub>3</sub> transfer from solution to manure surface, and from manure surface to atmosphere, set at 23.1 s/m.
-* M (kg) = Total mass of stored manure
-* Q = Equilibrium coefficient calculated in [MN.AMM.3](#eq-mn-amm-3)
-
-Lastly, we calculate total NH<sub>3</sub>-N emissions (kg), based on the emission rate we just calculated and the manure storage surface area.
-
-[See [MN.AMM.7](#eq-mn-amm-7)]{.aside .content-visible when-format="html"}
-$$
-\text{NH}_3\text{ emissions (kg)} = \text{NH}_3\text{N\_rate} \times \text{surface\_area}
-$$
-
-*Where*:
-
-* `NH3N_rate` (kg N/m$^2$) = Rate of NH<sub>3</sub>-N loss (kg/m$^2$) from manure, calculated in [MN.AMM.5](#eq-mn-amm-5).
-* `surface_area` (m$^2$) = Total manure storage surface area.
 
 **Calculate Nitrous Oxide Emissions** `_calculate_nitrous_oxide_emissions`
 
-N<sub>2</sub>O emissions (kg N<sub>2</sub>O-N) are based on the daily quantity of manure N loaded into the lagoon, and whether the lagoon is covered or uncovered. This method is based on @IPCC2019; however, it should be noted that the original @IPCC2006 method is based on daily manure N excretion by animals, whereas the current method is based on manure N loading into storage, which may reflect upstream N losses from NH<sub>3</sub> emissions in housing, solid liquid separation, etc. The calculation is as follows:
-
-[See [MN.NIT.1](#eq-mn-nit-1)]{.aside .content-visible when-format="html"}
-$$
-\text{N}_2\text{O-N emissions (kg)} = \text{Received\_N} \times \text{N}_2\text{O factor}
-$$
-
-*Where*:
-
-* `Received_N` (kg) = Quantity of manure total N loaded into storage on the current day
-* N<sub>2</sub>O factor = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to storage, based on the following logic:
-    * Cover type = crust OR cover; 0.005
-    * Cover type = no cover; 0 (no N<sub>2</sub>O emissions)
-
-### Received, stored, and emptied outputs
-
-Manure storages in RuFaS report two types of outputs to OutputManager each day: received manure and stored manure. 
+The methods for estimating N<sub>2</sub>O_factor emission from anaerobic lagoons are the same as those for slurry storage. See [MN.NIT.1](#eq-mn-nit-1) and relevant section in the Slurry Storage methodology. 
 
 **Received Manure**
 
@@ -1682,19 +1515,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. ManureStream instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -1711,7 +1544,7 @@ Instance(s) of `ManureStream` for each manure stream defined by the user that re
 
 **Calculate Daily Methane Generation**
 
-Calculates the daily mass of methane emitted from the bedded pack based on daily manure VS added to the bedded pack (through animal excretion and bedding addition) and an emission factor based on mixing activity and simulation average temperature @Hanson2024. Here and in other equations, ‘daily’ denotes the value associated with received manure added to the bedded pack on a specified simulation day.
+Calculates the daily mass of methane emitted from the bedded pack based on daily manure VS added to the bedded pack (through animal excretion and bedding addition) and an emission factor based on mixing activity and simulation average temperature [@Hanson2024]. Here and in other equations, 'daily' denotes the value associated with received manure added to the bedded pack on a specified simulation day.
 
 ::: {.callout-note}
 The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded
@@ -1738,7 +1571,7 @@ $$
 * B$_0$ = methane production potential (kg CH<sub>4</sub> per kg manure VS) of manure excreted onto the lot on a specified simulation day
 * Constant Value = 0.24 m$^3$ CH<sub>4</sub>/kg VS
 * MCF = methane conversion factor (@tbl-mn-bp-met-conv). This is based on simulation average ambient temperature
-* tVS (kg) = daily mass (kg) of manure-excreted total VS in the bedded pack manure, received from `ManureStream(s)`; note that bedding VS are not included in this value
+* tVS (kg) = daily mass (kg) of manure-excreted total VS in the bedded pack manure, received from `ManureStream`; note that bedding VS are not included in this value
 
 **Calculate Carbon Decomposition**
 
@@ -1758,8 +1591,8 @@ $$
 
 *Where*:
 
-* `EFFECTIVE_MICROBIAL_DECOMP_RATE` (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
-* `DECOMPOSITION_TEMPERATURE` = temperature of the inner compost layer, set to 60℃ (reflective of temperature at which microbial growth, and thus decomposition, is maximized)
+* EFFECTIVE_MICROBIAL_DECOMP_RATE (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
+* DECOMPOSITION_TEMPERATURE = temperature of the inner compost layer, set to 60℃ (reflective of temperature at which microbial growth, and thus decomposition, is maximized)
 
 ::: {#eq-mn-sto-5 style="font-size:90%"}
 [[**MN.STO.5**]]{.aside .content-visible when-format="html"}
@@ -1773,8 +1606,8 @@ $$
 
 *Where*:
 
-* `EFFECTIVE_MICROBIAL_DECOMP_RATE` (unitless) = the effectiveness of microbial decomposition rate per day, set to 0.00237
-* `DEFAULT_LAYER_TEMPERATURE` = temperature of the pack layer, set to 30℃ Setting the layer temperature to a constant value is a simplification as manure pack temperature is not modeled dynamically at this time
+* EFFECTIVE_MICROBIAL_DECOMP_RATE (unitless) = the effectiveness of microbial decomposition rate per day, set to 0.00237
+* DEFAULT_LAYER_TEMPERATURE = temperature of the pack layer, set to 30℃ Setting the layer temperature to a constant value is a simplification as manure pack temperature is not modeled dynamically at this time
 
 Second, we calculate the carbon decomposition rate per day (`calculate_carbon_decomposition_rate`). The value of this parameter is equal to 0.03876, but the equation and set values are included below for reference. 
 
@@ -1791,10 +1624,10 @@ $$
 
 *Where*:
 
-* `max_decomp_rate` and `slow_decomp_rate` calculated with [MN.STO.4](#eq-mn-sto-4), set to 0.04195 and 0.00846, respectively 
-* `FIRST_ORDER_DECAYING_COEFFICIENT` = First-order decaying coefficient constant, set to 0.10
-* `DEFAULT_DAYS_SINCE_LAST_MIXING` = number of days from the start of pack formation or last mixing event, set to 1 by default
-* `DEFAULT_LAG_TIME` = lag time in days to reach maximum decomposition rate, set to 2
+* max_decomp_rate and slow_decomp_rate calculated with [MN.STO.4](#eq-mn-sto-4), set to 0.04195 and 0.00846, respectively 
+* FIRST_ORDER_DECAYING_COEFFICIENT = First-order decaying coefficient constant, set to 0.10
+* DEFAULT_DAYS_SINCE_LAST_MIXING = number of days from the start of pack formation or last mixing event, set to 1 by default
+* DEFAULT_LAG_TIME = lag time in days to reach maximum decomposition rate, set to 2
 
 Third, we calculate the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. This value is set to 0.9664, but the equation and fixed values are provided below for reference.  
 
@@ -1810,9 +1643,9 @@ $$
 
 *Where*:
 
-* `oxygen_mole_fraction` = mole fraction of oxygen in the air within the bedded pack, unitless, set at 0.15. This is a simplification as oxygen content of the manure pack is not currently modeled.
-* `oxygen_half_saturation_constant` = the half-saturation constant, unitless, set at 0.02 by the original publication.
-* `oxygen_ambient_air_mole_fraction` = the mole fraction of oxygen in ambient air, unitless, set at 0.21 (ambient air is approximately 21% oxygen).
+* oxygen_mole_fraction = mole fraction of oxygen in the air within the bedded pack, unitless, set at 0.15. This is a simplification as oxygen content of the manure pack is not currently modeled.
+* oxygen_half_saturation_constant = the half-saturation constant, unitless, set at 0.02 by the original publication.
+* oxygen_ambient_air_mole_fraction = the mole fraction of oxygen in ambient air, unitless, set at 0.21 (ambient air is approximately 21% oxygen)
 
 Fourth, we calculate total carbon in the manure/bedding pack available for decomposition. Here we make some assumptions on the carbon content of manure degradable vs. non-degradable volatile solids. Degradable volatile solids, which originate from fecal excretion by animals, are considered to be 50% carbon by weight [@larney2011]. Non-degradable volatile solids, which originate primarily from bedding addition, are assumed to contain 35% carbon by weight. The total carbon available is the sum of these two quantities.         
 
@@ -1828,8 +1661,8 @@ $$
 
 *Where*:
 
-* `degradable_volatile_solids` = The degradable volatile solids (kg) in the daily manure added to the bedded pack.
-* `DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD` = the carbon content (%) of manure degradable volatile solids, set to 50% by default.          
+* degradable_volatile_solids = The degradable volatile solids (kg) in the daily manure added to the bedded pack
+* DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD = the carbon content (%) of manure degradable volatile solids, set to 50% by default          
 
 ::: {#eq-mn-sto-8}
 [[**MN.STO.8**]]{.aside .content-visible when-format="html"}
@@ -1843,8 +1676,8 @@ $$
 
 *Where*:
 
-* `nondegradable_volatile_solids` = The non-degradable volatile solids (kg) in the daily bedding and manure added to the bedded pack. 
-* `DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND` = the carbon content (%) of manure non-degradable volatile solids, set to 35% by default. 
+* nondegradable_volatile_solids = The non-degradable volatile solids (kg) in the daily bedding and manure added to the bedded pack
+* DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSND = the carbon content (%) of manure non-degradable volatile solids, set to 35% by default 
 
 ::: {#eq-mn-sto-9}
 [[**MN.STO.9**]]{.aside .content-visible when-format="html"}
@@ -1867,10 +1700,10 @@ $$
 
 *Where*:
 
-* `total_carbon` = total carbon available in manure pack (kg); [MN.STO.9](#eq-mn-sto-9)
-* `C_decomp_rate` = carbon decomposition rate per day; [MN.STO.6](#eq-mn-sto-6)
-* `DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP` = The effect of moisture on microbial decomposition, set at 0.65. This is a simplification as moisture content of the manure pack is not currently modeled. 
-* `anaerobic_effect` = the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. Set to 0.9664 by default.
+* total_carbon = total carbon available in manure pack (kg); [MN.STO.9](#eq-mn-sto-9)
+* C_decomp_rate = carbon decomposition rate per day; [MN.STO.6](#eq-mn-sto-6)
+* DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP = The effect of moisture on microbial decomposition, set at 0.65. This is a simplification as moisture content of the manure pack is not currently modeled. 
+* anaerobic_effect = the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. Set to 0.9664 by default.
 
 **Calculate Total VS Loss** `_apply_dry_matter_loss`
 
@@ -1885,8 +1718,8 @@ $$
 
 *Where*:
 
-* `methane` (kg) = The daily methane loss, calculated with [MN.MET.6](#eq-mn-met-6), based on the daily quantity of manure VS added to the bedded pack
-* `total_carbon_decomposition` (kg) = quantity of C lost through microbial decomposition (kg), calculated with [MN.STO.10](#eq-mn-sto-10), based on the daily quantity of manure VS added to the bedded pack
+* methane (kg) = The daily methane loss, calculated with [MN.MET.6](#eq-mn-met-6), based on the daily quantity of manure VS added to the bedded pack
+* total_carbon_decomposition (kg) = quantity of C lost through microbial decomposition (kg), calculated with [MN.STO.10](#eq-mn-sto-10), based on the daily quantity of manure VS added to the bedded pack
 
 **Calculate N Loss to Ammonia** `_calculate_cbpb_ammonia_emission`
 
@@ -1901,10 +1734,10 @@ $$
 
 *Where*:
 
-* `daily_maure_N` = Daily kg of manure N added to the bedded pack
-* `ammonia_coefficient` = kg of NH<sub>3</sub>-N emitted per kg of manure N added per day to the bedded pack, based on the style of management:
-    * Bedded pack (no mixing) = `AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING` (0.25) 
-    * Compost bedded pack (mixing) = `AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING` (0.50)
+*`daily_maure_N = Daily kg of manure N added to the bedded pack
+* ammonia_coefficient = kg of NH<sub>3</sub>-N emitted per kg of manure N added per day to the bedded pack, based on the style of management:
+    * Bedded pack (no mixing) = AMMONIA_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING (0.25) 
+    * Compost bedded pack (mixing) = AMMONIA_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING (0.50)
 
 **Calculate N loss to Nitrous Oxide** `_calculate_cbpb_nitrous_oxide_emission`
 
@@ -1917,10 +1750,10 @@ $$
 
 *Where*:
 
-* `daily_maure_N` = Daily kg of manure N added to the bedded pack
-* `ammonia_coefficient` = kg of NH<sub>3</sub>-N emitted per kg of manure N added per day to the bedded pack, based on the style of management:
-    * Bedded pack (no mixing) = `NITROUS_OXIDE_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING` (0.01) 
-    * Compost bedded pack (mixing) = `NITROUS_OXIDE_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING` (0.07)
+* daily_maure_N = Daily kg of manure N added to the bedded pack
+* ammonia_coefficient = kg of NH<sub>3</sub>-N emitted per kg of manure N added per day to the bedded pack, based on the style of management:
+    * Bedded pack (no mixing) = NITROUS_OXIDE_EMISSION_COEFFICIENT_WITH_UNTILLED_BEDDING (0.01) 
+    * Compost bedded pack (mixing) = NITROUS_OXIDE_EMISSION_COEFFICIENT_WITH_TILLED_BEDDING (0.07)
 
 **Calculate N Loss to Leaching** `calculate_nitrogen_loss_to_leaching`
 
@@ -1935,8 +1768,8 @@ $$
 
 *Where*:
 
-* `daily_maure_N` = Daily kg of manure N added to the bedded pack
-* `LEACHING_COEFFICIENT` = kg of N leached per kg of manure N added per day to the open lot; set at 0.035.
+* daily_maure_N = Daily kg of manure N added to the bedded pack
+* LEACHING_COEFFICIENT = kg of N leached per kg of manure N added per day to the open lot; set at 0.035
 
 ### Received, stored, and emptied outputs
 
@@ -2029,19 +1862,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$ and manure methane potential, m$^3$ / kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -2072,7 +1905,7 @@ $$
 
 **Calculate Daily Methane Generation** `calculate_ifsm_methane_emission`
 
-Calculates the daily mass of methane emitted from the open lot based on daily manure volatile solids (VS) added to lot manure (through animal excretion and bedding addition) and the emission factor calculated in [MN.MET.5]{#eq-mn-met-5}. Here and in other equations, ‘daily’ denotes the value associated with received manure added to the open lot on a specified simulation day.
+Calculates the daily mass of methane emitted from the open lot based on daily manure volatile solids (VS) added to lot manure (through animal excretion and bedding addition) and the emission factor calculated in [MN.MET.5](#eq-mn-met-5). Here and in other equations, ‘daily’ denotes the value associated with received manure added to the open lot on a specified simulation day.
 
 ::: {.callout-note}
 The quantity of volatile solids utilized in determination of CH<sub>4</sub> includes only manure-excreted volatile solids; bedding volatile solids are excluded
@@ -2090,7 +1923,7 @@ $$
 * B$_0$ = methane production potential (kg CH<sub>4</sub> per kg manure VS) of manure excreted onto the lot on a specified simulation day
 * MCF = methane conversion factor calculated in [MN.MET.5](#eq-mn-met-5), based on daily ambient temperature
 * tVS (kg) = daily mass (kg) of manure-excreted volatile solids in the open lot pen, received from `ManureStream(s)`; bedding volatile solids are not included in this value
-* `METHANE_FACTOR` = 0.67; unit conversion factor for CH<sub>4</sub> volume to mass (kg)
+* METHANE_FACTOR = 0.67; unit conversion factor for CH<sub>4</sub> volume to mass (kg)
 
 **Calculate Carbon Decomposition** `calculate_carbon_decomposition`
 
@@ -2110,8 +1943,8 @@ $$
             
 *Where*:
 
-* `EFFECTIVE_MICROBIAL_DECOMP_RATE` (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
-* `DECOMPOSITION_TEMPERATURE` = temperature of the inner compost layer, set to 60℃ (reflective of temperature at which microbial growth, and thus decomposition, is maximized)
+* EFFECTIVE_MICROBIAL_DECOMP_RATE (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
+* DECOMPOSITION_TEMPERATURE = temperature of the inner compost layer, set to 60℃ (reflective of temperature at which microbial growth, and thus decomposition, is maximized)
 
 ::: {style="font-size:90%"}
 [See [MN.STO.5](#eq-mn-sto-5)]{.aside .content-visible when-format="html"}
@@ -2125,8 +1958,8 @@ $$
             
 *Where*:
 
-* `EFFECTIVE_MICROBIAL_DECOMP_RATE` (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
-* `DEFAULT_LAYER_TEMPERATURE` = temperature of the inner compost layer, set to 30℃. Setting the layer temperature to a constant value is a simplification as manure pack temperature is not modeled dynamically at this time
+* EFFECTIVE_MICROBIAL_DECOMP_RATE (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
+* DEFAULT_LAYER_TEMPERATURE = temperature of the inner compost layer, set to 30℃. Setting the layer temperature to a constant value is a simplification as manure pack temperature is not modeled dynamically at this time
 
 Second, we calculate the carbon decomposition rate per day (`calculate_carbon_decomposition_rate`). The value of this parameter is equal to 0.03876, but the equation and set values are included below for reference. 
 
@@ -2143,10 +1976,10 @@ $$
 
 *Where*:
 
-* `max_decomp_rate` and `slow_decomp_rate` calculated with [MN.STO.4](#eq-mn-sto-4), set to 0.04195 and 0.00846, respectively 
-* `FIRST_ORDER_DECAYING_COEFFICIENT` = First-order decaying coefficient constant, set to 0.10
-* `DEFAULT_DAYS_SINCE_LAST_MIXING` = number of days from the start of pack formation or last mixing event, set to 1 by default
-* `DEFAULT_LAG_TIME` = lag time in days to reach maximum decomposition rate, set to 2
+* max_decomp_rate and slow_decomp_rate calculated with [MN.STO.4](#eq-mn-sto-4), set to 0.04195 and 0.00846, respectively 
+* FIRST_ORDER_DECAYING_COEFFICIENT = First-order decaying coefficient constant, set to 0.10
+* DEFAULT_DAYS_SINCE_LAST_MIXING = number of days from the start of pack formation or last mixing event, set to 1 by default
+* DEFAULT_LAG_TIME = lag time in days to reach maximum decomposition rate, set to 2
 
 Third, we calculate the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. This value is set to 0.9664, but the equation and fixed values are provided below for reference. 
    
@@ -2162,9 +1995,9 @@ $$
             
 *Where*:
 
-* `oxygen_mole_fraction` = mole fraction of oxygen in the air within the lot manure pack, unitless, set at 0.15. This is a simplification as oxygen content of the manure pack is not currently modeled.
-* `oxygen_half_saturation_constant` = the half-saturation constant, unitless, set at 0.02 by the original publication.
-* `oxygen_ambient_air_mole_fraction` = the mole fraction of oxygen in ambient air, unitless, set at 0.21 (ambient air is approximately 21% oxygen).
+* oxygen_mole_fraction = mole fraction of oxygen in the air within the lot manure pack, unitless, set at 0.15. This is a simplification as oxygen content of the manure pack is not currently modeled.
+* oxygen_half_saturation_constant = the half-saturation constant, unitless, set at 0.02 by the original publication.
+* oxygen_ambient_air_mole_fraction = the mole fraction of oxygen in ambient air, unitless, set at 0.21 (ambient air is approximately 21% oxygen).
 
 Fourth, we calculate total carbon in the manure/bedding pack available for decomposition. Here we make some assumptions on the carbon content of manure degradable vs. non-degradable volatile solids. Degradable volatile solids, which originate from fecal excretion by animals, are considered to be 50% carbon by weight [@larney2011]. Non-degradable volatile solids, which originate primarily from bedding addition, are assumed to contain 35% carbon by weight. The total carbon available is the sum of these two quantities. 
 
@@ -2178,8 +2011,8 @@ $$
 
 *Where*:
 
-* `degradable_volatile_solids` = The degradable volatile solids (kg) in the daily manure added to the open lot.
-* `DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD` = the carbon content (%) of manure degradable volatile solids, set to 50% by default. 
+* degradable_volatile_solids = The degradable volatile solids (kg) in the daily manure added to the open lot.
+* DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD = the carbon content (%) of manure degradable volatile solids, set to 50% by default. 
 
 [See [MN.STO.8](#eq-mn-sto-8)]{.aside .content-visible when-format="html"}
 $$
@@ -2191,8 +2024,8 @@ $$
 
 *Where*:
 
-* `non_degradable_volatile_solids` = The non-degradable volatile solids (kg) in the daily manure added to the open lot.
-* `DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD` = the carbon content (%) of manure non-degradable volatile solids, set to 35% by default. 
+* non_degradable_volatile_solids = The non-degradable volatile solids (kg) in the daily manure added to the open lot.
+* DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD = the carbon content (%) of manure non-degradable volatile solids, set to 35% by default. 
 
 [See [MN.STO.9](#eq-mn-sto-9)]{.aside .content-visible when-format="html"}
 $$
@@ -2214,10 +2047,10 @@ $$
             
 *Where*:
 
-* `total_carbon` = total carbon available in manure pack (kg); [MN.STO.9](#eq-mn-sto-9)
-* `C_decomp_rate` = carbon decomposition rate per day; [MN.STO.10](#eq-mn-sto-10)
-* `DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP` = The effect of moisture on microbial decomposition, set at 0.65. This is a simplification as moisture content of the manure pack is not currently modeled. 
-* `anaerobic_effect` = the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. Set to 0.9664 by default.
+* total_carbon = total carbon available in manure pack (kg); [MN.STO.9](#eq-mn-sto-9)
+* C_decomp_rate = carbon decomposition rate per day; [MN.STO.10](#eq-mn-sto-10)
+* DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP = The effect of moisture on microbial decomposition, set at 0.65. This is a simplification as moisture content of the manure pack is not currently modeled. 
+* anaerobic_effect = the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. Set to 0.9664 by default.
 
 **Calculate Total VS Loss**
 
@@ -2231,11 +2064,11 @@ $$
 *Where*:
 
 * methane (kg) = The daily methane loss, calculated with [MN.MET.6](#eq-mn-met-6), based on the daily quantity of manure VS added to the open lot
-* `total_carbon_decomposition` (kg) = quantity of C lost through microbial decomposition (kg), calculated with [MN.STO.10](#eq-mn-sto-10), based on the daily quantity of manure VS added to the open lot
+* total_carbon_decomposition (kg) = quantity of C lost through microbial decomposition (kg), calculated with [MN.STO.10](#eq-mn-sto-10), based on the daily quantity of manure VS added to the open lot
 
 **Calculate N Loss to Ammonia** `_calculate_cbcp_ammonia_emission`
 
-Manure nitrogen being deposited and accumulating in the bedded pack results in NH<sub>3</sub> emissions. Here we utilize an emission factor based on mixing activity [@Hanson2024] to estimate total kg of ammonia loss based on the daily manure N deposition by animals. 
+Manure nitrogen being deposited and accumulating in the bedded pack results in NH<sub>3</sub> emissions. Here we utilize an emission factor based on mixing activity to estimate total kg of ammonia loss based on the daily manure N deposition by animals [@Hanson2024]. 
       
 ::: {#eq-mn-amm-8}
 [[**MN.AMM.8**]]{.aside .content-visible when-format="html"}
@@ -2246,8 +2079,8 @@ $$
             
 *Where*:
 
-* `daily_manure_N` = Daily kg of manure N added to the open lot
-* `AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS` = kg of NH<sub>3</sub>-N emitted per kg of manure N added per day to the open lot; set at 0.36.
+* daily_manure_N = Daily kg of manure N added to the open lot
+* AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS = kg of NH<sub>3</sub>-N emitted per kg of manure N added per day to the open lot; set at 0.36.
 
 **Calculate N loss to Nitrous Oxide** `_calculate_cbpb_nitrous_oxide`
 
@@ -2260,8 +2093,8 @@ $$
 
 *Where*:
 
-* `daily_manure_N` = Daily kg of manure N added to the open lot
-* `NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS` = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to the open lot; set at 0.02.
+* daily_manure_N = Daily kg of manure N added to the open lot
+* NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to the open lot; set at 0.02
 
 **Calculate N Loss to Leaching** `calculate_nitrogen_loss_to_leaching`
 
@@ -2274,8 +2107,8 @@ $$
 
 *Where*:
 
-* `daily_manure_N` = Daily kg of manure N added to the open lot
-* `LEACHING_COEFFICIENT` = kg of N leached per kg of manure N added per day to the open lot; set at 0.035.
+* daily_manure_N = Daily kg of manure N added to the open lot
+* LEACHING_COEFFICIENT = kg of N leached per kg of manure N added per day to the open lot; set at 0.035
 
 ### Received, stored, and emptied outputs
 
@@ -2310,9 +2143,9 @@ Received manure simply refers to the manure being loaded into the manure storage
 
 **Stored Manure**
 
-Below is a summary of updates to ManureStream variables representing the stored manure. Note that the formulas below may be a summarization of multiple steps detailed above, and are intended to provide an overview of what mass losses/gains are reflected in the value of each variable.
+Below is a summary of updates to `ManureStream` variables representing the stored manure. Note that the formulas below may be a summarization of multiple steps detailed above, and are intended to provide an overview of what mass losses/gains are reflected in the value of each variable.
 
-Equations in the table below (Calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. 
+Equations in the table below (See [Table](#tbl-mn-ol-calc), calculation column) are in the format of: updated stored manure value = yesterday’s stored manure value + today’s manure value +/- XYZ. The updated stored manure values reflect the total quantity of manure/nutrients in storage on a single day after accounting for all gains/losses that occurred on that day. Received manure simply refers to the manure being loaded into the manure storage each day. 
 
 ```{python}
 #| label: tbl-mn-ol-calc
@@ -2325,9 +2158,9 @@ import_table(
 
 ::: {.callout-note}
 The “Max(0, )” notation prevents the ammoniacal N value from becoming negative. This is especially important early in a simulation when accumulated manure quantities that are very small compared to the fixed surface area value can lead to high ammonia emissions.
-degradable_volatile_solids_frac = received manure degradable_volatile_solids / received manure total_volatile_solids
-::: 
 
+`degradable_volatile_solids_frac` = received manure `degradable_volatile_solids` / received manure `total_volatile_solids`
+::: 
 
 ## Composting
 
@@ -2374,19 +2207,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
@@ -2429,7 +2262,7 @@ $$
 * B$_0$ = methane production potential (kg CH<sub>4</sub> per kg manure VS) of manure added to compost on a specified simulation day
 * MCF = methane conversion factor, based on simulation average ambient temperature
 * tVS (kg) = daily mass (kg) of manure-excreted total VS in the manure added to compost, received from `ManureStream(s)`; note that bedding VS are not included in this value
-* `METHANE_FACTOR` = 0.67; unite conversion factor for CH<sub>4</sub> volume to mass (kg)
+* METHANE_FACTO` = 0.67; unite conversion factor for CH<sub>4</sub> volume to mass (kg)
 
 **Calculate Carbon Decomposition** `calculate_carbon_decomposition`
 
@@ -2449,8 +2282,8 @@ $$
 
 *Where*:
 
-* `EFFECTIVE_MICROBIAL_DECOMP_RATE` (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
-* `DECOMPOSITION_TEMPERATURE` = temperature of the inner compost layer, set to 60℃ (reflective of temperature at which microbial growth, and thus decomposition, is maximized)
+* EFFECTIVE_MICROBIAL_DECOMP_RATE (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
+* DECOMPOSITION_TEMPERATURE = temperature of the inner compost layer, set to 60℃ (reflective of temperature at which microbial growth, and thus decomposition, is maximized)
 
 [See [MN.STO.5](#eq-mn-sto-5)]{.aside .content-visible when-format="html"}
 $$
@@ -2462,8 +2295,8 @@ $$
             
 *Where*:
 
-* `EFFECTIVE_MICROBIAL_DECOMP_RATE` (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
-* `daily_temperature` = average ambient air temperature on a single day (℃)
+* EFFECTIVE_MICROBIAL_DECOMP_RATE (unitless) = The effectiveness of microbial decomposition rate per day, set to 0.00237
+* daily_temperature = average ambient air temperature on a single day (℃)
 
 Second, we calculate the carbon decomposition rate per day (`calculate_carbon_decomposition_rate`). The value of this parameter is equal to 0.03876, but the equation and set values are included below for reference. 
 
@@ -2480,10 +2313,10 @@ $$
 
 *Where*:
 
-* `max_decomp_rate` and `slow_decomp_rate` calculated with [MN.STO.4](#eq-mn-sto-4) and [MN.STO.5](#eq-mn-sto-5)
-* `FIRST_ORDER_DECAYING_COEFFICIENT` = First-order decaying coefficient constant, set to 0.10
-* `DEFAULT_DAYS_SINCE_LAST_MIXING` = number of days from the start of composting or last turning/mixing event, set to 1 (i.e., assuming daily mixing)
-* `DEFAULT_LAG_TIME` = lag time in days to reach maximum decomposition rate, set to 2
+* max_decomp_rate and slow_decomp_rate calculated with [MN.STO.4](#eq-mn-sto-4) and [MN.STO.5](#eq-mn-sto-5)
+* FIRST_ORDER_DECAYING_COEFFICIENT = First-order decaying coefficient constant, set to 0.10
+* DEFAULT_DAYS_SINCE_LAST_MIXING = number of days from the start of composting or last turning/mixing event, set to 1 (i.e., assuming daily mixing)
+* DEFAULT_LAG_TIME = lag time in days to reach maximum decomposition rate, set to 2
 
 Third, we calculate the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. This value is set to 0.9664, but the equation and fixed values are provided below for reference. 
 
@@ -2499,9 +2332,9 @@ $$
 
 *Where*:
 
-* `oxygen_mole_fraction` = mole fraction of oxygen in the air within the windrow, unitless, set at 0.15. This is a simplification as oxygen content of the manure pack is not currently modeled.
-* `oxygen_half_saturation_constant` = the half-saturation constant, unitless, set at 0.02 by the original publication.
-* `oxygen_ambient_air_mole_fraction` = the mole fraction of oxygen in ambient air, unitless, set at 0.21 (ambient air is approximately 21% oxygen).
+* oxygen_mole_fraction = mole fraction of oxygen in the air within the windrow, unitless, set at 0.15. This is a simplification as oxygen content of the manure pack is not currently modeled
+* oxygen_half_saturation_constant = the half-saturation constant, unitless, set at 0.02 by the original publication
+* oxygen_ambient_air_mole_fraction = the mole fraction of oxygen in ambient air, unitless, set at 0.21 (ambient air is approximately 21% oxygen)
         
 Fourth, we calculate total carbon in the compost material available for decomposition. Here we make some assumptions on the carbon content of manure degradable vs. non-degradable volatile solids. Degradable volatile solids, which originate from fecal excretion by animals, are considered to be 50% carbon by weight @larney2011. Non-degradable volatile solids, which originate primarily from bedding addition, are assumed to contain 35\% carbon by weight. The total carbon available is the sum of these two quantities. 
 
@@ -2515,8 +2348,8 @@ $$
 
 *Where*:
 
-* `degradable_volatile_solids` = The degradable volatile solids (kg) in the daily manure added to the compost.
-* `DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD` = the carbon content (%) of manure degradable volatile solids, set to 50% by default. 
+* degradable_volatile_solids = The degradable volatile solids (kg) in the daily manure added to the compost
+* DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD = the carbon content (%) of manure degradable volatile solids, set to 50% by default
 
 [See [MN.STO.8](#eq-mn-sto-8)]{.aside .content-visible when-format="html"}
 $$
@@ -2528,8 +2361,8 @@ $$
 
 *Where*:
 
-* `non_degradable_volatile_solids` = The non-degradable volatile solids (kg) in the daily bedding and manure added to the compost.
-* `DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD` = the carbon content (%) of manure non-degradable volatile solids, set to 35% by default. 
+* non_degradable_volatile_solids = The non-degradable volatile solids (kg) in the daily bedding and manure added to the compost
+* DEFAULT_CARBON_FRACTION_AVAILABLE_IN_VSD = the carbon content (%) of manure non-degradable volatile solids, set to 35% by default 
 
 [See [MN.STO.9](#eq-mn-sto-9)]{.aside .content-visible when-format="html"}
 $$
@@ -2550,10 +2383,10 @@ $$
             
 *Where*:
 
-* `total_carbon` = total carbon available in manure pack (kg); [MN.STO.9](#eq-mn-sto-9)
-* `C_decomp_rate` = carbon decomposition rate per day; [MN.STO.10](#eq-mn-sto-10)
-* `DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP` = The effect of moisture on microbial decomposition, set at 0.65. This is a simplification as moisture content of the manure pack is not currently modeled. 
-* `anaerobic_effect` = the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. Set to 0.9664 by default.        
+* total_carbon = total carbon available in manure pack (kg); [MN.STO.9](#eq-mn-sto-9)
+* C_decomp_rate = carbon decomposition rate per day; [MN.STO.10](#eq-mn-sto-10)
+* DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP = The effect of moisture on microbial decomposition, set at 0.65. This is a simplification as moisture content of the manure pack is not currently modeled
+* anaerobic_effect = the anaerobic effect coefficient, related to the effect of the degree of aeration in the manure pack on decomposition. Set to 0.9664 by default.        
 
 **Calculate Total VS Loss** `_apply_dry_matter_loss`
 
@@ -2567,7 +2400,7 @@ $$
 *Where*:
 
 * methane (kg) = The daily methane loss, calculated with [MN.MET.6](#eq-mn-met-6), based on the daily quantity of manure VS added to the compost
-* `total_carbon_decomposition` (kg) = quantity of C lost through microbial decomposition (kg), calculated with [MN.STO.10](#eq-mn-sto-10), based on the daily quantity of manure VS added to the compost
+* total_carbon_decomposition (kg) = quantity of C lost through microbial decomposition (kg), calculated with [MN.STO.10](#eq-mn-sto-10), based on the daily quantity of manure VS added to the compost
 
 **Calculate N Loss to Ammonia** `_calculate_composting_ammonia_emissions`
 
@@ -2589,8 +2422,8 @@ $$
             
 *Where*:
 
-* `daily_manure_N` = Daily kg of manure N added to compost
-* `AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS` = kg of NH<sub>3</sub>-N emitted per kg of manure N added per day to compost, based on the composting method
+* daily_manure_N = Daily kg of manure N added to compost
+* AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS = kg of NH<sub>3</sub>-N emitted per kg of manure N added per day to compost, based on the composting method
 
 **Calculate N Loss to Nitrous Oxide** `_calculate_nitrous_oxide_emissions`
 
@@ -2612,8 +2445,8 @@ $$
 
 *Where*:
 
-* `daily_manure_N` = Daily kg of manure N added to the compost
-* `NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS` = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to the compost, based on the composting method
+* daily_manure_N = Daily kg of manure N added to the compost
+* NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS = kg of N<sub>2</sub>O-N emitted per kg of manure N added per day to the compost, based on the composting method
 
 **Calculate N Loss to Leaching** `calculate_nitrogen_loss_to_leaching`
 
@@ -2635,8 +2468,8 @@ $$
 
 *Where*:
 
-* `daily_manure_N` = Daily kg of manure N added to the compost
-* `LEACHING_COEFFICIENT` = kg of N leached per kg of manure N added per day to the compost, based on composting method
+* daily_manure_N = Daily kg of manure N added to the compost
+* LEACHING_COEFFICIENT = kg of N leached per kg of manure N added per day to the compost, based on composting method
 
 ### Received, stored, and emptied outputs
 
@@ -2728,19 +2561,19 @@ import_table(
 
 Instance(s) of `ManureStream` for each manure stream defined by the user that represent the attributes of the manure in the specific manure stream. `ManureStream` instances include the following variables (all in kg except for volume, m$^3$ and manure methane production potential, m$^3$ / kgVS):
 
-* water 
+* `water`
 * `ammoniacal_nitrogen`
-* nitrogen 
-* phosphorus
-* potassium
-* ash
+* `nitrogen`
+* `phosphorus`
+* `potassium`
+* `ash`
 * `manure_degradable_volatile_solids`
 * `manure_non_degradable_volatile_solids`
 * `bedding_non_degradable_volatile_solids`
 * `total_solids`
-* mass (equal to sum of water and total solids)
-* total volatile solids (equal to sum of degradable and non-degradable volatile solids)
-* volume
+* `total_mass` (equal to sum of water and total solids)
+* `total_volatile_solids` (equal to sum of degradable and non-degradable volatile solids)
+* `volume`
 * `methane_production_potential`
 
 ### Expected Outputs
