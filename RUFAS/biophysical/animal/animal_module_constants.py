@@ -146,6 +146,18 @@ class AnimalModuleConstants:
     MINIMUM_HEIFER_DAILY_GROWTH_RATE: float = 0.5
     """Minimum daily growth for heifers, kg."""
 
+    PRIMIPAROUS_TISSUE_CHANGE_P1: float = 20.0
+    """Tissue change parameter P1 for primiparous cows (Li et al., 2023), kg."""
+
+    PRIMIPAROUS_TISSUE_CHANGE_P2: float = 65.0
+    """Tissue change parameter P2 for primiparous cows (Li et al., 2023), days in milk."""
+
+    MULTIPAROUS_TISSUE_CHANGE_P1: float = 40.0
+    """Tissue change parameter P1 for multiparous cows (Li et al., 2023), kg."""
+
+    MULTIPAROUS_TISSUE_CHANGE_P2: float = 75.0
+    """Tissue change parameter P2 for multiparous cows (Li et al., 2023), days in milk."""
+
     PROTEIN_UPPER_LIMIT_FACTOR: float = 1.5
     """Factor used to generate the upper limit for metabolizable protein content in ration formulation."""
 

@@ -35,6 +35,8 @@ class GrowthInputs:
         Number of calves the animal has delivered, (unitless).
     calving_interval : float
         The interval between consecutive calving events, (simulation days).
+    days_since_calving : int
+        Number of days since the animal last calved, only set for dry cows and 0 otherwise, (simulation days).
 
     """
 
@@ -51,6 +53,7 @@ class GrowthInputs:
     calf_birth_weight: float
     calves: int
     calving_interval: float
+    days_since_calving: int
 
     @property
     def is_pregnant(self) -> bool:

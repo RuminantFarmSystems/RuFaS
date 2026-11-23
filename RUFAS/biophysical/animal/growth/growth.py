@@ -450,28 +450,119 @@ class Growth:
         [AN.BWT.20]
 
         """
-        updated_tissue_changed = self.tissue_changed
+        p1, p2 = self._determine_tissue_change_parameters(growth_inputs.calves)
         if growth_inputs.is_milking:
-            if growth_inputs.calves == 1:
-                body_weight_tissue = -20 / 65 * np.exp(1 - growth_inputs.days_in_milk / 65) + 20 / (
-                    65**2
-                ) * growth_inputs.days_in_milk * np.exp(1 - growth_inputs.days_in_milk / 65)
-
-                if growth_inputs.days_in_pregnancy == AnimalConfig.dry_off_day_of_pregnancy - 1:
-                    updated_tissue_changed = (
-                        20 * growth_inputs.days_in_milk / 65 * np.exp(1 - growth_inputs.days_in_milk / 65)
-                    )
-            else:
-                body_weight_tissue = -40 / 70 * np.exp(1 - growth_inputs.days_in_milk / 70) + 40 / (
-                    70**2
-                ) * growth_inputs.days_in_milk * np.exp(1 - growth_inputs.days_in_milk / 70)
-
-                if growth_inputs.days_in_pregnancy == AnimalConfig.dry_off_day_of_pregnancy - 1:
-                    updated_tissue_changed = (
-                        40 * growth_inputs.days_in_milk / 70 * np.exp(1 - growth_inputs.days_in_milk / 70)
-                    )
-        else:
-            body_weight_tissue = self.tissue_changed / (
-                growth_inputs.gestation_length - AnimalConfig.dry_off_day_of_pregnancy
+            return self._calculate_lactating_cow_tissue_change(
+                growth_inputs.days_in_milk, growth_inputs.days_in_pregnancy, self.tissue_changed, p1, p2
             )
+        body_weight_tissue = self._calculate_dry_cow_tissue_change(
+            growth_inputs.days_since_calving, growth_inputs.gestation_length, p1, p2
+        )
+        return body_weight_tissue, self.tissue_changed
+
+    @staticmethod
+    def _determine_tissue_change_parameters(calves: int) -> tuple[float, float]:
+        """
+        Determines the tissue change parameters P1 and P2 based on the cow's parity.
+
+        Parameters
+        ----------
+        calves : int
+            Number of calves the animal has delivered (unitless).
+
+        Returns
+        -------
+        tuple[float, float]
+            - The tissue change parameter P1 (kg).
+            - The tissue change parameter P2 (days in milk).
+
+        References
+        ----------
+        [AN.BWT.18]
+
+        """
+        if calves == 1:
+            return (
+                AnimalModuleConstants.PRIMIPAROUS_TISSUE_CHANGE_P1,
+                AnimalModuleConstants.PRIMIPAROUS_TISSUE_CHANGE_P2,
+            )
+        return (
+            AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P1,
+            AnimalModuleConstants.MULTIPAROUS_TISSUE_CHANGE_P2,
+        )
+
+    @staticmethod
+    def _calculate_lactating_cow_tissue_change(
+        days_in_milk: int, days_in_pregnancy: int, tissue_changed: float, p1: float, p2: float
+    ) -> tuple[float, float]:
+        """
+        Calculates the body weight tissue change for a lactating cow.
+
+        Parameters
+        ----------
+        days_in_milk : int
+            Number of days the cow has been lactating (simulation days).
+        days_in_pregnancy : int
+            Number of days the cow has been pregnant (simulation days).
+        tissue_changed : float
+            Current body weight change due to tissue mobilization (kg).
+        p1 : float
+            The tissue change parameter P1 (kg).
+        p2 : float
+            The tissue change parameter P2 (days in milk).
+
+        Returns
+        -------
+        tuple[float, float]
+            - The body weight tissue change for the lactating cow (kg).
+            - The updated tissue changed, recalculated on the day before dry off (kg).
+
+        References
+        ----------
+        [AN.BWT.18]
+        [AN.BWT.19]
+
+        """
+        body_weight_tissue = -p1 / p2 * np.exp(1 - days_in_milk / p2) + p1 / (p2**2) * days_in_milk * np.exp(
+            1 - days_in_milk / p2
+        )
+
+        updated_tissue_changed = tissue_changed
+        if days_in_pregnancy == AnimalConfig.dry_off_day_of_pregnancy - 1:
+            updated_tissue_changed = p1 * days_in_milk / p2 * np.exp(1 - days_in_milk / p2)
         return body_weight_tissue, updated_tissue_changed
+
+    @staticmethod
+    def _calculate_dry_cow_tissue_change(days_since_calving: int, gestation_length: int, p1: float, p2: float) -> float:
+        """
+        Calculates the body weight tissue change for a dry cow.
+
+        Parameters
+        ----------
+        days_since_calving : int
+            Number of days since the cow last calved (simulation days).
+        gestation_length : int
+            Total gestation period of the cow (simulation days).
+        p1 : float
+            The tissue change parameter P1 (kg).
+        p2 : float
+            The tissue change parameter P2 (days in milk).
+
+        Returns
+        -------
+        float
+            The body weight tissue change for the dry cow (kg).
+
+        References
+        ----------
+        [AN.BWT.19]
+        [AN.BWT.20]
+
+        """
+        return float(
+            p1
+            * days_since_calving
+            / p2
+            * np.exp(1 - days_since_calving / p2)
+            / (gestation_length - AnimalConfig.dry_off_day_of_pregnancy)
+        )

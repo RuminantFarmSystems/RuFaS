@@ -22,6 +22,7 @@ def sample_growth_inputs() -> Generator[GrowthInputs, None, None]:
         calf_birth_weight=45.0,
         calves=1,
         calving_interval=365.0,
+        days_since_calving=200,
     )
 
 
@@ -45,6 +46,7 @@ def test_growth_inputs_initialization(sample_growth_inputs: GrowthInputs) -> Non
     assert sample_growth_inputs.calf_birth_weight == 45.0
     assert sample_growth_inputs.calves == 1
     assert sample_growth_inputs.calving_interval == 365.0
+    assert sample_growth_inputs.days_since_calving == 200
 
 
 @pytest.mark.parametrize(
