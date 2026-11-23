@@ -3236,6 +3236,512 @@ Calf losses in RuFaS include two distinct processes: stillbirth and mortality fo
    * If a random draw is less than the `still_birth_rate`, then `self.stillborn` = True and added to `stillborn_newborn_calves`
 
 
+::: {#sec-an-genetics}
+### Genetics Submodule
+:::
+
+#### Overview
+
+Genetic merit is one of the main long-term drivers of herd productivity and profitability. Earlier versions of RuFaS represented it with a single Net Merit (NM$) value assigned to each animal from a national distribution. That value had no mechanistic link to the animal's performance: milk components and other traits were assigned independently of it, so breeding and culling decisions could not change the herd's productive potential in the model.
+
+The genetics submodule replaces this proxy with a trait-level quantitative-genetic representation. For each animal and each trait it simulates a true breeding value, permanent and temporary environmental effects, the resulting phenotype, and an estimated breeding value with a realistic amount of estimation error. Breeding values are transmitted from dam and sire to calf, so that selection decisions made in the simulation accumulate over generations. A ranking index built from the estimated breeding values gives the herd manager a criterion on which to base reproductive and, in future, culling decisions.
+
+The current implementation covers two traits, **fat yield** and **protein yield** (kg). They were chosen as the proof of concept because they carry the largest weights in NM$ (31.8% and 13.0% of relative emphasis in the 2025 revision; @vanraden2025), they are moderately heritable, and they map directly onto quantities RuFaS already reports.
+
+**Scope.** The submodule currently simulates, transmits and reports genetic values and uses them to rank animals for reproductive decisions. The simulated fat and protein phenotypes do not yet determine milk composition: daily milk fat and protein are still computed as daily milk yield multiplied by the fixed, user-entered fat and protein percentages. The submodule therefore affects reported genetic outcomes and ranking-based reproductive decisions, and does not feed back into milk, feed intake or emissions.
+
+#### Required User Inputs
+
+**Switches and Parameters**
+
+All parameters are set in the animal input file. @tbl-an-gen-inputs lists them with their location and default.
+
+```{python}
+#| label: tbl-an-gen-inputs
+#| tbl-cap: User inputs that control the genetics submodule and genetics-informed reproduction. Sources for the default values are given in the sections where each parameter is introduced. 
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-inputs.csv",
+  colalign = ["left", "left", "left", "center"]
+)
+```
+
+Reliabilities by life stage, the sexed-semen conception multiplier and the male-calf rates by semen type are constants in the code and are not user inputs.
+
+**Data Files**
+
+Two CSV files in `input/data/animal_genetics/` supply the time-dependent quantities (@tbl-an-gen-input-files, @fig-ani-gen-input). Both are registered in the metadata and can be replaced by farm- or breed-specific files with the same columns.
+
+```{python}
+#| label: tbl-an-gen-input-files
+#| tbl-cap: Data files read by the genetics submodule. 
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-input-files.csv",
+  colalign = ["left", "left", "left", "left", "left"]
+)
+```
+1. @cdcb_nd_a
+2. @cdcb_nd_b
+
+![Input data series. (a) National mean fat and protein phenotype by birth year. (b) Breeding value of top-listing Holstein semen by calf birth month; the series is a linear trend rising by about 8.3 kg of fat and 5.3 kg of protein per year.](../resources/images/ani-gen-input.png){#fig-ani-gen-input}
+
+**Genetic base.** The semen series is expressed on the current CDCB genetic base, introduced in April 2025, on which the average breeding value of cows born in 2020 is zero. A TBV of zero in the model therefore corresponds to an average 2020-born Holstein cow. 
+
+**Out-of-range dates.** For a birth year or month outside either file, the nearest available entry is used and a warning is raised once per simulation. Simulations that run past 2023 hold the mean phenotype at its 2023 value, and simulations that run past December 2025 hold the semen value at its last entry, so the sire contribution stops improving from that point.
+
+**Input Validation**
+
+Cross-validation rules applied when inputs are read require that: `ranking_method` is null when `selective_repro_strategy` is false and is not null when it is true; `simulate_genetics` is true when the `ranking_method` is genetic; and the three semen allocation proportions sum to one for heifers and for cows.
+
+#### Outputs
+
+When genetics simulation is on, the animal module reports the variables in @tbl-an-gen-outputs. All breeding values, environmental effects and phenotypes are in kilograms; the ranking index is unitless.
+
+```{python}
+#| label: tbl-an-gen-outputs
+#| tbl-cap: Outputs produced by the genetics submodule.
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-outputs.csv",
+  colalign = ["left", "left", "left"]
+)
+```
+
+#### Methodology
+
+##### Theoretical Background
+
+This section summarizes the quantitative-genetic concepts the submodule relies on.
+
+**Decomposition of the Phenotype**
+
+The observed performance of an animal for a trait (its phenotype, P) is modelled as the sum of a population mean, the animal's additive genetic value and two environmental deviations:
+
+::: {#eq-an-gen-1}
+[[**AN.GEN.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{P} = \mu + \text{TBV} + \text{PE} + \text{TE}
+$$
+:::
+
+*Where*:
+
+* μ = mean of a reference population 
+* TBV = true breeding value. The value of an animal's genes to its progeny, that is, the additive genetic effect. The broader genetic value also includes dominance and epistatic effects, which are not transmitted predictably and are not modelled. The TBV is fixed at conception and cannot be observed directly.
+* PE = permanent environmental effect. Non-genetic influences that are specific to the animal and persist across all of its records, for example rearing conditions or lasting effects of early-life health events.
+* TE = temporary environmental effect. Short-term influences that differ from one record to the next, such as feed quality, weather or transient illness in a particular lactation.
+
+All four are expressed in the units of the trait (kg of fat or protein).
+
+**Variance Components, Heritability, and Repeatability**
+
+Assuming the three random terms are independent, the phenotypic variance is the sum of their variances:
+
+::: {#eq-an-gen-2}
+[[**AN.GEN.2**]]{.aside .content-visible when-format="html"}
+$$
+\sigma^2_\text{P} = \sigma^2_\text{TBV} + \sigma^2_\text{PE} + \sigma^2_\text{TE}
+$$
+:::
+
+
+Heritability (h$^2$) is the share of phenotypic variance that is additive genetic, and repeatability (R) is the share that is permanent to the animal, whether genetic or environmental:
+
+::: {#eq-an-gen-3}
+[[**AN.GEN.3**]]{.aside .content-visible when-format="html"}
+$$
+\text{h}^2 = \frac{\sigma^2_\text{TBV}}{\sigma^2_\text{P}}
+$$
+:::
+
+::: {#eq-an-gen-4}
+[[**AN.GEN.4**]]{.aside .content-visible when-format="html"}
+$$
+\text{R} = \frac{\sigma^2_\text{TBV} + \sigma^2_\text{PE}}{\sigma^2_\text{P}}
+$$
+:::
+
+Given a phenotypic variance, a heritability and a repeatability, the three components follow directly:
+
+::: {#eq-an-gen-5}
+[[**AN.GEN.5**]]{.aside .content-visible when-format="html"}
+$$
+\sigma^2_\text{TBV} = \text{h}^2 \sigma^2_\text{P}, \quad \sigma^2_\text{PE} = \text{R} \sigma^2_\text{P} - \sigma^2_\text{TBV}, \quad \sigma^2_\text{TE} = \sigma^2_\text{P} - \sigma^2_\text{TBV} - \sigma^2_\text{PE}     
+$$
+:::
+
+**Estimated Breeding Values, Accuracy, and Reliability**
+
+Because the TBV is unobservable, selection is based on an estimated breeding value (EBV). EBVs are predicted from pedigree, the animal's own records, progeny records and, increasingly, genomic tests. The quality of the prediction is described by its accuracy, the correlation between estimated and true breeding value, and by its reliability, the square of the accuracy:
+
+::: {#eq-an-gen-6}
+[[**AN.GEN.6**]]{.aside .content-visible when-format="html"}
+$$
+\text{r} = corr(\text{EBV,TBV}), \qquad \text{REL} = \text{r}^2
+$$
+:::
+
+Reliability rises as information accumulates over an animal's life. A property of well-behaved (unbiased) predictions is that EBVs vary less than the TBVs they estimate:
+
+::: {#eq-an-gen-7}
+[[**AN.GEN.7**]]{.aside .content-visible when-format="html"}
+$$
+Var(\text{EBV}) = \text{REL} \times Var(\text{TBV})
+$$
+:::
+
+With no information (REL = 0) every animal receives the same EBV and the variance is zero. With perfect information (REL = 1) the EBV equals the TBV. In the United States, EBVs are computed by the Council on Dairy Cattle Breeding (CDCB) from genomic tests, farm records and the national database. Reproducing that evaluation would require a national pedigree and data set, so the submodule does not simulate it. Instead it generates each EBV statistically from the animal's TBV and a reliability typical of the animal's life stage.
+
+**Selection Indicies**
+
+Animals are ranked on an index that combines the EBVs of several traits with weights reflecting their economic importance. The index most widely used in the United States is lifetime Net Merit (NM`<span>&#36;</span>`{=html}), which combines about 40 traits covering production, health, fertility, conformation and feed efficiency [@vanraden2025]. The submodule currently uses a two-trait index with weights taken from the NM$ relative emphasis on fat and protein.
+
+##### Model Assumptions
+
+* **Additive infinitesimal model.** Each trait is controlled by many genes of small additive effect, so breeding values are normally distributed. Dominance, epistasis and individual loci are not represented.
+* **Lifetime constancy.** An animal's TBV and PE are drawn once and never change. TE is redrawn at the start of every lactation.
+* **No genotype-by-environment interaction.** Genetic and environmental effects are additive and independent of each other.
+* **Correlated traits.** Fat and protein yield are correlated at the genetic, permanent-environment and temporary-environment levels. Each pair of effects is drawn jointly from a bivariate normal distribution.
+* **Statistical EBVs.** EBVs are generated from the TBV with a reliability that depends only on life stage. The genetic evaluation itself is not simulated, and all animals are assumed to be genotyped.
+* **Sires are not individuals.** Sires are not simulated as individual animals. Each calf conceived using dairy semen receives a paternal genetic contribution based on the average genetic merit of the top three Holstein sires for its birth month, using historical CDCB WebConnect data.
+* **No inbreeding tracking.** The Mendelian sampling variance is a constant half of the base genetic variance and is not reduced for inbred parents.
+* **National parameters by default.** Variances and correlations default to United States Holstein values. Variances and correlations can be overridden by the user; the population mean phenotype and the semen series are read from data files.
+
+##### Model Description
+
+**State Variables**
+
+When genetics simulation is switched on, every animal carries the eleven values in @tbl-an-gen-state. Subscripts $_\text{F}$ and $_\text{P}$ denote fat and protein yield.
+
+```{python}
+#| label: tbl-an-gen-state
+#| tbl-cap: Genetic state variables held by each animal.
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-state.csv",
+  colalign = ["left", "left", "left", "center", "left"]
+)
+```
+
+**Variance Parameters and Their Defaults**
+
+Each of the three random effects is described by a variance for fat, a variance for protein and a correlation between the two traits. The nine parameters are user inputs with national Holstein defaults 
+
+```{python}
+#| label: tbl-an-gen-variance
+#| tbl-cap: Default variance components and between-trait correlations.
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-variance.csv",
+  colalign = ["left", "center", "center", "center", "left"]
+)
+```
+(1) @benzaabza2016
+(2) @alseaf2007
+(3) @aip2025
+
+*Derivation of the default variances*
+
+The defaults are derived from three published quantities for United States Holsteins.
+* **Standard deviation of true transmitting ability (TTA)**: 26.45 lb for fat and 18.49 lb for protein (@aip2025 table of TTA standard deviations used for NM$ 2025).
+* **Heritability**: h2 = 0.20 for both fat and protein yield (USDA-ARS AIP, 2025).
+* **Repeatability**: R = 0.50 for both traits, in line with animal-model estimates for Holstein yield traits [@suzuki1994; @vantassell1999].
+
+*Step 1: genetic variance.* A transmitting ability is half of a breeding value, because a parent passes half of its genes to its offspring. The standard deviation of the TBV is therefore twice that of the TTA. Converting pounds to kilograms (1 kg = 2.20462 lb):
+
+::: {#eq-an-gen-8}
+[[**AN.GEN.8**]]{.aside .content-visible when-format="html"}
+$$
+\sigma_\text{TBV} = \frac{2\sigma_\text{TTA}}{2.20462}, \quad \sigma^2_\text{TBV} = \left(\frac{2\sigma^2_\text{TTA}}{2.20462}\right)^2
+$$
+:::
+
+*Step 2: phenotypic variance.* From the definition of heritability [AN.GEN.3](#an-gen-3):
+
+::: {#eq-an-gen-9}
+[[**AN.GEN.9**]]{.aside .content-visible when-format="html"}
+$$
+\sigma^2_\text{P} = \frac{2\sigma^2_\text{TBV}}{\text{h}^2}
+$$
+:::
+
+*Step 3: environmental variances.* From the definition of repeatability [AN.GEN.4](#an-gen-4) and the sum of the components [AN.GEN.2](#an-gen-2):
+
+::: {#eq-an-gen-10}
+[[**AN.GEN.10**]]{.aside .content-visible when-format="html"}
+$$
+\sigma^2_\text{PE} = \text{R}\sigma^2_\text{P} - \sigma^2_\text{TPV} = (\text{R} - \text{h}^2)\sigma^2_\text{P}, \quad \sigma^2_\text{TE} = (1 - \text{R})\sigma^2_\text{P}
+$$
+:::
+
+```{python}
+#| label: tbl-an-gen-variance-calc
+#| tbl-cap: Calculation of the default variance components following the three steps above.
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-variance-calc.csv",
+  colalign = ["center", "left", "center", "center", "left"]
+)
+```
+Results are computed from unrounded intermediate values. By construction, 20% of phenotypic variance is additive genetic, 30% is permanent environment and 50% is temporary environment for both traits
+
+![Default partition of the phenotypic variance of fat and protein yield into additive genetic, permanent-environment, and temporary-environment components](../resources/images/ani-gen-pheno-var.png){#fig-ani-gen-pheno}
+
+**True Breeding Values**
+
+Throughout this section, BVN (m1, m2; v1, v2; $\rho$) denotes a bivariate normal distribution with means m1 and m2, variances v1 and v2 and correlation $\rho$.
+
+*Animals without a simulated dam*
+
+Animals in the starting herd, calves created during herd spin-up, and purchased replacement heifers have no dam in the simulation. Their TBVs are drawn from the base population distribution, centred on zero:
+
+::: {#eq-an-gen-11}
+[[**AN.GEN.11**]]{.aside .content-visible when-format="html"}
+$$
+(\text{TBV}_\text{F}, \text{TBV}_\text{P}) \sim \text{BVN}(0,0; \sigma^2_\text{TBV,F}, \sigma^2_\text{TBV,P}; \rho_\text{TBV})
+$$
+:::
+
+The draw does not depend on the animal's birth year. A purchased replacement heifer receives a fresh draw at the moment she enters the herd.
+
+*Calves born during the simulation*
+
+A calf inherits half of each parent's breeding value on average. The expected TBV of the calf is the mid-parent value,
+
+::: {#eq-an-gen-12}
+[[**AN.GEN.12**]]{.aside .content-visible when-format="html"}
+$$
+\mu_\text{calf,t} = \tfrac{1}{2} (\text{TBV}_\text{sire,t} + \text{TBV}_\text{dam,t}), \quad \text{t}\epsilon\{\text{F,P}\}
+$$
+:::
+
+where the dam's TBV is that of the cow or heifer that calved, and the sire's TBV is the top-listing semen value for the calf's birth month, the average of the top three Holstein sires [@cdcb_nd_b]. Random segregation of the parents' alleles adds the Mendelian sampling term, whose variance is half of the base genetic variance:
+
+::: {#eq-an-gen-13}
+[[**AN.GEN.13**]]{.aside .content-visible when-format="html"}
+$$
+\sigma^2_\text{MS,t} = \tfrac{1}{2} \sigma^2_\text{TBV,t}
+$$
+:::
+
+The calf's two TBVs are then drawn jointly, keeping the genetic correlation between the traits:
+
+::: {#eq-an-gen-14}
+[[**AN.GEN.14**]]{.aside .content-visible when-format="html"}
+$$
+(\text{TBV}_\text{F}, \text{TBV}_\text{P}) \sim \text{BVN}(\mu_\text{calf,F}, \mu_\text{calf,P}; \tfrac{1}{2} \sigma^2_\text{TBV,F}, \tfrac{1}{2} \sigma^2_\text{TBV,P}; \rho_\text{TBV})
+$$
+:::
+
+With the default parameters the Mendelian sampling standard deviations are √(575.8/2) = 16.97 kg for fat and √(281.4/2) = 11.86 kg for protein. If the birth month lies outside the semen data range, the nearest available month is used and a warning is written once per simulation.
+
+**Environmental Effects**
+
+The permanent environmental effects are drawn once, when the animal is created:
+
+::: {#eq-an-gen-15}
+[[**AN.GEN.15**]]{.aside .content-visible when-format="html"}
+$$
+(\text{PE}_\text{F}, \text{PE}_\text{P}) \sim \text{BVN}(0,0; \sigma^2_\text{PE,F}, \sigma^2_\text{PE,P}; \rho_\text{TBV})
+$$
+:::
+
+The temporary environmental effects are drawn when the animal is created and redrawn at the start of every lactation:
+
+::: {#eq-an-gen-16}
+[[**AN.GEN.16**]]{.aside .content-visible when-format="html"}
+$$
+(\text{TE}_\text{F}, \text{TE}_\text{P}) \sim \text{BVN}(0,0; \sigma^2_\text{TE,F}, \sigma^2_\text{TE,P}; \rho_\text{TBV})
+$$
+:::
+
+Successive TE draws for the same animal are independent of one another and of the animal's TBV and PE. Separating the two environmental terms lets the model distinguish a cow that is consistently above or below her genetic potential from one that has a single good or poor lactation. It also leaves a natural entry point for future work: ration quality or disease in a given lactation could act through TE, and general management level through PE or the population mean.
+
+**Phenotype**
+
+The phenotype of animal i for trait t is obtained from Equation 1, with the population mean taken as the national Holstein average for the animal's birth year y$_\text{i}$:
+
+::: {#eq-an-gen-17}
+[[**AN.GEN.17**]]{.aside .content-visible when-format="html"}
+$$
+\text{P}_\text{i,t} = \mu(\text{y}_\text{i}) + \text{TBV}_\text{i,t} + \text{PE}_\text{i,t} + \text{TE}_\text{i,t}
+$$
+:::
+
+The means μ$_\text{t}$(y) are read from the national mean phenotype table [@cdcb_nd_a]. For birth years outside the table the nearest available year is used and a warning is written once. The phenotype is recomputed whenever TE is redrawn, that is, at every calving.
+
+The phenotype is an annual, per-lactation quantity in kilograms. It is computed for all animal classes, including calves and heifers, for which it should be read as the expected future performance given the effects drawn so far rather than as an observed record. As noted previously, it is not yet linked to daily milk composition.
+
+**Estimated Breeding Values**
+
+*Formulation*
+
+The EBV of animal i is generated from its TBV, the mean TBV of its group g, and the reliability RELs assigned to the animal's life stage s. The true deviation of the animal from its group mean is first shrunk by the reliability:
+
+::: {#eq-an-gen-18}
+[[**AN.GEN.18**]]{.aside .content-visible when-format="html"}
+$$
+\mu_{\text{EBV}_\text{i,t}} = \text{m}_\text{g,t} + \text{REL}_\text{s} (\text{TBV}_\text{i,t} - \text{m}_\text{g,t})
+$$
+:::
+
+where m$_\text{g,t}$ is the mean TBV of the group of animals to which the animal belongs when the estimate is made. It plays the role of the population mean towards which an estimate is pulled when information is incomplete. A normally distributed estimation error is then added:
+
+::: {#eq-an-gen-19}
+[[**AN.GEN.19**]]{.aside .content-visible when-format="html"}
+$$
+\text{EBV}_\text{i,t} = \mu_{\text{EBV}_\text{i,t}} + \epsilon_\text{i,t}, \quad \epsilon_\text{i,t} \sim  (0, \text{REL}_\text{s}(1 - \text{REL}_\text{s}) \sigma^2_{\text{TBV}_\text{TBV,t}})
+$$
+:::
+
+The errors for fat and protein are drawn independently, so the two EBVs of an animal are correlated only through the correlation of its TBVs.
+The deviation is taken from the group mean and not from zero, because selection moves the herd mean away from zero over time and shrinking towards zero would then bias every EBV downwards.
+
+*Statistical properties*
+
+[AN.GEN.18](#an-gen-18) and [AN.GEN.19](#an-gen-19) follow from two requirements: that EBV and TBV are bivariate normal, and that the EBV behaves as an unbiased prediction with reliability REL ([AN.GEN.6](#an-gen-6) and [AN.GEN.7](#an-gen-7)). Writing σ2 for the national (base-population) TBV variance, the same population to which the reliabilities in Table 4 refer. The variance of the EBVs is
+
+::: {#eq-an-gen-20}
+[[**AN.GEN.20**]]{.aside .content-visible when-format="html"}
+$$
+Var(\text{EBV}) = \text{REL}^2 \sigma^2 + \text{REL}(1 - \text{REL}) \sigma^2 = \text{REL} \times \sigma^2
+$$
+:::
+
+which reproduces [AN.GEN.7](#an-gen-7), and the correlation between EBV and TBV is
+
+::: {#eq-an-gen-21}
+[[**AN.GEN.21**]]{.aside .content-visible when-format="html"}
+$$
+corr(\text{EBV,TBV}) = \frac{\text{REL} \times \sigma^2}{\sqrt{\text{REL} \times \sigma^2 \times \sigma}} = \sqrt{\text{REL}} = \text{r}
+$$
+:::
+
+which reproduces [AN.GEN.6](#an-gen-6). 
+
+*Reliability by life stage*
+
+Reliabilities are fixed values representing genotyped animals (@tbl-an-gen-ebv) and are applied to both fat and protein. All non-lactating classes (calves and heifers) use the heifer value, and cows use the value for their parity, capped at the third. The values are approximate: a genomic test without records gives a reliability of about 0.65 for yield traits, rising to about 0.70 once the animal has its own record (@holstein_nd; see also @toghiani2024). The further increase with each lactation is a model assumption representing the accumulation of the cow’s own records. For comparison, the reliability of a parent average alone is about 0.36 [@holstein_nd].
+
+```{python}
+#| label: tbl-an-gen-ebv
+#| tbl-cap: Reliability of the EBV by life stage (genotyped animals), and the implied accuracy and error standard deviation with the default variances.
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-ebv.csv",
+  colalign = ["left", "center", "center", "center", "center"]
+)
+```
+
+The same reliabilities are applied to fat and protein. They are approximate national values for genotyped animals. Lower reliabilities for herds that do not genotype (for example 0.35, 0.55, 0.65 and 0.75 for the same four stages) are not yet available as an option.
+
+**Ranking Index**
+
+The ranking index is a weighted sum of the two EBVs:
+
+::: {#eq-an-gen-22}
+[[**AN.GEN.22**]]{.aside .content-visible when-format="html"}
+$$
+\text{I} = \text{w}_\text{F} \text{EBV}_\text{F} + \text{w}_\text{P} \text{EBV}_\text{P}
+$$
+:::
+
+The default weights are wF = 0.318 and wP = 0.13, the relative emphasis placed on fat and protein in the 2025 revision of NM$ [@vanraden2025]. Because only the ratio of the weights affects the ranking, these are equivalent to 71% and 29%. Users can supply their own weights between 0 and 1. The index is recomputed every time the EBVs change and is reported as unitless. It is a ranking device only; it is not a monetary NM$ value.
+
+**Schedule of Updates Over an Animal's Life**
+
+@fig-ani-gen-life-cycle summarizes when each quantity is drawn or recomputed. TBV and PE are set once. TE and the phenotype change at every calving. The EBV and the ranking index change at the first three calvings and are then frozen, reflecting the assumption that reliability does not improve beyond the third lactation.
+
+![Life-cycle schedule of the genetic state variables. An animal that enters the simulation as a cow in the starting herd receives her first EBV at the reliability of her current parity. The “4th+ calving” column applies at every calving from the fourth onward.](../resources/images/ani-gen-life-cycle.png){#fig-ani-gen-life-cycle}
+
+*Worked Example*
+
+A cow with TBV<sub>F</sub> of +10.0 kg and TBV<sub>P</sub> of +5.0 kg calves in January 2025, when the top-listing semen values are +119.6 kg (fat) and +61.8 kg (protein).
+
+* The calf's expected TBVs are (119.6 + 10.0)/2 = 64.8 kg and (61.8 + 5.0)/2 = 33.4 kg, and her actual TBVs are drawn around these with standard deviations of 16.97 and 11.86 kg and a correlation of 0.59. 
+* Suppose the draw returns exactly the expected values and the calves in the herd average +50.0 kg for fat. Her fat EBV then has expectation 50.0 + 0.75 × (64.8 − 50.0) = 61.1 kg and an error standard deviation of √(0.75 × 0.25 × 575.8) = 10.39 kg. 
+* With a protein EBV of, say, 31.0 kg, her ranking index is 0.318 × 61.1 + 0.13 × 31.0 = 23.5.
+
+A cow with TBV<sub>F</sub> of +10.0 kg and TBV<sub>P</sub> of +5.0 kg calves in January 2020, when the top-listing semen values are +77.9 kg (fat) and +35.5 kg (protein). 
+
+* The calf’s expected TBVs are (77.9 + 10.0)/2 = 43.95 kg and (35.5 + 5.0)/2 = 20.25 kg, and her actual TBVs are drawn around these with standard deviations of 16.97 and 11.86 kg and a correlation of 0.59. 
+* Suppose the draw returns exactly the expected values, and the calves in the herd average +30.0 kg for fat and +15.0 kg for protein. Her EBVs then have expectations 
+  * EBV<sub>F</sub> = 30.0 + 0.75 × (43.95 − 30.0) = 40.5 kg, error standard deviation = √(0.75 × 0.25 × 575.8) = 10.39 kg
+  * EBV<sub>P</sub> = 15.0 + 0.75 × (20.25 − 15.0) = 18.9 kg, error standard deviation = √(0.75 × 0.25 × 281.4) = 7.26 kg
+  * In the simulation, an estimation error is added to each EBV, drawn independently for the two traits. 
+* Suppose the draws are ε<sub>F</sub> = +5.2 kg (about half an error standard deviation above zero) and ε<sub>P</sub>= −3.6 kg (about half an error standard deviation below zero). Then,
+  * EBV<sub>F</sub> = 40.5 + 5.2 = 45.7 kg
+  * EBV<sub>P</sub>  = 18.9 − 3.6 = 15.3 kg
+  * Her ranking index is 0.318 × 45.7 + 0.13 × 15.3 = 16.5. 
+  * In this draw her fat merit is overestimated by 5.2 kg and her protein merit is underestimated by 3.6 kg relative to their expected values, and her index is 1.2 higher than it would be without estimation error.
+
+##### Use Case Example: Genetics-informed Semen Allocation
+
+The ranking index becomes a management tool once a decision depends on it. The first such application in RuFaS is the choice of semen type at insemination. It reproduces a strategy now common on commercial dairies: sexed dairy semen on the genetically best animals to produce replacement heifers, beef semen on the poorest to produce higher-value crossbred calves, and conventional dairy semen in between.
+
+The application is active when three settings are combined: `simulate_genetics` is true, `selective_repro_strategy` is true and `ranking_method` is "genetic". With any other combination, every insemination uses one generic semen type and calf sex follows the user's overall male-calf rate.
+
+**Ranking and Percentile**
+
+Heifers are ranked only against other heifers, and cows only against other cows. Each day, the ranking indices of all breeding-eligible heifers and, separately, of all breeding-eligible cows are collected. When an animal is inseminated, her percentile among the N breeding-eligible animals of her own type (heifers or cows) is
+
+::: {#eq-an-gen-23}
+[[**AN.GEN.23**]]{.aside .content-visible when-format="html"}
+$$
+\text{q}_\text{i} = \tfrac{1}{2} \Sigma_\text{j} 1(\text{I}_\text{j} \leq \text{I}_\text{i})
+$$
+::: 
+
+so that q = 1 for the best-ranked animal.
+
+**Allocation Rule**
+
+Let s, c and b be the user-specified proportions of sexed dairy, conventional dairy and beef semen for the animal's class, with s + c + b = 1. The semen type is assigned from the top of the ranking downwards (@tbl-an-gen-semen-rule, @fig-ani-gen-semen-alloc)
+
+```{python}
+#| label: tbl-an-gen-semen-rule
+#| tbl-cap: Semen allocation rule.
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-semen-rule.csv",
+  colalign = ["center", "center"]
+)
+```
+
+![Default allocation of semen types across the ranking-index percentile for heifers and cows in this application.](../resources/images/ani-gen-semen-alloc.png){#fig-ani-gen-semen-alloc}
+
+**Effect of Semen Type**
+
+The semen type then affects conception, calf sex and the fate of the calf (@tbl-an-gen-semen-type). The sex of the embryo is determined at conception. If conception fails, the semen type is cleared and a new allocation is made at the next insemination.
+
+```{python}
+#| label: tbl-an-gen-semen-type
+#| tbl-cap: Properties of each semen type. Conception base rate is the user input conception rate for the used reproductive protocol.  
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-semen-type.csv",
+  colalign = ["center", "center", "center", "center"]
+)
+```
+
+The semen allocation closes the genetic loop. High-index dams contribute most of the retained heifer calves, each of which inherits half of her dam's TBV [AN.GEN.12](#an-gen-12), so the mean TBV of home-raised replacements depends on the allocation proportions chosen.
+
+**Example Comparison**
+
+A typical use is to compare a herd with and without selective allocation, holding all other inputs equal (@tbl-an-gen-comparison). The outputs of interest are the mean TBV of each animal group over time (genetic trend), the number of dairy heifer calves retained, the number of beef-cross calves sold, and the number of inseminations per conception.
+
+```{python}
+#| label: tbl-an-gen-comparison
+#| tbl-cap: Example settings for comparing a baseline herd with a selective semen-allocation strategy. 
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-comparison.csv",
+  colalign = ["left", "center", "center"]
+)
+```
+
+##### Known Limitations and Future Development
+
+```{python}
+#| label: tbl-an-gen-limits
+#| tbl-cap: Limitations and planned development.
+import_table(
+  "../resources/table_data/animal/tbl-an-gen-limits.csv",
+  colalign = ["left", "left", "left"]
+)
+```
+
 ## Manure Excretion
 
 ### Introduction

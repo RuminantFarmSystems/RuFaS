@@ -11,12 +11,12 @@ tbl-column: page
 ## Introduction 
 
 The Soil and Crop Module simulates the daily changes in soil composition and crop growth based on nutrient availability,
- weather and soil types. The underlying biophysical processes are drawn from existing models of soil and plant
- biogeochemistry including the SWAT model, Daycent, and SurPhos. The management routines execute the daily
- biogeochemical processes and direct simulation of the user-provided management practices including application of
- manure or synthetic fertilizer, tillage, planting and harvesting. As part of the whole farm biophysical simulation in
- RuFaS, the Soil and Crop Module receives manure from the Manure Module and sends harvested crop biomass to the Feed
- Storage Module.
+weather and soil types. The underlying biophysical processes are drawn from existing models of soil and plant
+biogeochemistry including the SWAT model, Daycent, and SurPhos. The management routines execute the daily
+biogeochemical processes and direct simulation of the user-provided management practices including application of
+manure or synthetic fertilizer, tillage, planting and harvesting. As part of the whole farm biophysical simulation in
+RuFaS, the Soil and Crop Module receives manure from the Manure Module and sends harvested crop biomass to the Feed
+Storage Module.
 
 ## Field Management 
 ### Introduction 
@@ -176,7 +176,7 @@ import_table(
 #| label: tbl-sc-field-general-outputs
 #| tbl-cap: Other miscellaneous field management-associated outputs. Here, [FIELD_NAME] indicates the name of the field.
 import_table(
-  "../resources/table_data/soil_and_crop/expected_outputs/tbl-sc-field-general-outputs.csv",
+  "../resources/table_data/soil_and_crop/tbl-sc-field-general-outputs.csv",
 )
 ```
 
@@ -272,10 +272,10 @@ that steps through all the functions that execute the field management operation
 * Tillage
 * Soil Nutrient Cycling + Crop Growth
 * Crop Management
-    * Transition crops to dormancy
-    * Plant crops
-    * Harvest crops
-    * Update crop and crop residue coverage
+  * Transition crops to dormancy
+  * Plant crops
+  * Harvest crops
+  * Update crop and crop residue coverage
 
 Once these daily processes have been executed for each field, the `FieldManager` `daily_update_routine()` function
 sends all the outputs to the `OutputManager` via the `output_gatherer.send_daily_variables()` function.
@@ -367,7 +367,7 @@ on the soil surface
 The proportion of the subsurface fertilizer that is applied to each layer is calculated from the relationship between
 the bottom depth of each soil and the application depth. So, for each layer a “depth factor” is calculated as:
 
-if layer_depth < application_depth:
+if `layer_depth` < `application_depth`:
 
 ::: {#eq-sc-fld-5}
 [[**SC.FLD.5**]]{.aside .content-visible when-format="html"}
@@ -553,7 +553,8 @@ $$
 & \qquad \qquad \qquad \qquad \qquad \qquad \qquad \times \frac{\text{ammonium\_fraction}}{\text{field\_size}} \\[8pt]
 &\text{mass\_fresh\_organic\_nitrogen\_added} = \text{manure\_dry\_matter\_mass} \times \text{organic\_nitrogen\_fraction} \\
 & \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \times \frac{\text{fresh\_fraction\_of\_organic\_nitrogen}}{\text{field\_size}} \\[8pt]
-&\text{mass\_stable\_organic\_nitrogen\_added} = 
+&\text{mass\_stable\_organic\_nitrogen\_added} = \text{manure\_dry\_matter\_mass} \times \text{organic\_nitrogen\_fraction} \\
+& \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \times \frac{1 - \text{fresh\_fraction\_of\_organic\_nitrogen}}{\text{field\_size}} \\[8pt]
 \end{aligned}
 $$
 :::  
@@ -803,9 +804,9 @@ $$
             
 *Where*:
         
-* T<sub>bare</sub> = Temperature of a bare soil surface (℃) with no cover
-* T<sub>av</sub> = Average daily temperature (℃) on the day
-* E<sub>sr</sub> = Radiation term
+* T<sub>bare</sub> = temperature of a bare soil surface (℃) with no cover
+* T<sub>av</sub> = average daily temperature (℃) on the day
+* E<sub>sr</sub> = radiation term
 
 ::: {#eq-sc-tmp-8}
 [[**SC.TMP.8**]]{.aside .content-visible when-format="html"}
@@ -1424,7 +1425,7 @@ Nitrogen enters the cycle as synthetic fertilizer, manure, and plant residue.
     * Manure dry matter mass goes into ammonium and nitrate pools using certain equations.
 * Residue biomass also gets converted into fresh and active organic N pools via mineralization. If residue is in top 2
 cm it goes into the fresh organic N pool while if residue is below 2 cm it goes into the active organic N pool.
-    * 80% of fresh organic N is converted into nitrate and 20% into active pool via decomposition. 
+  * 80% of fresh organic N is converted into nitrate and 20% into active pool via decomposition. 
 
 **Intialize soil N Pools** `layer_data.py`
             
@@ -1590,7 +1591,7 @@ $$
             
 * cation_exchange_factor = provided by the soil input file
         
-The total mass of $NH_{4}$ (kg N ha$^{-1}$) converted through nitrification and volatilization is given by:
+The total mass of NH$_4$ (kg N ha$^{-1}$) converted through nitrification and volatilization is given by:
 
 ::: {#eq-sc-nnv-4}
 [[**SC.NNV.4**]]{.aside .content-visible when-format="html"}
@@ -1906,7 +1907,7 @@ $$
 * water_factor = nutrient cycling water factor for the layer
 * activeN = amount of N in the active organic pool (kg N ha$^{-1}$)
                      
-N mineralized from the active pool is transferred from the active pool to the $NH_{4}$ pool. Decomposition and
+N mineralized from the active pool is transferred from the active pool to the NH$_4$ pool. Decomposition and
 mineralization are a function of a daily decay rate constant that is calculated with the C:N and C:P ratios of the
 residue, and temperature and soil water factors. The C:N and C:P ratios of the residues in the soil layer are currently
 fixed at:
@@ -2041,7 +2042,7 @@ After initialization soil P pools are converted from mg phosphorus kg$^{-1}$ soi
 **Soluble Phosphorus** `soluble_phosphorus.py`
 
 The `SolublePhosphorus` class calculates the P transferred via hydrological processes in the soil based on equations
-from the APLE and SurPhos models [@vadas2007]. The     `daily_update_routine` alters phosphorus levels in the
+from the APLE and SurPhos models [@vadas2007]. The `daily_update_routine` alters phosphorus levels in the
 `SoilData` object by tracking phosphorus in runoff (if any) from the first soil layer and phosphorus percolated
 downward through the soil profile.
 
@@ -2114,7 +2115,7 @@ $$
         
 *Where*:
             
-* DRP<sub>leachate</sub> is the dissolved reactive phosphorus leached from the soil layer (mg L$^{-1}$)
+* DRP<sub>leachate</sub> = dissolved reactive phosphorus leached from the soil layer (mg L$^{-1}$)
         
 The maximum leachate concentration specified in APLE is 20 (mg L$^{-1}$), and is applied here as the min term. Leached
 P is added to the soil layer immediately below the layer for which it is calculated.

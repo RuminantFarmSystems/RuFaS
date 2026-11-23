@@ -1,0 +1,15 @@
+Variable,Description,Units
+harvest_yield.field=[FIELD_NAME].crop,Name of the crop in the field at this time,--
+harvest_yield.field=[FIELD_NAME].harvest_type,Harvest type of the harvest operation,--
+harvest_yield.field=[FIELD_NAME].wet_yield,"Mass of the harvested crop, before drying",kg/ha
+harvest_yield.field=[FIELD_NAME].dry_yield,"Mass of the harvested crop, after drying",kg/ha
+harvest_yield.field=[FIELD_NAME].nitrogen,Nitrogen mass in the harvested crop,kg/ha
+harvest_yield.field=[FIELD_NAME].phosphorus,Phosphorus mass in the harvested crop,kg/ha
+harvest_yield.field=[FIELD_NAME].yield_residue,Mass of the residue produced from the harvested crop,kg/ha
+harvest_yield.field=[FIELD_NAME].residue_nitrogen,Nitrogen mass in the crop residue,kg/ha
+harvest_yield.field=[FIELD_NAME].residue_phosphorus,Phosphorus mass in the crop residue,kg/ha
+harvest_yield.field=[FIELD_NAME].harvest_index,Harvest index value for this crop,--
+harvest_yield.field=[FIELD_NAME].planting_year,Year this crop was planted,--
+harvest_yield.field=[FIELD_NAME].planting_day,Day this crop was planted,--
+harvest_yield.field=[FIELD_NAME].harvest_year,Year this crop was harvested,--
+harvest_yield.field=[FIELD_NAME].harvest_day,Day this crop was harvested,--

@@ -1,0 +1,8 @@
+﻿Step,Quantity,Fat yield,Protein yield
+Input,$\sigma_\text{TTA}$ (lb),26.45,18.49
+1,$\sigma_\text{TBV} = 2 \sigma_\text{TTA}$ / 2.20462$ (kg),2 x 26.45 / 2.20462 = 23.995,2 x 18.49 / 2.20462 = 16.774
+1,$\sigma^2_\text{TBV}$ (kg$^2$),23.9952 = 575.8,16.7742 = 281.4
+2,$\sigma^2_\text{P} = \sigma^2_\text{TBV} / 0.2$ (kg$^2$),"575.8 / 0.20 = 2,878.8","281.4 / 0.20 = 1,406.8"
+3,$\sigma^2_\text{PE} = (0.50 - 0.20) \sigma^2_\text{P}$ (kg$^2$),"0.30 x 2,878.8 = 863.6","0.30 x 1,406.8 = 422.0"
+3,$\sigma^2_\text{TE} = (1 - 0.50) \sigma^2_\text{P}$ (kg$^2$),"0.50 x 2,878.8 = 1,439.4","0.50 x 1,406.8 = 703.4"
+Check,$\sigma_\text{P}$ (kg),53.7 (118 lb),37.5 (83 lb)

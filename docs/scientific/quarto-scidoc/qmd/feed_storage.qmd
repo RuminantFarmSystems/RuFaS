@@ -141,7 +141,7 @@ $$
 #| tbl-cap: Hay storage types and associated fractional loss coefficients.
 import_table(
   "../resources/table_data/feed_storage/tbl-fs-hay-type.csv",
-  colalign = ["left", "center"]
+  colalign = ["center", "center"]
 )
 ```
 
@@ -159,7 +159,7 @@ The lowest energy method for hay drying is passive drying in the field when cond
 #| tbl-cap: Nutrients and associated fractional loss coefficients for unprotected hay storage.
 import_table(
   "../resources/table_data/feed_storage/tbl-fs-hay-unpro-nutr.csv",
-  colalign = ["left", "center"]
+  colalign = ["center", "center"]
 )
 ```
 
@@ -168,7 +168,7 @@ import_table(
 #| tbl-cap: Nutrients and associated fractional loss coefficients for protected or indoor hay storage.
 import_table(
   "../resources/table_data/feed_storage/tbl-fs-hay-pro-nutr.csv",
-  colalign = ["left", "center"]
+  colalign = ["center", "center"]
 )
 ```
                     
@@ -220,11 +220,11 @@ $$
 #| tbl-cap: Nutrients and associated fractional loss coefficients for silage.
 import_table(
   "../resources/table_data/feed_storage/tbl-fs-silage-nutr.csv",
-  colalign = ["left", "center"]
+  colalign = ["center", "center"]
 )
 ```
 
-Ensiled crops may also lose dry matter through effluent efflux. Crops that are ensiled with a dry matter content less than 30\% lose both water and dry matter according to the following equations:
+Ensiled crops may also lose dry matter through effluent efflux. Crops that are ensiled with a dry matter content less than 30% lose both water and dry matter according to the following equations:
 
 :::{#eq-fs-sil-4}
 [[**FS.SIL.4**]]{.aside .content-visible when-format="html"}    

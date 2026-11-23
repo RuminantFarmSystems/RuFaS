@@ -17,39 +17,35 @@ The emissions and resource used associated with feeds are calculated by the `Emi
 
 ### Calculation of Purchased Feed Emissions
 
-Purchased feed emissions are calculated multiplying the emission factor associated with feed $i$ ($\text{EF}_{i}$) by the total dry matter mass of the feed fed to the herd each day ($\text{DM_Fed}_{i}$). 
-
+Purchased feed emissions are calculated multiplying the emission factor associated with feed i (EF$_\text{i}$) by the total dry matter mass of the feed fed to the herd each day (DM_Fed$_\text{i}$).
 
 :::{#eq-em-pfe-1}
-
 [[**EM.PFE.1**]]{.aside .content-visible when-format="html"}    
 $$
-\text{PurchasedFeedEmission}_{i} = \text{EF}_{i} \times \text{DM_Fed}_{i}
+\text{PurchasedFeedEmission}_\text{i} = \text{EF}_\text{i} \times \text{DM\_Fed}_\text{i}
 $$
 :::
 
-In [EM.PFE.1](#eq-em-pfe-1), the emission factors are expected to be in units of $\text{CO}_{2}\text{-eq} / \text{kg feed DM}$. These emissions factors are provided via a database that contains an emission factor for each RuFaS Feed ID for each US FIPS county code. One set of emissions factors describes the total emissions associated with production of the feed, and the other database separates only the emissions associated with land use change. 
-
-
+In [EM.PFE.1](#eq-em-pfe-1), the emission factors are expected to be in units of CO$_2$-eq / kg feed DM. These emissions factors are provided via a database that contains an emission factor for each RuFaS Feed ID for each US FIPS county code. One set of emissions factors describes the total emissions associated with production of the feed, and the other database separates only the emissions associated with land use change. 
 
 ### Purchased Feed Emission Factor Database Preparation
 
-The RuFaS model requires a standardized table of emission factors (EF) for all (or as many as possible) of the feeds available in the feed library. These emission factors are expressed in $\text{kg CO}_\text{2}\text{e}/\text{kg}$ feed Dry Matter (DM). Preparing this table involves consolidating data from national, regional, and county-specific sources into a unified county-level format compatible with RuFaS.
+The RuFaS model requires a standardized table of emission factors (EF) for all (or as many as possible) of the feeds available in the feed library. These emission factors are expressed in kg CO$_2$e/kg feed Dry Matter (DM). Preparing this table involves consolidating data from national, regional, and county-specific sources into a unified county-level format compatible with RuFaS.
 
 #### Data Sources and Initial Processing
 
-The methodology draws on three distinct levels of data, each requiring specific conversions to reach the target units ($\text{kg CO}_\text{2}\text{e}/\text{kg}$ DM), summarized in @tbl-emis-pfe-sources.
+The methodology draws on three distinct levels of data, each requiring specific conversions to reach the target units (kg CO$_2$e/kg DM), summarized in @tbl-em-pfe-sources.
 
 ```{python}
-#| label: tbl-emis-pfe-sources
+#| label: tbl-em-pfe-sources
 #| tbl-cap: Data sources used to construct the purchased feed emission factor database.
 import_table(
-  "../resources/table_data/emissions/tbl-emis-pfe-sources.csv",
+  "../resources/table_data/emissions/tbl-em-pfe-sources.csv",
   colalign = ["left", "left", "left", "left", "left"]
 )
 ```
 
-The first data processing step is to convert all emission factors into the common unit of $\text{kg CO}_\text{2}\text{-eq}/\text{kg}$ DM. Regional emission factors, originally reported on a tonne basis, are first converted to a kilogram basis:
+The first data processing step is to convert all emission factors into the common unit of kg CO$_2$-eq/kg DM. Regional emission factors, originally reported on a tonne basis, are first converted to a kilogram basis:
 
 :::{#eq-em-pfe-2}
 [[**EM.PFE.2**]]{.aside .content-visible when-format="html"}    
@@ -67,31 +63,31 @@ $$
 $$
 :::
 
-* EF<sub>i</sub><sup>DM</sup>: emission factor of feed i, expressed on a dry matter basis (kg CO<sub>2</sub>e/kg DM)
-* EF<sub>i</sub><sup>as fed</sup>: emission factor of feed i, expressed on an as-fed basis (kg CO<sub>2</sub>e/kg as fed)
-* DM<sub>i</sub>: fraction of feed i's fresh mass that is dry matter
+* EF<sub>i</sub><sup>DM</sup> = emission factor of feed i, expressed on a dry matter basis (kg CO<sub>2</sub>e/kg DM)
+* EF<sub>i</sub><sup>as fed</sup> = emission factor of feed i, expressed on an as-fed basis (kg CO<sub>2</sub>e/kg as fed)
+* DM<sub>i</sub> = fraction of feed i's fresh mass that is dry matter
 
-The percent dry matter assumptions used for this conversion are given in @tbl-emis-pfe-dm-content.
+The percent dry matter assumptions used for this conversion are given in @tbl-em-pfe-dm-content.
 
 ```{python}
-#| label: tbl-emis-pfe-dm-content
+#| label: tbl-em-pfe-dm-content
 #| tbl-cap: Percent dry matter assumptions used to convert as-fed emission factors to a dry matter basis.
 import_table(
-  "../resources/table_data/emissions/tbl-emis-pfe-dm-content.csv",
-  colalign = ["left", "center"]
+  "../resources/table_data/emissions/tbl-em-pfe-dm-content.csv",
+  colalign = ["center", "center"]
 )
 ```
 
 #### Feed Emission Factors for the RuFaS Feed Library
 
-The RuFaS feed library contains multiple feeds that are distinct from a ruminant nutrition perspective (e.g., forages of varying maturity or feeds with slightly different compositions) but are not differentiated in the methods used to develop the feed emission factors. Available emission factors are therefore extrapolated to cover as many of the RuFaS feeds as possible. @tbl-emis-pfe-feed-id-xwalk cross-references emission factor feed names with the RuFaS Feed IDs that use that feed's emission factor.
+The RuFaS feed library contains multiple feeds that are distinct from a ruminant nutrition perspective (e.g., forages of varying maturity or feeds with slightly different compositions) but are not differentiated in the methods used to develop the feed emission factors. Available emission factors are therefore extrapolated to cover as many of the RuFaS feeds as possible. @tbl-em-pfe-feed-id-xwalk cross-references emission factor feed names with the RuFaS Feed IDs that use that feed's emission factor.
 
 ```{python}
-#| label: tbl-emis-pfe-feed-id-xwalk
+#| label: tbl-em-pfe-feed-id-xwalk
 #| tbl-cap: Cross-reference between emission factor feed names and RuFaS Feed IDs.
 import_table(
-  "../resources/table_data/emissions/tbl-emis-pfe-feed-id-xwalk.csv",
-  colalign = ["left", "left"]
+  "../resources/table_data/emissions/tbl-em-pfe-feed-id-xwalk.csv",
+  colalign = ["center", "left"]
 )
 ```
 
@@ -104,10 +100,10 @@ $$
 $$
 :::
 
-* EF<sub>mix</sub>: emission factor of the byproduct mix (kg CO<sub>2</sub>e/kg DM)
-* IncRate<sub>i</sub>: inclusion rate of component feed i in the byproduct mix
-* EF<sub>i</sub>: emission factor of component feed i (kg CO<sub>2</sub>e/kg DM)
-* n: number of component feeds in the byproduct mix
+* EF<sub>mix</sub> = emission factor of the byproduct mix (kg CO<sub>2</sub>e/kg DM)
+* IncRate<sub>i</sub> = inclusion rate of component feed i in the byproduct mix
+* EF<sub>i</sub> = emission factor of component feed i (kg CO<sub>2</sub>e/kg DM)
+* n = number of component feeds in the byproduct mix
 
 Because @deondarza2021 defines fewer, broader regions than the analysis that produced the regional feed emission factors, the feed emission factors of the smaller feed emission regions are combined into each of the broader byproduct regions as a weighted average based on the 2020 milk production of the smaller regions:
 
@@ -118,18 +114,18 @@ $$
 $$
 :::
 
-* EF<sub>byproduct region</sub>: emission factor for the feed, weighted-averaged up to a byproduct region (kg CO<sub>2</sub>e/kg DM)
-* MilkProd<sub>r</sub>: 2020 milk production (million lbs) of feed emission region r
-* EF<sub>r</sub>: emission factor for the feed in the smaller feed emission region r (kg CO<sub>2</sub>e/kg DM)
+* EF<sub>byproduct region</sub> = emission factor for the feed, weighted-averaged up to a byproduct region (kg CO<sub>2</sub>e/kg DM)
+* MilkProd<sub>r</sub> = 2020 milk production (million lbs) of feed emission region r
+* EF<sub>r</sub> = emission factor for the feed in the smaller feed emission region r (kg CO<sub>2</sub>e/kg DM)
 
-The crosswalk between the smaller feed emission regions and the four byproduct regions used by @deondarza2021 is given in @tbl-emis-pfe-byprod-region-xwalk.
+The crosswalk between the smaller feed emission regions and the four byproduct regions used by @deondarza2021 is given in @tbl-em-pfe-byprod-region-xwalk.
 
 ```{python}
-#| label: tbl-emis-pfe-byprod-region-xwalk
+#| label: tbl-em-pfe-byprod-region-xwalk
 #| tbl-cap: Crosswalk between feed emission regions and byproduct regions, weighted by 2020 milk production.
 import_table(
-  "../resources/table_data/emissions/tbl-emis-pfe-byprod-region-xwalk.csv",
-  colalign = ["left", "right", "left"]
+  "../resources/table_data/emissions/tbl-em-pfe-byprod-region-xwalk.csv",
+  colalign = ["left", "center", "center"]
 )
 ```
 
@@ -170,13 +166,13 @@ The homegrown feed emissions are estimated by the `EmissionsEstimator.estimate_f
 5. **Scale intensities by the feed fed.** The daily intensity of each feed is multiplied by the DM mass of that feed deducted from farmgrown feed storage to feed the herd on that day.
 6. **Estimate the LCA reference values.** The daily DM mass of each farmgrown feed fed is multiplied by the county-level emission factors from the purchased feed emission factor database.
 
-The data used in these steps are summarized in @tbl-emis-hfe-inputs.
+The data used in these steps are summarized in @tbl-em-hfe-inputs.
 
 ```{python}
-#| label: tbl-emis-hfe-inputs
+#| label: tbl-em-hfe-inputs
 #| tbl-cap: Simulation outputs used to estimate homegrown feed emissions and resource use.
 import_table(
-  "../resources/table_data/emissions/tbl-emis-hfe-inputs.csv",
+  "../resources/table_data/emissions/tbl-em-hfe-inputs.csv",
   colalign = ["left", "left", "left", "left"]
 )
 ```
@@ -188,16 +184,16 @@ The Soil and Crop Module reports N<sub>2</sub>O and NH<sub>3</sub> emissions for
 :::{#eq-em-hfe-1}
 [[**EM.HFE.1**]]{.aside .content-visible when-format="html"}
 $$
-\text{DailyFieldEmission}_{x,f,d} = \text{Area}_{f} \times \sum_{l=1}^{Layer_{f}} \text{LayerEmission}_{x,f,l,d}
+\text{DailyFieldEmission}_\text{x,f,d} = \text{Area}_\text{f} \times \sum_{l=1}^{\text{Layer}_\text{f}} \text{LayerEmission}_\text{x,f,l,d}
 $$
 :::
 
-* DailyFieldEmission<sub>x,f,d</sub>: total emission of type $x$ (N<sub>2</sub>O-N or NH<sub>3</sub>-N) from field $f$ on simulation day $d$ (kg N)
-* Area<sub>f</sub>: area of field $f$ (ha)
-* LayerEmission<sub>x,f,l,d</sub>: emission of type $x$ from soil layer $l$ of field $f$ on simulation day $d$ (kg N/ha)
-* Layer<sub>f</sub>: number of soil layers in field $f$
+* DailyFieldEmission<sub>x,f,d</sub> = total emission of type x (N<sub>2</sub>O-N or NH<sub>3</sub>-N) from field f on simulation day d (kg N)
+* Area<sub>f</sub> = area of field f (ha)
+* LayerEmission<sub>x,f,l,d</sub> = emission of type x from soil layer l of field f on simulation day d (kg N/ha)
+* Layer<sub>f</sub> = number of soil layers in field f
 
-Synthetic fertilizer applications are recorded by the Soil and Crop Module as the total mass of N, P, and K applied to the field (kg) on the day of application. Manure applications are recorded as the total mass of manure N applied (kg). These event values are used directly as daily values for the application day, with a value of zero on days with no application. The six emission and resource variables tracked for each field and day, $\text{DailyFieldEmissionOrResource}_{x,f,d}$, are therefore:
+Synthetic fertilizer applications are recorded by the Soil and Crop Module as the total mass of N, P, and K applied to the field (kg) on the day of application. Manure applications are recorded as the total mass of manure N applied (kg). These event values are used directly as daily values for the application day, with a value of zero on days with no application. The six emission and resource variables tracked for each field and day, DailyFieldEmissionOrResource$_\text{x,f,d}$, are therefore:
 
 * N<sub>2</sub>O-N emissions (kg N<sub>2</sub>O-N)
 * NH<sub>3</sub>-N emissions (kg NH<sub>3</sub>-N)
@@ -215,13 +211,13 @@ The Soil and Crop Module records each harvest event with the crop name, field na
 :::{#eq-em-hfe-2}
 [[**EM.HFE.2**]]{.aside .content-visible when-format="html"}
 $$
-\text{TotalHarvestYield}_{f,h} = \text{YieldPerHa}_{f,h} \times \text{Area}_{f}
+\text{TotalHarvestYield}_\text{f,h} = \text{YieldPerHa}_\text{f,h} \times \text{Area}_\text{f}
 $$
 :::
 
-* TotalHarvestYield<sub>f,h</sub>: DM mass of crop harvested from field $f$ in harvest $h$ (kg DM)
-* YieldPerHa<sub>f,h</sub>: DM yield of crop harvested from field $f$ in harvest $h$ (kg DM/ha)
-* Area<sub>f</sub>: area of field $f$ (ha)
+* TotalHarvestYield<sub>f,h</sub> = DM mass of crop harvested from field f in harvest h (kg DM)
+* YieldPerHa<sub>f,h</sub> = DM yield of crop harvested from field f in harvest h (kg DM/ha)
+* Area<sub>f</sub> = area of field f (ha)
 
 When a harvested crop is received into feed storage, the Feed Storage Module records the field name, crop name, and RuFaS Feed ID of the stored feed. RuFaS uses these records to build a lookup from each (field, crop) pair to a single Feed ID. Harvests that are not received into a farmgrown feed storage, such as cover crops that are terminated and not harvested for feed, have no Feed ID and are not allocated any emissions or resources.
 
@@ -232,14 +228,14 @@ The emissions and resources allocated to a harvest are those that occurred in th
 :::{#eq-em-hfe-3}
 [[**EM.HFE.3**]]{.aside .content-visible when-format="html"}
 $$
-\text{HarvestedFeedEmissionOrResource}_{x,f,h} = \sum_{d = t_{f,h-1}+1}^{t_{f,h}} \text{DailyFieldEmissionOrResource}_{x,f,d}
+\text{HarvestedFeedEmissionOrResource}_\text{x,f,h} = \sum_\text{d = t\_{f,h-1}+1}^\text{t\_{f,h}} \text{DailyFieldEmissionOrResource}_\text{x,f,d}
 $$
 :::
 
-* HarvestedFeedEmissionOrResource<sub>x,f,h</sub>: emission or resource $x$ allocated to harvest $h$ in field f (kg)
-* DailyFeedEmissionOrResource<sub>x,f,d</sub>: emission or resource $x$ of field $f$ on simulation day $d$ (kg), from [EM.HFE.1](#eq-em-hfe-1) or the fertilizer and manure application records
-* t<sub>f,h</sub>: simulation day of harvest $h$ in field $f$
-* t<sub>f,h-1</sub>: simulation day of the most recent window-closing harvest event in field $f$ before harvest $h$ (equal to -1 for the first harvest in the field, so the window starts on simulation day 0)
+* HarvestedFeedEmissionOrResource<sub>x,f,h</sub> = emission or resource x allocated to harvest h in field f (kg)
+* DailyFeedEmissionOrResource<sub>x,f,d</sub> = emission or resource x of field f on simulation day d (kg), from [EM.HFE.1](#eq-em-hfe-1) or the fertilizer and manure application records
+* t<sub>f,h</sub> = simulation day of harvest h in field f
+* t<sub>f,h-1</sub> = simulation day of the most recent window-closing harvest event in field f before harvest h (equal to -1 for the first harvest in the field, so the window starts on simulation day 0)
 
 How each harvest event affects the accumulation window depends on whether it produces a farmgrown feed and on the harvest type:
 
@@ -251,42 +247,42 @@ Harvest events are processed in chronological order across all fields. This keep
 
 ### Emission and Resource Intensity of Farmgrown Feeds
 
-The same farmgrown feed can be harvested several times and from several fields over a simulation. Each time feed $j$ is harvested, the emissions and resources allocated to that harvest ([EM.HFE.3](#eq-em-hfe-3)) and the DM harvested ([EM.HFE.2](#eq-em-hfe-2)) are added to running totals for the feed:
+The same farmgrown feed can be harvested several times and from several fields over a simulation. Each time feed j is harvested, the emissions and resources allocated to that harvest ([EM.HFE.3](#eq-em-hfe-3)) and the DM harvested ([EM.HFE.2](#eq-em-hfe-2)) are added to running totals for the feed:
 
 :::{#eq-em-hfe-4}
 [[**EM.HFE.4**]]{.aside .content-visible when-format="html"}
 $$
-\text{TotalEmissionOrResource}_{x,j}(t) = \sum_{(f,h) \in H_{j}(t)} \text{HarvestedFeedEmissionOrResource}_{x,f,h}
+\text{TotalEmissionOrResource}_\text{x,j}(\text{t}) = \sum_{\text{(f,h)} \in \text{H\_{j}(t)}} \text{HarvestedFeedEmissionOrResource}_\text{x,f,h}
 $$
 :::
 
 :::{#eq-em-hfe-5}
 [[**EM.HFE.5**]]{.aside .content-visible when-format="html"}
 $$
-\text{TotalYield}_{j}(t) = \sum_{(f,h) \in H_{j}(t)} \text{TotalHarvestYield}_{f,h}
+\text{TotalYield}_\text{j}\text{(t)} = \sum_{\text{(f,h)} \in \text{H\_{j}(t)}} \text{TotalHarvestYield}_\text{f,h}
 $$
 :::
 
-* TotalEmissionOrResource<sub>x,j</sub>(t): cumulative emission or resource $x$ allocated to feed $j$ through simulation day $t$ (kg)
-* TotalYield<sub>j</sub>(t): cumulative DM harvested of feed $j$ through simulation day $t$ (kg DM)
-* H<sub>j</sub>(t): the set of all harvests, in any field, that produced feed $j$ on or before simulation day t
-* HarvestedFeedEmissionOrResource<sub>x,f,h</sub>: emission or resource $x$ allocated to harvest $h$ in field $f$ (kg), from [EM.HFE.3](#eq-em-hfe-3)
-* TotalHarvestYield<sub>f,h</sub>: DM mass harvested from field $f$ in harvest $h$ (kg DM), from [EM.HFE.2](#eq-em-hfe-2)
+* TotalEmissionOrResource<sub>x,j</sub>(t) = cumulative emission or resource x allocated to feed j through simulation day t (kg)
+* TotalYield<sub>j</sub>(t) = cumulative DM harvested of feed j through simulation day t (kg DM)
+* H<sub>j</sub>(t) = the set of all harvests, in any field, that produced feed j on or before simulation day t
+* HarvestedFeedEmissionOrResource<sub>x,f,h</sub> = emission or resource x allocated to harvest h in field f (kg), from [EM.HFE.3](#eq-em-hfe-3)
+* TotalHarvestYield<sub>f,h</sub> = DM mass harvested from field f in harvest h (kg DM), from [EM.HFE.2](#eq-em-hfe-2)
 
-The emission or resource intensity of feed $j$ is the ratio of the running totals. It is updated on each harvest day of feed $j$:
+The emission or resource intensity of feed j is the ratio of the running totals. It is updated on each harvest day of feed j:
 
 :::{#eq-em-hfe-6}
 [[**EM.HFE.6**]]{.aside .content-visible when-format="html"}
 $$
-\text{CumulativeFeedIntensity}_{x,j,d} = \frac{\text{TotalEmissionOrResource}_{x,j}(t_{j,k})}{\text{TotalYield}_{j}(t_{j,k})}, \quad t_{j,k} \le d \le t_{j,k+1}
+\text{CumulativeFeedIntensity}_\text{x,j,d} = \frac{\text{TotalEmissionOrResource}_\text{{x,j}(t\_{j,k})}}{\text{TotalYield}_\text{{j}(t\_{j,k})}}, \quad \text{t\_{j,k}} \le \text{d} \le \text{t\_{j,k+1}}
 $$
 :::
 
-* CumulativeFeedIntensity<sub>x,j,d</sub>: intensity of emission or resource $x$ for feed $j$ on simulation day $d$ (kg per kg harvested DM; for example, kg N<sub>2</sub>O-N/kg DM)
-* t<sub>j,k</sub>: simulation day of the k<sup>th</sup> harvest of feed $j$ (in any field)
-* t<sub>j,k+1</sub>: simulation day of the next harvest of feed $j$, or the last day of the simulation if there are no further harvests of feed $j$
+* CumulativeFeedIntensity<sub>x,j,d</sub> = intensity of emission or resource x for feed j on simulation day d (kg per kg harvested DM; for example, kg N<sub>2</sub>O-N/kg DM)
+* t<sub>j,k</sub> = simulation day of the k<sup>th</sup> harvest of feed j (in any field)
+* t<sub>j,k+1</sub> = simulation day of the next harvest of feed j, or the last day of the simulation if there are no further harvests of feed j
 
-The intensity is held constant from a harvest of feed $j$ through the day of its next harvest, when it is recalculated with the new harvest included. On days before the first harvest of feed $j$, the intensity is set to zero. When feeds from different harvests and fields share storage, the intensity is a DM-weighted average of all harvests of that feed up to that day. Larger harvests therefore have more influence on the intensity of the feed than smaller ones.
+The intensity is held constant from a harvest of feed j through the day of its next harvest, when it is recalculated with the new harvest included. On days before the first harvest of feed j, the intensity is set to zero. When feeds from different harvests and fields share storage, the intensity is a DM-weighted average of all harvests of that feed up to that day. Larger harvests therefore have more influence on the intensity of the feed than smaller ones.
 
 ### Emissions and Resource Use of Farmgrown Feed Fed
 
@@ -295,16 +291,16 @@ Each day, the Feed Storage Module records the DM mass of each farmgrown feed ded
 :::{#eq-em-hfe-7}
 [[**EM.HFE.7**]]{.aside .content-visible when-format="html"}
 $$
-\text{HomegrownFeedEmissionOrResource}_{x,j,d} = \text{CumulativeFeedIntensity}_{x,j,d} \times \text{DM_Fed}_{j,d}
+\text{HomegrownFeedEmissionOrResource}_\text{{x,j,d}} = \text{CumulativeFeedIntensity}_\text{x,j,d} \times \text{DM\_Fed}_\text{j,d}
 $$
 :::
 
 
-* HomegrownFeedEmissionOrResource<sub>x,j,d</sub>: emission or resource $x$ associated with the farmgrown feed $j$ fed on simulation day $d$ (kg)
-* I<sub>x,j,d</sub>: intensity of emission or resource $x$ for feed $j$ on simulation day $d$ (kg/kg DM), from [EM.HFE.6](#eq-em-hfe-6)
-* DM_Fed<sub>j,d</sub>: DM mass of farmgrown feed $j$ deducted from storage and fed to the herd on simulation day $d$ (kg DM)
+* HomegrownFeedEmissionOrResource<sub>x,j,d</sub> = emission or resource x associated with the farmgrown feed j fed on simulation day d (kg)
+* I<sub>x,j,d</sub> = intensity of emission or resource x for feed j on simulation day d (kg/kg DM), from [EM.HFE.6](#eq-em-hfe-6)
+* DM_Fed<sub>j,d</sub> = DM mass of farmgrown feed j deducted from storage and fed to the herd on simulation day d (kg DM)
 
-Only farmgrown feeds that have both a harvest record and a feed deduction record get these values. On days when no feed $j$ is fed, all values for feed $j$ are zero.
+Only farmgrown feeds that have both a harvest record and a feed deduction record get these values. On days when no feed j is fed, all values for feed j are zero.
 
 ### LCA Reference Estimates for Farmgrown Feeds
 
@@ -313,34 +309,34 @@ To give a point of comparison for the process-based estimates above, RuFaS also 
 :::{#eq-em-hfe-8}
 [[**EM.HFE.8**]]{.aside .content-visible when-format="html"}
 $$
-\text{HomegrownFeedLCAEmissions}_{j,d} = \text{EF}_{j} \times \text{DM_Fed}_{j,d}
+\text{HomegrownFeedLCAEmissions}_\text{j,d} = \text{EF}_\text{j} \times \text{DM\_Fed}_\text{j,d}
 $$
 :::
 
 :::{#eq-em-hfe-9}
 [[**EM.HFE.9**]]{.aside .content-visible when-format="html"}
 $$
-\text{HomegrownFeedLUC}_{j,d} = \text{EF}^{\text{LUC}}_{j} \times \text{DM_Fed}_{j,d}
+\text{HomegrownFeedLUC}_\text{j,d} = \text{EF}^{\text{LUC}}_\text{j} \times \text{DM\_Fed}_\text{j,d}
 $$
 :::
 
-* HomegrownFeedLCAEmission<sub>j,d</sub>: LCA-based carbon footprint of farmgrown feed $j$ fed on simulation day $d$ (kg CO<sub>2</sub>-eq)
-* HomegrownFeedLUC<sub>j,d</sub>: LCA-based land use change emissions of farmgrown feed $j$ fed on simulation day $d$ (kg CO<sub>2</sub>-eq)
-* EF<sub>j</sub>: total emission factor for feed $j$ in the simulation's FIPS county (kg CO<sub>2</sub>-eq/kg DM)
-* EF<sup>LUC</sup><sub>j</sub>: land use change emission factor for feed $j$ in the simulation's FIPS county (kg CO<sub>2</sub>-eq/kg DM)
-* DM_Fed<sub>j,d</sub>: DM mass of farmgrown feed $j$ fed on simulation day $d$ (kg DM)
+* HomegrownFeedLCAEmission<sub>j,d</sub> = LCA-based carbon footprint of farmgrown feed j fed on simulation day d (kg CO<sub>2</sub>-eq)
+* HomegrownFeedLUC<sub>j,d</sub> = LCA-based land use change emissions of farmgrown feed j fed on simulation day d (kg CO<sub>2</sub>-eq)
+* EF<sub>j</sub> = total emission factor for feed j in the simulation's FIPS county (kg CO<sub>2</sub>-eq/kg DM)
+* EF<sup>LUC</sup><sub>j</sub> = land use change emission factor for feed j in the simulation's FIPS county (kg CO<sub>2</sub>-eq/kg DM)
+* DM_Fed<sub>j,d</sub> = DM mass of farmgrown feed j fed on simulation day d (kg DM)
 
 Feeds with no emission factor in the database are omitted from these estimates. The LCA estimates are not added to the process-based estimates. They are reported separately, as an independent reference for the same feed.
 
 ### Reported Outputs
 
-@tbl-emis-hfe-outputs lists the daily outputs reported for each farmgrown feed. In each variable name, `[ID]` is the RuFaS Feed ID. The per-kg DM intensities ([EM.HFE.6](#eq-em-hfe-6)) and the totals for the feed fed ([EM.HFE.7](#eq-em-hfe-7)) have the same variable names. They are told apart by the reporting function recorded with each variable in the output: `_report_daily_farmgrown_feed_emissions_and_resource_intensity` for the intensities and `_report_daily_farmgrown_feed_fed_emissions_and_resources` for the totals.
+@tbl-em-hfe-outputs lists the daily outputs reported for each farmgrown feed. In each variable name, `[ID]` is the RuFaS Feed ID. The per-kg DM intensities ([EM.HFE.6](#eq-em-hfe-6)) and the totals for the feed fed ([EM.HFE.7](#eq-em-hfe-7)) have the same variable names. They are told apart by the reporting function recorded with each variable in the output: `_report_daily_farmgrown_feed_emissions_and_resource_intensity` for the intensities and `_report_daily_farmgrown_feed_fed_emissions_and_resources` for the totals.
 
 ```{python}
-#| label: tbl-emis-hfe-outputs
+#| label: tbl-em-hfe-outputs
 #| tbl-cap: Daily homegrown feed emissions and resource use outputs reported for each farmgrown feed.
 import_table(
-  "../resources/table_data/emissions/tbl-emis-hfe-outputs.csv",
+  "../resources/table_data/emissions/tbl-em-hfe-outputs.csv",
   colalign = ["left", "left", "left"]
 )
 ```
