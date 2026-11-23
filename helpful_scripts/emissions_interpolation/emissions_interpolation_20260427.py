@@ -208,7 +208,7 @@ for EEEname in EEEnames:
             raise ValueError("temp map and county codes don't match")
         gps_points_in_state = [
             x for x, y in zip(tempmap, county_codes_without_self) if x is not None and get_statecode(y) == statecode
-            ]
+        ]
         for idx_feed, feed_id in enumerate(feed_columns):
             if feed_id == "1" and statecode == "09":
                 print("catchit")
