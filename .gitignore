@@ -70,3 +70,8 @@ DataCollectionApp/schema/*
 !DataCollectionApp/schema/.keep
 
 docs/_build/
+
+# Local planning artifacts
+backups_interface/
+# Keep the isolated NASEM dependency specification
+!helpful_scripts/interface_rufas/requirements-nasem.lock.txt
