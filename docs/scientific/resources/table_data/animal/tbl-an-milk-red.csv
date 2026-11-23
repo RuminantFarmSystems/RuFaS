@@ -1,0 +1,3 @@
+﻿Section , Variable , Definition , Default , Min , Max 
+feed_properties,milk_reduction_maximum,Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements,--,0,50
+,tolerance,Allowable +/- percentage variance in each of the defined ration inclusion percentage values,0,0,1

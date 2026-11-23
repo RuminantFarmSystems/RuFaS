@@ -1,0 +1,2 @@
+﻿Digester, Description 
+AnaerobicDigester ," anaerobic_digester.py inherits behavior from the base class, Digester; however, at this time, there is no functionality included in the base Digester class. Therefore all methods are contained within the anaerobic_digestion.py child class."

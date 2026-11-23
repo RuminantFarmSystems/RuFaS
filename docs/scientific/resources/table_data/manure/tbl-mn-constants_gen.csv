@@ -1,0 +1,7 @@
+Variable, Value, Definition
+ACHIEVABLE_METHANE_EMISSION , 0.24 m$^3$ CH<sub>4</sub>/kg VS , Achievable methane generation
+IDEAL_GAS_LAW_R , 0.0821 L atm/mol K , Ideal gas law constant
+LIQUID_MANURE_DENSITY , 1000 kg/m$^3$ , Default liquid manure density
+SLURRY_MANURE_DENSITY , 990 kg/m$^3$ , Default density of manure as excreted.
+SOLID_MANURE_DENSITY , 700 kg/m$^3$ , Default solid manure density
+WATER_DENSITY_KG_PER_M3 , 0.997 kg/m$^3$ , Default water density 

@@ -1,0 +1,10 @@
+﻿Variable , Definition , Default , Min , Max
+harvest_days , Julian day(s) of year to harvest , -- ,1,366
+harvest_years , Calendar years in which the harvesting occurs , -- ,1, -- 
+harvest_operations , Operation(s) with which this crop will be harvested , --,--," harvest_only, harvest_kill, kill_only "
+harvest_type ," Whether the crop uses scheduled harvests or optimal harvests (“scheduled”,  “optimal”)", scheduled ,--,--  
+planting_days , Julian day(s) of year to plant, -- ,1,366
+planting_years , Calendar years in which the planting occurs, -- ,1,--
+pattern_repeat , Number of times that this crop schedule should be repeated,0,0, -- 
+planting_skip , Number of years to be skipped between planting schedule repetitions,0,0, -- 
+harvesting_skip , Number of years to be skipped between harvest schedule repetitions,0,0, -- 

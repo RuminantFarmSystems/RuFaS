@@ -1,0 +1,4 @@
+﻿Variable, Definition, Description
+Name, --,  Unique identifier of the specific bedded pack configuration used.
+storage_time_period, days,  The number of days that the manure/bedding pack accumulates in the pen before being removed and replaced with fresh bedding. 
+is_mixed, true/false,  A boolean indicator for whether the bedded pack is routinely mixed to intentionally promote composting activity. 

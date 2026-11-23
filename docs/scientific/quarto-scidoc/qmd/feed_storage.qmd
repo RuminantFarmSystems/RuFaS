@@ -75,9 +75,9 @@ $$
 
 Where we know that, in order to capture the differing rates of DM loss before and after the forage has reached its target DM content: 
 
-* L<sub>base</sub> (kg): the minimum loss expected from `protected-indoor` as the sum of DM lost in the first 30 days of storage 
-* L<sub>first 30 days</sub> (kg): the sum of DM lost in the first 30 days of storage 
-* L<sub>post 30 days</sub> (kg): the loss after 30 days
+* L<sub>base</sub> (kg) = the minimum loss expected from `protected-indoor` as the sum of DM lost in the first 30 days of storage 
+* L<sub>first 30 days</sub> (kg) = the sum of DM lost in the first 30 days of storage 
+* L<sub>post 30 days</sub> (kg) = the loss after 30 days
 
 :::{#eq-fs-hay-2}
 [[**FS.HAY.2**]]{.aside .content-visible when-format="html"}    
@@ -100,7 +100,7 @@ $$
 $$
 :::
 
-* Q is the sensible heat generated in the hay (kJ/kg) based on bale density.
+* Q = sensible heat generated in the hay (kJ/kg) based on bale density
 
 :::{#eq-fs-hay-5}
 [[**FS.HAY.5**]]{.aside .content-visible when-format="html"}    
@@ -109,9 +109,9 @@ $$
 $$
 :::
 
-* Moisture is the fraction of water mass at time of storage (unitless)
-* MF is the target final moisture percent of hay (percent) as defined by the user (default: 12)
-* d is the number of days the hay has been stored for 
+* Moisture = fraction of water mass at time of storage (unitless)
+* MF = target final moisture percent of hay (percent) as defined by the user (default: 12)
+* d = number of days the hay has been stored for 
 
 :::{#eq-fs-hay-6}
 [[**FS.HAY.6**]]{.aside .content-visible when-format="html"}    
@@ -127,14 +127,14 @@ $$
 $$
 :::
 
-* d: number of days the hay has been stored for,
-* i: day of storage that dry matter loss is being calculated for, 
-* l: loss coefficient (unitless) from @tbl-fs-hay-type; [FS.HAY.7](#eq-fs-hay-7)
-* rain<sub>i</sub>: amount of rain on day i (cm) 
-* high<sub>i</sub>: high temperature on day i (^∘C)
-* low<sub>i</sub>: low temperature on day (^∘C)
-* b<sub>density</sub>: bale density (kg/(m^2)) [FS.HAY.5](#eq-fs-hay-5)
-* b<sub>size</sub>: diameter of the hay bale (m)
+* d = number of days the hay has been stored for,
+* i = day of storage that dry matter loss is being calculated for, 
+* l = loss coefficient (unitless) from @tbl-fs-hay-type; [FS.HAY.7](#eq-fs-hay-7)
+* rain<sub>i</sub> = amount of rain on day i (cm) 
+* high<sub>i</sub> = high temperature on day i ($^∘$C)
+* low<sub>i</sub> = low temperature on day ($^∘$C)
+* b<sub>density</sub> = bale density (kg/m$^2$) [FS.HAY.5](#eq-fs-hay-5)
+* b<sub>size</sub> = diameter of the hay bale (m)
 
 ```{python}
 #| label: tbl-fs-hay-type
@@ -187,14 +187,14 @@ $$
 $$
 :::
 
-* d: number of days the alfalfa has been ensiled for, 
-* i: days since ensiling that dry matter loss is being calculated for, 
-* drymass<sub>i-1</sub>: dry matter mass of ensiled alfalfa on day i-1,
-* dryfrac<sub>i-1</sub>: fraction of ensiled alfalfa fresh mass that is dry matter on day i-1. 
+* d = number of days the alfalfa has been ensiled for
+* i = days since ensiling that dry matter loss is being calculated for
+* drymass<sub>i-1</sub> = dry matter mass of ensiled alfalfa on day i-1
+* dryfrac<sub>i-1</sub> = fraction of ensiled alfalfa fresh mass that is dry matter on day i-1.
 * When i is 1:
-   * drymass<sub>i-1</sub> is the initial amount of ensiled alfalfa dry mass
-   * dryfrac<sub>i-1</sub> the initial dry matter fraction of the ensiled alfalfa. 
-* This equation is only appropriate for use if dryfrac<sub>i-1</sub> is in the range [0.2, 0.6] and the average temperature on day and i is in the range [5, 45] (^∘C).
+   * drymass<sub>i-1</sub> = initial amount of ensiled alfalfa dry mass
+   * dryfrac<sub>i-1</sub> = initial dry matter fraction of the ensiled alfalfa.
+* This equation is only appropriate for use if dryfrac<sub>i-1</sub> is in the range [0.2, 0.6] and the average temperature on day and i is in the range [5, 45] ($^∘$C)
 
         
 Corn, grass, and small grain daily dry matter loss (fraction) is calculated with the equation:
@@ -206,14 +206,14 @@ $$
 $$
 :::
 
-* d: number of days the forage has been ensiled for 
-* i: days since ensiling that dry matter loss is being calculated for 
-* drymass<sub>i-1</sub>: dry matter mass of ensiled forage on day i-1
-* dryfrac<sub>i-1</sub>: fraction of ensiled forage fresh mass that is dry matter on day i-1.
-* When i is 1, 
-   * drymass<sub>i-1</sub>: initial amount of ensiled forage dry mass 
-   * dryfrac<sub>i-1</sub>: initial dry matter fraction of the ensiled forage. 
-* This equation is only appropriate for use if dryfrac<sub>i-1</sub>: is in the range [0.15, 0.6] and the average temperature on day i is in the range [0, 40] (^∘C).
+* d = number of days the forage has been ensiled for 
+* i = days since ensiling that dry matter loss is being calculated for 
+* drymass<sub>i-1</sub> = dry matter mass of ensiled forage on day i-1
+* dryfrac<sub>i-1</sub> = fraction of ensiled forage fresh mass that is dry matter on day i-1
+* When i is 1
+   * drymass<sub>i-1</sub> = initial amount of ensiled forage dry mass 
+   * dryfrac<sub>i-1</sub> = initial dry matter fraction of the ensiled forage. 
+* This equation is only appropriate for use if dryfrac<sub>i-1</sub> is in the range [0.15, 0.6] and the average temperature on day i is in the range [0, 40] ($^∘$C)
 
 ```{python}
 #| label: tbl-fs-silage-nutr
@@ -233,9 +233,9 @@ $$
 $$
 :::
 
-* dryfrac<sub>effluent</sub>: fraction of dry matter in the effluent that is lost
-* M<sub>effluent</sub>: estimated maximum effluent (kg)
-* d: number of days the crop has been ensiled for
+* dryfrac<sub>effluent</sub> = fraction of dry matter in the effluent that is lost
+* M<sub>effluent</sub> = estimated maximum effluent (kg)
+* d = number of days the crop has been ensiled for
 
 :::{#eq-fs-sil-5}
 [[**FS.SIL.5**]]{.aside .content-visible when-format="html"}    
@@ -244,9 +244,9 @@ $$
 $$
 :::
 
-* dryfrac<sub>effluent</sub>: fraction of dry matter in the effluent that is lost
-* M<sub>effluent</sub>: estimated maximum effluent (kg)
-* d: number of days the crop has been ensiled for
+* dryfrac<sub>effluent</sub> = fraction of dry matter in the effluent that is lost
+* M<sub>effluent</sub> = estimated maximum effluent (kg)
+* d = number of days the crop has been ensiled for
 
 The fraction of dry matter in effluent is a constant defined as: 
 
@@ -264,8 +264,8 @@ $$
 $$
 :::
 
-* mass<sub>fresh</sub>: fresh mass of the crop when it is ensiled (kg) 
-* dryfrac: fraction of the crop’s fresh mass which is dry matter when it is ensiled.
+* mass<sub>fresh</sub> = fresh mass of the crop when it is ensiled (kg) 
+* dryfrac = fraction of the crop’s fresh mass which is dry matter when it is ensiled
 
 Dry matter lost in effluent is preferentially from CP, water soluble carbohydrates, and non-protein nitrogen each of which is recalculated by the following equations:
 
@@ -278,9 +278,9 @@ $$
 $$
 :::
 
-* CP<sub>initial</sub>: percentage of dry matter mass that is crude protein in the ensiled crop before accounting for dry matter loss to effluent 
-* DL<sub>initial</sub>: fraction of dry matter mass lost to effluent. 
-* The percentage of crude protein is lower-bounded at 0.
+* CP<sub>initial</sub> = percentage of dry matter mass that is crude protein in the ensiled crop before accounting for dry matter loss to effluent 
+* DL<sub>initial</sub> = fraction of dry matter mass lost to effluent
+* The percentage of crude protein is lower-bounded at 0
 
 The percentage of NPN is calculated with the equation:
 
@@ -291,11 +291,10 @@ $$
 $$
 :::
 
-* NPN<sub>initial</sub>: percentage of dry matter mass that is non-protein nitrogen in the ensiled crop before accounting for dry matter loss to effluent
-* CP<sub>initial</sub>: percentage of dry matter mass that is crude protein before accounting for dry matter loss to effluent 
-* DL<sub>initial</sub>: fraction of dry matter mass lost to effluent
+* NPN<sub>initial</sub> = percentage of dry matter mass that is non-protein nitrogen in the ensiled crop before accounting for dry matter loss to effluent
+* CP<sub>initial</sub> = percentage of dry matter mass that is crude protein before accounting for dry matter loss to effluent 
+* DL<sub>initial</sub> = fraction of dry matter mass lost to effluent
 * The percentage of non-protein nitrogen is lower-bounded at 0
-
 
 DL<sub>fraction</sub> is calculated with the equation:
 
@@ -305,12 +304,12 @@ $$
 \text{DL}_\text{fraction} = \frac{\text{DM}_\text{lost}}{\text{DM}_\text{initial}}
 $$
 
-* DM<sub>lost</sub>: amount of dry matter mass in the ensiled crop after accounting for dry matter lost to effluent
-* DM<sub>initial</sub>: amount of dry matter mass in the ensiled crop before accounting for dry matter lost to effluent
+* DM<sub>lost</sub> = amount of dry matter mass in the ensiled crop after accounting for dry matter lost to effluent
+* DM<sub>initial</sub> = amount of dry matter mass in the ensiled crop before accounting for dry matter lost to effluent
 
 ### Baleage
 
-Baleage is an ensiled forage with a DM content between 50-65% that is baled and wrapped to allow ensiling. The higher DM content of baleage lowers the amount of acid needed to achieve effective preservation and allows it to be consolidated into a bale. Fermentation DM losses for baleage are calculated by [FS.SIL.1]{#eq-fs-sil-1} and [FS.SIL.2]{#eq-fs-sil-2}  with fractional nutrient loss coefficients from Table 3{.mark}. Baleage does not experience effluent losses.
+Baleage is an ensiled forage with a DM content between 50-65% that is baled and wrapped to allow ensiling. The higher DM content of baleage lowers the amount of acid needed to achieve effective preservation and allows it to be consolidated into a bale. Fermentation DM losses for baleage are calculated by [FS.SIL.1](#eq-fs-sil-1) and [FS.SIL.2](#eq-fs-sil-2) with fractional nutrient loss coefficients from @tbl-fs-silage-nutr. Baleage does not experience effluent losses.
 
 ### Nutrient Composition
 
@@ -325,10 +324,10 @@ $$
 
 Where we know that: 
 
-* n<sub>updated</sub> is the percentage of the target nutrient in the stored crop’s dry matter mass after accounting for dry matter loss 
-* n<sub>initial</sub> is the percentage of the target nutrient in the stored crop’s dry matter mass before accounting for dry matter loss 
-* C is the fractional loss coefficient specific to the nutrient and storage type
-* DL<sub>fraction</sub> is the fraction of dry matter lost
+* n<sub>updated</sub> = percentage of the target nutrient in the stored crop’s dry matter mass after accounting for dry matter loss 
+* n<sub>initial</sub> = percentage of the target nutrient in the stored crop’s dry matter mass before accounting for dry matter loss 
+* C = fractional loss coefficient specific to the nutrient and storage type
+* DL<sub>fraction</sub> = fraction of dry matter lost
 
 :::{#eq-fs-nut-2}
 [[**FS.NUT.2**]]{.aside .content-visible when-format="html"}    
@@ -336,9 +335,5 @@ $$
 \text{DL}_\text{fraction} = \frac{\text{DM}_\text{updated}}{\text{DM}_\text{updated}}
 $$
 :::
-
-## Purchased Feed Emissions
-
-
 
 ## References
