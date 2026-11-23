@@ -728,15 +728,11 @@ class FileManager:
                 return loaded_pool
         except FileNotFoundError:
             logger.error(
-                f"The file '{str(file_path)}' does not exist.",
-                extra={"rufas_log_name": "Pool File Not Found Error"}
+                f"The file '{str(file_path)}' does not exist.", extra={"rufas_log_name": "Pool File Not Found Error"}
             )
             raise
         except json.JSONDecodeError as e:
-            logger.error(
-                str(e),
-                extra={"rufas_log_name": "JSON Pool File Parsing Error"}
-            )
+            logger.error(str(e), extra={"rufas_log_name": "JSON Pool File Parsing Error"})
             raise
 
     def clear_output_dir(self, vars_file_path: Path, output_dir: Path) -> None:
@@ -753,15 +749,14 @@ class FileManager:
         is_file_found_in_dir = self.is_file_in_dir(output_dir, vars_file_path)
         if is_file_found_in_dir:
             logger.error(
-                f"{vars_file_path} in output directory.",
-                extra={"rufas_log_name": "Can't clear output directory"}
+                f"{vars_file_path} in output directory.", extra={"rufas_log_name": "Can't clear output directory"}
             )
         else:
             keep_list = [".keep", "output_filters"]
             Utility.empty_dir(output_dir, keep=keep_list)
             logger.info(
                 "Provided variables-file path was not in output directory.",
-                extra={"rufas_log_name": "Output directory successfully cleared"}
+                extra={"rufas_log_name": "Output directory successfully cleared"},
             )
 
     def is_file_in_dir(self, dir_path: Path, file_path: Path) -> bool:
@@ -848,14 +843,14 @@ class FileManager:
         if not isinstance(origin_label_value, str):
             logger.error(
                 f"Origin label must be a string. Received '{origin_label_value}' of type {type(origin_label_value)}.",
-                extra={"rufas_log_name": "Origin Label Error"}
+                extra={"rufas_log_name": "Origin Label Error"},
             )
             return OriginLabel.NONE
 
         if origin_label_value not in supported_options:
             logger.error(
                 f"Origin label must be one of {supported_options}. Received '{origin_label_value}'.",
-                extra={"rufas_log_name": "Origin Label Error"}
+                extra={"rufas_log_name": "Origin Label Error"},
             )
             return OriginLabel.NONE
 
