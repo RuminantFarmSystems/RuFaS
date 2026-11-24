@@ -751,7 +751,7 @@ class FileManager:
                 extra={"rufas_log_name": "Output directory successfully cleared"},
             )
 
-    def is_file_in_dir(self, dir_path: Path, file_path: Path) -> bool:
+    def is_file_in_dir(self, dir_path: Path, file_path: Path | None) -> bool:
         """
         Checks if a file path is in the provided directory.
 
@@ -759,8 +759,8 @@ class FileManager:
         ----------
         dir_path : Path
             Path to the directory to be checked.
-        file_path : Path
-            Path to file to be checked.
+        file_path : Path | None
+            Path to the file to be checked. If None, returns False.
 
         Returns
         -------
