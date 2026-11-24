@@ -1137,11 +1137,6 @@
         "events": {
           "type": "string",
           "default": ""
-        },
-        "net_merit": {
-          "type": "number",
-          "description": "The net merit value.",
-          "default": 0.0
         }
       }
     },
@@ -1192,11 +1187,6 @@
         },
         "events": {
           "type": "string"
-        },
-        "net_merit": {
-          "type": "number",
-          "description": "The net merit value.",
-          "default": 0.0
         }
       }
     },
@@ -1304,11 +1294,6 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
-        },
-        "net_merit": {
-          "type": "number",
-          "description": "The net merit value.",
-          "default": 0.0
         }
       }
     },
@@ -1416,11 +1401,6 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
-        },
-        "net_merit": {
-          "type": "number",
-          "description": "The net merit value.",
-          "default": 0.0
         }
       }
     },
@@ -1569,11 +1549,6 @@
           "type": "number",
           "description": "Calving Interval",
           "minimum": 0
-        },
-        "net_merit": {
-          "type": "number",
-          "description": "The net merit value.",
-          "default": 0.0
         }
       }
     },
@@ -1684,11 +1659,6 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
-        },
-        "net_merit": {
-          "type": "number",
-          "description": "The net merit value.",
-          "default": 0.0
         }
       }
     }
