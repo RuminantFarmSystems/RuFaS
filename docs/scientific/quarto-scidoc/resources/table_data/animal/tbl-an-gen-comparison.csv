@@ -1,7 +1,7 @@
 ﻿Setting,Baseline,Selective allocation
-simulate_genetics,TRUE,TRUE
-selective_repro_strategy,FALSE,TRUE
+simulate_genetics,true,true
+selective_repro_strategy,false,true
 ranking_method,null,"""genetic"""
 "Heifer semen proportions (sexed, conventional, beef)",not used,"0.5, 0.5, 0.0"
 "Cow semen proportions (sexed, conventional, beef)",not used,"0.2, 0.5, 0.3"
-Expected direction of change,Reference,"More heifer calves from high-index dams, beef-cross calves from low-index cows, faster rise in mean TBV of home-raised replacements, slightly more inseminations per conception with sexed semen"
+Expected direction of change,Reference,"More heifer calves from high-index dams, beef-cross calves from low-index cows, faster rise in mean TBV of home-raised replacements, slightly more inseminations per conception with sexed semen because sexed semen has a lower conception rate"

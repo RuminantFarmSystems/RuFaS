@@ -33,15 +33,14 @@ file.
 * resources: contains the materials referenced by the source code to be included in the final documentation, organized
 into subfolders by data type:
 
-  - `rufas.bib` (bare file): BibTex file from which in-text citations are pulled and the final bibliography is 
+  * `rufas.bib` (bare file): BibTex file from which in-text citations are pulled and the final bibliography is 
   constructed
   
-  - table_data: files that contain the data to be presented in the documentation
+  * table_data: files that contain the data to be presented in the documentation
   
-  - images: pictures and other images referenced by the `.qmd` files.
+  * images: pictures and other images referenced by the `.qmd` files.
   
-  - templates: template files for this project (i.e., templates for rendering output, qmd templates, etc.)
-  
+  * templates: template files for this project (i.e., templates for rendering output, qmd templates, etc.)
   
 * scripts: code files that do something useful related to the quarto documentation, examples include the 
 code to audit the references (`quarto_audit.py`) and code to facilitate importing tables (`make_grid_table.py` and 
@@ -81,4 +80,5 @@ quarto render --help
 ```
 
 ## Troubleshooting
-<!-- TBD -->
+
+Examples of how to format chapters, figures, tables, equations, and bibliography entries can be found in the `example_structures.qmd` file in the `qmd` folder.

@@ -11,12 +11,12 @@ tbl-column: page
 ## Introduction 
 
 The Soil and Crop Module simulates the daily changes in soil composition and crop growth based on nutrient availability,
- weather and soil types. The underlying biophysical processes are drawn from existing models of soil and plant
- biogeochemistry including the SWAT model, Daycent, and SurPhos. The management routines execute the daily
- biogeochemical processes and direct simulation of the user-provided management practices including application of
- manure or synthetic fertilizer, tillage, planting and harvesting. As part of the whole farm biophysical simulation in
- RuFaS, the Soil and Crop Module receives manure from the Manure Module and sends harvested crop biomass to the Feed
- Storage Module.
+weather and soil types. The underlying biophysical processes are drawn from existing models of soil and plant
+biogeochemistry including the SWAT model, Daycent, and SurPhos. The management routines execute the daily
+biogeochemical processes and direct simulation of the user-provided management practices including application of
+manure or synthetic fertilizer, tillage, planting and harvesting. As part of the whole farm biophysical simulation in
+RuFaS, the Soil and Crop Module receives manure from the Manure Module and sends harvested crop biomass to the Feed
+Storage Module.
 
 ## Field Management 
 ### Introduction 

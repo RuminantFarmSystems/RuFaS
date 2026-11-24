@@ -75,7 +75,6 @@ or newborn animals are guided to suitable pens, while animals marked for
 removal (sold or deceased) are taken out of the herd and removed from the farm
 records.
 
-
 **Output Reporting** At day’s end, Joe and Dr. Julie review the updated
 HerdReproductionStatistics on the whiteboard. Joe then compiles a concise
 report summarizing the day’s herd stats. He forwards this information to the

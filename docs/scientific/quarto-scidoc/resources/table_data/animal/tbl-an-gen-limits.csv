@@ -1,6 +1,6 @@
 ﻿Topic,Current behavior,Planned or possible development
 Link to milk composition,Phenotypes are reported but daily fat and protein come from fixed percentages,"Drive per-cow, per-lactation fat and protein from the phenotype, consistently with a future dynamic milk-component model"
-Genetic base of initial and purchased animals,Mean TBV of zero for every birth year,Birth-year national average (Section 8)
+Genetic base of initial and purchased animals,Mean TBV of zero for every birth year,Birth-year national average
 Culling,Not informed by genetics,Use genetic merit when culling cows and selecting young stock
 Semen allocation,"One rule based on the ranking percentile, set separately for heifers and cows","Breeding groups defined by parity, service number or production; user-defined semen types and conception rates"
 Traits,Fat and protein yield only,"Further NM$ traits (for example milk, productive life, fertility), including unfavorable genetic correlations between yield and fertility"

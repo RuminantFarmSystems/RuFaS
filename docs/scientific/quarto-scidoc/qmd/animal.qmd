@@ -34,8 +34,7 @@ and Cow).
 
 *  Calves progress to Heifer I when their age reaches the user-defined input for weaning day.
 *  Heifer I progresses to Heifer II when their age reaches the user-defined input for breeding start day. 
-*  Heifer II animals that successfully conceive become Heifer III's when the number of days left in their pregnancy 
-is equal to the user-defined input for prefresh days (default 21).
+*  Heifer II animals that successfully conceive become Heifer III's when the number of days left in their pregnancy is equal to the user-defined input for prefresh days (default 21).
 *  When a Heifer III calves, she becomes a Cow for the rest of her life on the RuFaS farm.
 *  Cows cycle through lactating and non-lactating phases until they are removed from the herd through mortality, acute sale, or low production sale (i.e., herd-size management in which the lowest-ranking eligible cows are sold as incoming heifers calve).
 
@@ -144,13 +143,10 @@ import_table(
 
 #### Relevant Outputs
 
-- `number_of_animals_in_pen_[id]_[AnimalCombination]`: reports the number of animals in each pen each day.
-
-- `ration_per_animals_for_pen_[id]_[AnimalCombination]`: reports average dry matter intake of an animal in the pen at the time of the ration formulation.
-
-- `ration_per_animals_for_pen_[id]_[AnimalCombination].[RUFAS_feed_id]`: reports the amount of each feed that is delivered per animal in the pen.
-
-- `ration_nutrient_amount_for\_pen_[AnimalCombination].[nutrient]`: is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated).
+* `number_of_animals_in_pen_[id]_[AnimalCombination]`: reports the number of animals in each pen each day.
+* `ration_per_animals_for_pen_[id]_[AnimalCombination]`: reports average dry matter intake of an animal in the pen at the time of the ration formulation.
+* `ration_per_animals_for_pen_[id]_[AnimalCombination].[RUFAS_feed_id]`: reports the amount of each feed that is delivered per animal in the pen.
+* `ration_nutrient_amount_for\_pen_[AnimalCombination].[nutrient]`: is reporting the amount of each of the following nutrients that is provided by the ration per animal in the pen (all reported in kilograms unless otherwise indicated).
 
 #### Methodology
 
@@ -183,7 +179,7 @@ Due to oscillations in the exact number of animals in each animal type, it is st
 Pens are initiated from the Pen class by the `HerdManager` at the beginning of the simulation and, if needed, an additional pen is created to accommodate animals if the animal numbers have exceeded the max stocking density. 
 
 ::: {.callout-note}
-*Available Functions*
+**Available Functions**
 
 `Remove_animals_by_ids`: This function is called when the `HerdManager` calls for: `remove_animal_from_pen_and_id_map`. It is pen specific and removes the animal from the pen and the animal ID from the animal ID map that tracks the animals in the pen. 
 
@@ -1967,7 +1963,7 @@ Heifer IIIs are not sold as a mechanism for controlling excess herd size. Instea
 
 The rate of Heifer IIIs calving is largely determined by the rate of dairy female calves who are born and kept in the herd, and can be regulated through the calf retention policy inputs, which are described in the Newborn calf sales section.
 
- More details of the processes at an individual animal level, including acute sales, deaths, and calf retention, are described in the [Culling](#sec-an-cull) section of Animal-level processes and management. 
+More details of the processes at an individual animal level, including acute sales, deaths, and calf retention, are described in the [Culling](#sec-an-cull) section of Animal-level processes and management. 
 
 #### Low Production sales 
 At each herd-size check, `HerdManager` evaluates the current number of cows relative to the user-defined buying and selling thresholds.
@@ -1978,8 +1974,8 @@ Not all cows are eligible for removal. Eligibility is determined using the user-
 
 Eligible cows are ranked according to `cull_ranking_criteria`:
 
-`‘milk’` = rank cows according to current daily milk production.
-`‘305_day_milk’` =  rank cows according to 305-day milk yield.
+* `‘milk’` = rank cows according to current daily milk production.
+* `‘305_day_milk’` =  rank cows according to 305-day milk yield.
 
 The lowest-ranking eligible cow is removed first. Additional eligible cows are removed, as necessary, until the herd size is within the necessary bounds.
 
@@ -2017,7 +2013,6 @@ Low production culling replaces the previous production-related culling mechanis
 RuFaS manages the cow population (dry and lactating cows) by comparing the current number of cows with user-defined buying and selling thresholds at intervals specified by `herd_size_adjustment_interval`.
 
 When the cow population falls below the buying threshold, replacement Heifer IIIs (springers) are purchased from the replacement market. Purchased Heifer IIIs enter the herd as springers and subsequently join the cow population at first calving.
-
 
 **User Inputs and Constants**
 
@@ -2087,7 +2082,6 @@ When a Heifer III or Cow animal reaches the end of their pregnancy and starts la
 assigned a birthweight according to a user-informed random distribution. All male calves are recorded and removed from the farm on day 1
 of their life. Female calves are retained or sold according to the user-selected calf retention method. Retention may be determined using an event-based Monte Carlo process informed by `keep_female_calf_rate`, or by a user-defined annual target number of female calves to retain.
 
-
 ### Bodyweight and Growth
 
 #### Introduction
@@ -2122,9 +2116,9 @@ import_table(
 
 #### Expected Outputs
 
-- `herd_statistics.avg_cow_body_weight` (kg): the daily average bodyweight of all cows in the herd 
-- `Pen_[pen ID]_[pen animal combination].avg_BW` (kg): the daily average bodyweight of all animals in each pen
-- `sold_weight` (kg)
+* `herd_statistics.avg_cow_body_weight` (kg): the daily average bodyweight of all cows in the herd 
+* `Pen_[pen ID]_[pen animal combination].avg_BW` (kg): the daily average bodyweight of all animals in each pen
+* `sold_weight` (kg)
 
 #### Methodology
 
@@ -2186,7 +2180,7 @@ $$
 $$
 :::
 
-Where MSBW is mature shrunk bodyweight (0.96 x mature bodyweight) and SBW is shrunk bodyweight (0.96 x bodyweight)
+Where MSBW is mature shrunk bodyweight (0.96 x mature bodyweight) and SBW is shrunk bodyweight (0.96 x bodyweight).
 
 ##### Pregnant Heifer Growth
 
@@ -2347,8 +2341,7 @@ $$
 
 The reproduction component of the RuFaS model is designed based on reproductive program options recommended by the @dcrc_protocols and experts in the field. 
 It offers three pre-defined reproductive program options for nulliparous heifers (estrus detection [`ED`], timed artificial insemination [`TAI`],
-and synchronized estrus detection [`Synch-ED`]) and three options for lactating cows ([`ED`], [`TAI`], and a combined [`ED`]-[`TAI`] approach). Users can select appropriate reproductive
-protocols and specify reproductive performance variables for both nulliparous heifers and lactating cows.
+and synchronized estrus detection [`Synch-ED`]) and three options for lactating cows ([`ED`], [`TAI`], and a combined [`ED`]-[`TAI`] approach). Users can select appropriate reproductive protocols and specify reproductive performance variables for both nulliparous heifers and lactating cows.
 
 This reproduction component simulates key reproductive events, including estrus occurrence, estrus detection, hormone administration, 
 artificial insemination (AI), pregnancy checks, and pregnancy outcomes (abortion or successful delivery). Reproductive culling decisions are also modeled, 
@@ -2363,6 +2356,10 @@ synchronization treatments, breeding efficiency, and pregnancy outcomes. The key
 * **Breeding Interventions:** Number of semen straws used (`semen_number`) and total AI procedures performed (`AI_times`)
 * **Reproductive Efficiency:** Time from first breeding attempt to pregnancy confirmation (`breeding_to_pregnancy_time`) and the interval from calving to confirmed pregnancy (`calving_to_pregnancy_time`)
 * **Pregnancy Monitoring:** Total number of pregnancy checks performed (`pregnancy_diagnoses`)
+
+::: {.callout-note}
+The optional [Genetics Submodule](#sec-an-genetics) may be used to choose the type of semen used in insemination (sexed, beef, or conventional). The submodule is active when three settings are combined: `simulate_genetics` is true, `selective_repro_strategy` is true and `ranking_method` is "genetic".
+:::
 
 #### Required User Inputs
 
@@ -2404,7 +2401,7 @@ Anytime an insemination is performed after an OvSynch program, the conception ra
 
 Overall reporting for reproductive measures can be summarized and split into scheduled events and updates on an individual basis for heifers and cows. Please note that this is not an exhaustive list, but do include: 
 
-* *Herd-Level*
+* **Herd-Level**
   * Heifers (`heiferII`)
     * `num_heiferII_in_ed_period`
     * `ai_num_h`
@@ -2429,7 +2426,7 @@ Overall reporting for reproductive measures can be summarized and split into sch
     * `avg_breeding_to_preg_time`
     * `avg_calving_interval`
 
-* *Individual Animal-Level* is reported in the `AnimalModuleReporter.` via `_record_animal_events`
+* **Individual Animal-Level** is reported in the `AnimalModuleReporter.` via `_record_animal_events`
 
 #### Methodology
 
@@ -2751,7 +2748,7 @@ reduction values are used.
 **User Inputs and Constants**
 
 * `Milk_reduction_maximum`: Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements 
-* **Tolerance:** Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently 
+* Tolerance: Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently 
 has no effect due to no implementation of automatic ration optimizer. 
 * `Milk_reduction_kg` is set to 0.25 kg: Milk reduction amount for each failed ration attempt, kg. 
 * `Minimum_avg_pen_milk` is set to 15 kg: Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal
@@ -2928,21 +2925,21 @@ $$
 ::: {#eq-an-mlk-5}
 [[**AN.MLK.5**]]{.aside .content-visible when-format="html"}
 $$
-M305_{Herd} = (M305_{P1} \times P1\%) + (M305_{\text{P2}} \times P2\%) + (M305_{P3} times P3^+\%)
+\text{M}305_\text{Herd} = (\text{M}305_\text{P1} \times \text{P1\%}) + (\text{M}305_{\text{P2}} \times \text{P2\%}) + (\text{M}305_\text{P3} \times \text{P}3^+\%)
 $$
 :::
 
 ::: {#eq-an-mlk-6}
 [[**AN.MLK.6**]]{.aside .content-visible when-format="html"}
 $$
-M305_{P2} = M305_{P1} \times 118\%
+\text{M305}_\text{P2} = \text{M305}_\text{P1} \times 118\%
 $$
 :::
 
 ::: {#eq-an-mlk-7}
 [[**AN.MLK.7**]]{.aside .content-visible when-format="html"}
 $$
-M305_{P3^+} = M305_{P1} \times 125\%
+\text{M305}_{\text{P}3^+} = \text{M305}_\text{P1} \times 125\%
 $$
 :::
 
@@ -2975,20 +2972,21 @@ are generated in RuFaS. Please see the Milk Production section for more details 
 
 [See [AN.MLK-9](#eq-an-mlk-9)]{.aside .content-visible when-format="html"}
 $$
-Y_t = l * t^{m} * e^{-nt}
+\text{Y}_\text{t} = \text{l} \times \text{t}^\text{m} \times e^{\text{-nt}}
 $$
         
-Where:
-* Y(t): Daily milk yield
-* t: Time in days
-* l, m, n: Parameters adjusted for farm-specific conditions
+*Where*:
+
+* Y$_t$ = daily milk yield
+* t = time in days
+* l, m, n = parameters adjusted for farm-specific conditions
 
 **305-Day Milk Yield**
 
 ::: {#eq-an-mlk-10}
 [[**AN.MLK.10**]]{.aside .content-visible when-format="html"}
 $$
-\int_{l}^{305} lt^me^{-nt}dt
+\int_\text{l}^{305} \text{lt}^\text{m}e^\text{-nt}\text{dt}
 $$
 :::
 
@@ -3048,15 +3046,15 @@ Acute-sale and mortality probabilities are separate. A cow will likely have diff
 
 Cow mortality represents removal of a cow from the herd because of death. The whole-herd annual death risk is the user-defined `annual_death_prob`. This risk is distributed across parity groups using `parity_death_dist` and then converted to a daily, fresh-adjusted risk. A cow selected for mortality is recorded as a death, assigned the cull reason `culled for death`, and removed from the herd.
 
-Each cow is assigned to one of three parity groups: 1st lactation, 2nd lactation, or 3rd and later lactations. The fraction of the cow herd in each parity group is recalculated daily from the current cow population. The annual risk for a cow in parity group $p$ is calculated by spreading the expected events from that group over the cows currently in that group:
+Each cow is assigned to one of three parity groups: 1st lactation, 2nd lactation, or 3rd and later lactations. The fraction of the cow herd in each parity group is recalculated daily from the current cow population. The annual risk for a cow in parity group p is calculated by spreading the expected events from that group over the cows currently in that group:
 
 :::{#eq-an-cul-2}
 $$
-\text{annual\_risk}_p = \frac{\text{herd\_annual\_risk} \times \text{event\_fraction}_p}{\text{parity\_group\_fraction}_p}
+\text{annual\_risk}_\text{p} = \frac{\text{herd\_annual\_risk} \times \text{event\_fraction}_\text{p}}{\text{parity\_group\_fraction}_\text{p}}
 $$
 :::
 
-Where `herd_annual_risk` is `annual_death_prob` for mortality or the result of for acute sales, `event_fraction` is the corresponding entry of `parity_death_dist` or `parity_sale_dist`, and `parity_group_fraction` is the fraction of the current cow herd in parity group $p$. If no cows are currently in a parity group, the annual risk for that group is set to 0.
+Where `herd_annual_risk` is `annual_death_prob` for mortality or the result of for acute sales, `event_fraction` is the corresponding entry of `parity_death_dist` or `parity_sale_dist`, and `parity_group_fraction` is the fraction of the current cow herd in parity group p. If no cows are currently in a parity group, the annual risk for that group is set to 0.
 
 The annual risk for the cow's parity group is first converted to an average daily risk:
 
@@ -3294,7 +3292,7 @@ Cross-validation rules applied when inputs are read require that: `ranking_metho
 
 #### Outputs
 
-When genetics simulation is on, the animal module reports the variables in @tbl-an-gen-outputs. All breeding values, environmental effects and phenotypes are in kilograms; the ranking index is unitless.
+When genetics simulation is on, the animal module reports the variables in @tbl-an-gen-outputs. All breeding values, environmental effects and phenotypes are in kilograms; the ranking index is unitless. The eleven genetic values of each animal are summarized in @tbl-an-gen-state.
 
 ```{python}
 #| label: tbl-an-gen-outputs
@@ -3341,7 +3339,6 @@ $$
 \sigma^2_\text{P} = \sigma^2_\text{TBV} + \sigma^2_\text{PE} + \sigma^2_\text{TE}
 $$
 :::
-
 
 Heritability (h$^2$) is the share of phenotypic variance that is additive genetic, and repeatability (R) is the share that is permanent to the animal, whether genetic or environmental:
 
@@ -3422,7 +3419,7 @@ import_table(
 
 **Variance Parameters and Their Defaults**
 
-Each of the three random effects is described by a variance for fat, a variance for protein and a correlation between the two traits. The nine parameters are user inputs with national Holstein defaults 
+Each of the three random effects is described by a variance for fat, a variance for protein, and a correlation between the two traits. The nine parameters are user inputs with national Holstein defaults. 
 
 ```{python}
 #| label: tbl-an-gen-variance
@@ -3432,15 +3429,16 @@ import_table(
   colalign = ["left", "center", "center", "center", "left"]
 )
 ```
-(1) @benzaabza2016
-(2) @alseaf2007
-(3) @aip2025
+1. @benzaabza2016
+2. @alseaf2007
+3. @aip2025
 
 *Derivation of the default variances*
 
 The defaults are derived from three published quantities for United States Holsteins.
+
 * **Standard deviation of true transmitting ability (TTA)**: 26.45 lb for fat and 18.49 lb for protein (@aip2025 table of TTA standard deviations used for NM$ 2025).
-* **Heritability**: h2 = 0.20 for both fat and protein yield (USDA-ARS AIP, 2025).
+* **Heritability**: h$^2$ = 0.20 for both fat and protein yield [@aip2025].
 * **Repeatability**: R = 0.50 for both traits, in line with animal-model estimates for Holstein yield traits [@suzuki1994; @vantassell1999].
 
 *Step 1: genetic variance.* A transmitting ability is half of a breeding value, because a parent passes half of its genes to its offspring. The standard deviation of the TBV is therefore twice that of the TTA. Converting pounds to kilograms (1 kg = 2.20462 lb):
@@ -3478,13 +3476,13 @@ import_table(
   colalign = ["center", "left", "center", "center", "left"]
 )
 ```
-Results are computed from unrounded intermediate values. By construction, 20% of phenotypic variance is additive genetic, 30% is permanent environment and 50% is temporary environment for both traits
+Results are computed from unrounded intermediate values. The resulting share follow directly from the heritability and repeatability values above: 20% of phenotypic variance is additive genetic (h$^2$), 30% is permanent environment (R - h$^2$), and 50% is temporary environment (1 - R) for both traits.
 
-![Default partition of the phenotypic variance of fat and protein yield into additive genetic, permanent-environment, and temporary-environment components](../resources/images/ani-gen-pheno-var.png){#fig-ani-gen-pheno}
+![Default partition of the phenotypic variance of fat and protein yield into additive genetic, permanent-environment, and temporary-environment components.](../resources/images/ani-gen-pheno-var.png){#fig-ani-gen-pheno}
 
 **True Breeding Values**
 
-Throughout this section, BVN (m1, m2; v1, v2; $\rho$) denotes a bivariate normal distribution with means m1 and m2, variances v1 and v2 and correlation $\rho$.
+Throughout this section, BVN (m$_1$, m$_2$; v$_1$, v$_2$; $\rho$) denotes a bivariate normal distribution with means m$_1$ and m$_2$, variances v$_1$ and v$_2$ and correlation $\rho$.
 
 *Animals without a simulated dam*
 
@@ -3528,7 +3526,7 @@ $$
 $$
 :::
 
-With the default parameters the Mendelian sampling standard deviations are √(575.8/2) = 16.97 kg for fat and √(281.4/2) = 11.86 kg for protein. If the birth month lies outside the semen data range, the nearest available month is used and a warning is written once per simulation.
+with the default parameters the Mendelian sampling standard deviations are √(575.8/2) = 16.97 kg for fat and √(281.4/2) = 11.86 kg for protein. If the birth month lies outside the semen data range, the nearest available month is used and a warning is written once per simulation.
 
 **Environmental Effects**
 
@@ -3554,7 +3552,7 @@ Successive TE draws for the same animal are independent of one another and of th
 
 **Phenotype**
 
-The phenotype of animal i for trait t is obtained from Equation 1, with the population mean taken as the national Holstein average for the animal's birth year y$_\text{i}$:
+The phenotype of animal i for trait t is obtained [AN.GEN.1](#eq-an-gen-1), with the population mean taken as the national Holstein average for the animal's birth year y$_\text{i}$:
 
 ::: {#eq-an-gen-17}
 [[**AN.GEN.17**]]{.aside .content-visible when-format="html"}
@@ -3563,15 +3561,13 @@ $$
 $$
 :::
 
-The means μ$_\text{t}$(y) are read from the national mean phenotype table [@cdcb_nd_a]. For birth years outside the table the nearest available year is used and a warning is written once. The phenotype is recomputed whenever TE is redrawn, that is, at every calving.
-
-The phenotype is an annual, per-lactation quantity in kilograms. It is computed for all animal classes, including calves and heifers, for which it should be read as the expected future performance given the effects drawn so far rather than as an observed record. As noted previously, it is not yet linked to daily milk composition.
+where μ$_\text{t}$(y) is the national mean yield of Holstein cows born in the animal's birth year, taken from the CDCB genetic trend [@cdcb_nd_a] and converted from pounds to kilograms; for birth years outside the table, the nearest available year is used and a warning is written once. As in U.S. genetic evaluations, the phenotype is a 305-day lactation yield, adjusted to twice-daily milking and to a 36-month-old, second-parity cow [@cdcb_2020]. It is recomputed at every calving, when TE is redrawn, and is computed for all animals; for calves and heifers it represents expected future performance rather than an observed record. It is not yet linked to daily milk composition.
 
 **Estimated Breeding Values**
 
 *Formulation*
 
-The EBV of animal i is generated from its TBV, the mean TBV of its group g, and the reliability RELs assigned to the animal's life stage s. The true deviation of the animal from its group mean is first shrunk by the reliability:
+The EBV of animal i is generated from its TBV, the mean TBV of its group g, and the reliability REL$_\text{S}$ assigned to the animal's life stage s. The true deviation of the animal from its group mean is first shrunk by the reliability:
 
 ::: {#eq-an-gen-18}
 [[**AN.GEN.18**]]{.aside .content-visible when-format="html"}
@@ -3580,7 +3576,7 @@ $$
 $$
 :::
 
-where m$_\text{g,t}$ is the mean TBV of the group of animals to which the animal belongs when the estimate is made. It plays the role of the population mean towards which an estimate is pulled when information is incomplete. A normally distributed estimation error is then added:
+where m$_\text{g,t}$ is the mean TBV of the group of animals to which the animal belongs when the estimate is made. In RuFaS, g is the calf group when the EBV is first estimated at birth (the estimate is kept through the heifer stages until first calving), and the cow group (all parities combined) when it is re-estimated at calving. It plays the role of the population mean towards which an estimate is pulled when information is incomplete. A normally distributed estimation error is then added:
 
 ::: {#eq-an-gen-19}
 [[**AN.GEN.19**]]{.aside .content-visible when-format="html"}
@@ -3590,11 +3586,12 @@ $$
 :::
 
 The errors for fat and protein are drawn independently, so the two EBVs of an animal are correlated only through the correlation of its TBVs.
+
 The deviation is taken from the group mean and not from zero, because selection moves the herd mean away from zero over time and shrinking towards zero would then bias every EBV downwards.
 
 *Statistical properties*
 
-[AN.GEN.18](#an-gen-18) and [AN.GEN.19](#an-gen-19) follow from two requirements: that EBV and TBV are bivariate normal, and that the EBV behaves as an unbiased prediction with reliability REL ([AN.GEN.6](#an-gen-6) and [AN.GEN.7](#an-gen-7)). Writing σ2 for the national (base-population) TBV variance, the same population to which the reliabilities in Table 4 refer. The variance of the EBVs is
+[AN.GEN.18](#an-gen-18) and [AN.GEN.19](#an-gen-19) follow from two requirements: that EBV and TBV are bivariate normal, and that the EBV behaves as an unbiased prediction with reliability REL ([AN.GEN.6](#an-gen-6) and [AN.GEN.7](#an-gen-7)). Writing $\sigma^2% for the national (base-population) TBV variance, the same population to which the reliabilities in @tbl-an-gen-ebv refer. The variance of the EBVs is
 
 ::: {#eq-an-gen-20}
 [[**AN.GEN.20**]]{.aside .content-visible when-format="html"}
@@ -3640,7 +3637,7 @@ $$
 $$
 :::
 
-The default weights are wF = 0.318 and wP = 0.13, the relative emphasis placed on fat and protein in the 2025 revision of NM$ [@vanraden2025]. Because only the ratio of the weights affects the ranking, these are equivalent to 71% and 29%. Users can supply their own weights between 0 and 1. The index is recomputed every time the EBVs change and is reported as unitless. It is a ranking device only; it is not a monetary NM$ value.
+The default weights are w$_F$ = 0.318 and w$_P$ = 0.13, the relative emphasis placed on fat and protein in the 2025 revision of NM$ [@vanraden2025]. Because only the ratio of the weights affects the ranking, these are equivalent to 71% and 29%. Users can supply their own weights between 0 and 1. The index is recomputed every time the EBVs change and is reported as unitless. It is a ranking device only; it is not a monetary NM$ value.
 
 **Schedule of Updates Over an Animal's Life**
 
@@ -3648,32 +3645,28 @@ The default weights are wF = 0.318 and wP = 0.13, the relative emphasis placed o
 
 ![Life-cycle schedule of the genetic state variables. An animal that enters the simulation as a cow in the starting herd receives her first EBV at the reliability of her current parity. The “4th+ calving” column applies at every calving from the fourth onward.](../resources/images/ani-gen-life-cycle.png){#fig-ani-gen-life-cycle}
 
-*Worked Example*
-
-A cow with TBV<sub>F</sub> of +10.0 kg and TBV<sub>P</sub> of +5.0 kg calves in January 2025, when the top-listing semen values are +119.6 kg (fat) and +61.8 kg (protein).
-
-* The calf's expected TBVs are (119.6 + 10.0)/2 = 64.8 kg and (61.8 + 5.0)/2 = 33.4 kg, and her actual TBVs are drawn around these with standard deviations of 16.97 and 11.86 kg and a correlation of 0.59. 
-* Suppose the draw returns exactly the expected values and the calves in the herd average +50.0 kg for fat. Her fat EBV then has expectation 50.0 + 0.75 × (64.8 − 50.0) = 61.1 kg and an error standard deviation of √(0.75 × 0.25 × 575.8) = 10.39 kg. 
-* With a protein EBV of, say, 31.0 kg, her ranking index is 0.318 × 61.1 + 0.13 × 31.0 = 23.5.
+*Worked Examples*
 
 A cow with TBV<sub>F</sub> of +10.0 kg and TBV<sub>P</sub> of +5.0 kg calves in January 2020, when the top-listing semen values are +77.9 kg (fat) and +35.5 kg (protein). 
 
-* The calf’s expected TBVs are (77.9 + 10.0)/2 = 43.95 kg and (35.5 + 5.0)/2 = 20.25 kg, and her actual TBVs are drawn around these with standard deviations of 16.97 and 11.86 kg and a correlation of 0.59. 
-* Suppose the draw returns exactly the expected values, and the calves in the herd average +30.0 kg for fat and +15.0 kg for protein. Her EBVs then have expectations 
+The calf’s expected TBVs are (77.9 + 10.0)/2 = 43.95 kg and (35.5 + 5.0)/2 = 20.25 kg, and her actual TBVs are drawn around these with standard deviations of 16.97 and 11.86 kg and a correlation of 0.59. 
+
+* Suppose the draw returns exactly the expected values, and the calves in the herd average +30.0 kg for fat and +15.0 kg for protein. Her EBVs then have expectations: 
   * EBV<sub>F</sub> = 30.0 + 0.75 × (43.95 − 30.0) = 40.5 kg, error standard deviation = √(0.75 × 0.25 × 575.8) = 10.39 kg
   * EBV<sub>P</sub> = 15.0 + 0.75 × (20.25 − 15.0) = 18.9 kg, error standard deviation = √(0.75 × 0.25 × 281.4) = 7.26 kg
   * In the simulation, an estimation error is added to each EBV, drawn independently for the two traits. 
+
 * Suppose the draws are ε<sub>F</sub> = +5.2 kg (about half an error standard deviation above zero) and ε<sub>P</sub>= −3.6 kg (about half an error standard deviation below zero). Then,
   * EBV<sub>F</sub> = 40.5 + 5.2 = 45.7 kg
   * EBV<sub>P</sub>  = 18.9 − 3.6 = 15.3 kg
-  * Her ranking index is 0.318 × 45.7 + 0.13 × 15.3 = 16.5. 
+  * Her ranking index is 0.318 × 45.7 + 0.13 × 15.3 = 16.5
   * In this draw her fat merit is overestimated by 5.2 kg and her protein merit is underestimated by 3.6 kg relative to their expected values, and her index is 1.2 higher than it would be without estimation error.
 
 ##### Use Case Example: Genetics-informed Semen Allocation
 
-The ranking index becomes a management tool once a decision depends on it. The first such application in RuFaS is the choice of semen type at insemination. It reproduces a strategy now common on commercial dairies: sexed dairy semen on the genetically best animals to produce replacement heifers, beef semen on the poorest to produce higher-value crossbred calves, and conventional dairy semen in between.
+The ranking index becomes a management tool once a decision depends on it. The first such application in RuFaS is the choice of semen type at insemination. It reproduces a strategy now common on commercial dairies: use sexed dairy semen for the genetically best animals to produce replacement heifers, beef semen for the poorest to produce higher-value crossbred calves, and conventional dairy semen in between.
 
-The application is active when three settings are combined: `simulate_genetics` is true, `selective_repro_strategy` is true and `ranking_method` is "genetic". With any other combination, every insemination uses one generic semen type and calf sex follows the user's overall male-calf rate.
+The application is active when three settings are combined: `simulate_genetics` is true, `selective_repro_strategy` is true and `ranking_method` is "genetic". With any other combination, every insemination uses one generic semen type and calf sex follows the user's overall male-calf rate. These configurations are in the `animal.json` file.
 
 **Ranking and Percentile**
 
@@ -3690,7 +3683,7 @@ so that q = 1 for the best-ranked animal.
 
 **Allocation Rule**
 
-Let s, c and b be the user-specified proportions of sexed dairy, conventional dairy and beef semen for the animal's class, with s + c + b = 1. The semen type is assigned from the top of the ranking downwards (@tbl-an-gen-semen-rule, @fig-ani-gen-semen-alloc)
+Let s, c and b be the user-specified proportions of sexed dairy, conventional dairy and beef semen for the animal's class, with s + c + b = 1. The semen type is assigned from the top of the ranking downwards (@tbl-an-gen-semen-rule, @fig-ani-gen-semen-alloc).
 
 ```{python}
 #| label: tbl-an-gen-semen-rule
@@ -3705,7 +3698,7 @@ import_table(
 
 **Effect of Semen Type**
 
-The semen type then affects conception, calf sex and the fate of the calf (@tbl-an-gen-semen-type). The sex of the embryo is determined at conception. If conception fails, the semen type is cleared and a new allocation is made at the next insemination.
+The semen type then affects conception, calf sex and the fate of the calf (@tbl-an-gen-semen-type). The sex of the embryo is determined at conception. If conception fails, the semen type is cleared and a new allocation is made at the next insemination. The semen allocation closes the genetic loop. High-index dams contribute most of the retained heifer calves, each of which inherits half of her dam's TBV [AN.GEN.12](#eq-an-gen-12), so the mean TBV of home-raised replacements depends on the allocation proportions chosen.
 
 ```{python}
 #| label: tbl-an-gen-semen-type
@@ -3715,8 +3708,8 @@ import_table(
   colalign = ["center", "center", "center", "center"]
 )
 ```
-
-The semen allocation closes the genetic loop. High-index dams contribute most of the retained heifer calves, each of which inherits half of her dam's TBV [AN.GEN.12](#an-gen-12), so the mean TBV of home-raised replacements depends on the allocation proportions chosen.
+$^1$ The sexed-semen conception multiplier (0.85) is a representative value within the range reported in the literature: 0.70–0.83 for early U.S. field data [@norman2010], 0.77 across trials published from 1999 to 2021 and 0.81 for trials after 2015 [@reese2021], and 0.80–0.93 in recent field studies [@butler2026].
+$^2$ The probability of a male calf with sexed semen (0.10) reflects the ~90% female calves reported for sexed semen ([@norman2010; @butler2026]).
 
 **Example Comparison**
 
@@ -3751,8 +3744,8 @@ growing heifers, lactating cows, and dry cows. It calculates the quantities of t
 manure. The implementation is designed for flexibility, enabling integration with other RuFaS modules for modeling 
 farm management scenarios. This module includes:
 
-* *Classes:* `ManureExcretionCalculator`
-* *Key Methods:*
+* **Classes:** `ManureExcretionCalculator`
+* **Key Methods:**
   * `calculate_calf_manure`
   * `calculate_heifer_manure`
   * `calculate_cow_manure`
@@ -3828,7 +3821,7 @@ import_table(
 
 ### Methodology
 
-#### Calf Manure Excretion (`calculate_calf_manure`)
+#### Calf Manure Excretion `calculate_calf_manure`
 
 **Manure excretions**
 
@@ -3915,7 +3908,7 @@ $$
 $$
 :::
 
-#### Heifer Manure Excretion (`calculate_heifer_manure`)
+#### Heifer Manure Excretion `calculate_heifer_manure`
 
 **Manure excretions**
 
@@ -4030,7 +4023,7 @@ $$
 $$
 :::
 
-#### Lactating Cow Manure Excretion (`_calculate_lactating_cow_manure`)
+#### Lactating Cow Manure Excretion `_calculate_lactating_cow_manure`
 
 **Manure excretions**
 
@@ -4047,9 +4040,7 @@ $$
 $$
 :::
 
-*Total solids/Fecal dry matter (kg/d)*
-
-Calculate the amount of fecal dry matter excreted (kg/d). Fecal dry matter is assumed to be equivalent to total solids:
+Total solids/Fecal dry matter (kg/d): Calculate the amount of fecal dry matter excreted (kg/d). Fecal dry matter is assumed to be equivalent to total solids:
 
 ::: {#eq-an-exc-19}
 [[**AN.EXC.19**]]{.aside .content-visible when-format="html"}
@@ -4168,7 +4159,7 @@ $$
 $$
 :::
 
-#### Dry Cow Manure Excretion (`_calculate_dry_cow_manure`)
+#### Dry Cow Manure Excretion `_calculate_dry_cow_manure`
 
 **Manure excretions**
 
@@ -4248,14 +4239,14 @@ $$
 $$
 :::
 
-#### Manure Phosporus Excretion (`_calculate_phosphorus_excretion_manure`)
+#### Manure Phosporus Excretion `_calculate_phosphorus_excretion_manure`
 
 Total phosphorus fraction of feces:
 
 ::: {#eq-an-exc-30}
 [[**AN.EXC.30**]]{.aside .content-visible when-format="html"}
 $$
-\text{manure\_phosphorus\_fraction} = \frac{\text{fecal\_phosphorus} + \text{urine\_phosphorus\_required}}{\text{total\_manure\_excreted} \times 1000 g/kg}
+\text{manure\_phosphorus\_fraction} = \frac{\text{fecal\_phosphorus} + \text{urine\_phosphorus\_required}}{\text{total\_manure\_excreted} \times 1000 \text{g/kg}}
 $$
 :::
 
@@ -4328,8 +4319,8 @@ calves [@IPCC2006]. The equation from @Mills2003 is also available for dry and l
 
 <br> Simulation of enteric methane mitigation via mitigation supplements 3-NOP or monensin are also available for lactating cows The module integrates with the `DigestiveSystem` class and supports methane mitigation strategies using feed additives.
 
-* *Classes:* `EntericMethaneCalculator`
-* *Key Methods:*
+* **Classes:** `EntericMethaneCalculator`
+* **Key Methods:**
    * `calculate_calf_manure`
    * `calculate_heifer_manure`
    * `calculate_cow_methane` (lactating and dry cow methods are called within this method)
@@ -4416,7 +4407,7 @@ $$
 $$
 :::
 
-#### Calf Methane Emissions (`calculate_calf_methane`)
+#### Calf Methane Emissions `calculate_calf_methane`
 
 Methance emissions are calculated using body weight. The selected methane model for other animal categories does not 
 apply here. [@Pattanaik2003] reported no difference in calf methane production in crossbred calves. Methane emissions 
@@ -4429,7 +4420,7 @@ $$
 $$
 :::
 
-#### Heifer Methane Emissions (`calculate_heifer_methane`)
+#### Heifer Methane Emissions `calculate_heifer_methane`
 
 ::: {#eq-an-met-5}
 [[**AN.MET.5**]]{.aside .content-visible when-format="html"}
@@ -4438,7 +4429,7 @@ $$
 $$
 :::
 
-#### Lactating Cow Methane Emissions (`calculate_cow_methane`)
+#### Lactating Cow Methane Emissions `calculate_cow_methane`
 
 For lactating cows, the Mutian, Mills, or IPCC model is applied
 
@@ -4488,7 +4479,7 @@ $$
 $$
 :::
 
-#### Dry Cow Methane Emissions (`_calculate_dry_cow_manure`)
+#### Dry Cow Methane Emissions `_calculate_dry_cow_manure`
 
 **Mills Model** <br>
 This is previously described in the [lactating cow section](#sec-an-mills-model) but is also applied to dry cows here.
@@ -4592,7 +4583,7 @@ $$
 
 If no valid mitigation method is selected, the reduction defaults to 0%.
 
-**Adjust the Initial Predicted Enteric Methane (`EntericMethaneCalculator.calculate_cow_methane`)** 
+**Adjust the Initial Predicted Enteric Methane** `EntericMethaneCalculator.calculate_cow_methane`
 
 First, the initially predicted methane yield of the basal diet is calculated
 

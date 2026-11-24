@@ -1,0 +1,20 @@
+# Highlighted Updates {.unnumbered}
+
+<!-- reuse code to import functions from "../scripts/": -->
+{{< include ../scripts/_import-from-scripts.qmd >}}
+
+## v1.2.0
+
+In v1.2.0 the scientific documents were transfered into a new format (Quarto) and the following changes were made:
+
+* **Animal module**:
+    * Addition of herd dynamics section
+    * Addition of genetics submodule section
+    * Update of ration formulation section
+* **Manure module**:
+    * Connections sections were removed to create a new Connections chapter
+    * Corrections to MN.MET.6 and the methane yield unit and citation in the anaerobic digestion section
+* **New chapters**:
+    * Connections - covering the animal-manure and manure-soil and crop module connections
+    * Emissions - covering home grown and purchased feed emissions
+    * Highlighted updates - high level overview of changes made in each version update

@@ -1,12 +1,12 @@
 ﻿Input,Location in the animal input,Description,Default
-simulate_genetics,herd_information,"Master switch. When false, no genetic values are created, tracked or reported",FALSE
+simulate_genetics,herd_information,"Master switch. When false, no genetic values are created, tracked or reported",false
 "tbv_fat_variance, tbv_protein_variance",genetics,"TBV variances, kg$^2$ (≥ 0)","575.8, 281.4"
 tbv_correlation,genetics,Genetic correlation between fat and protein (−1 to 1),0.59
 "permanent_environment_fat_variance, ..._protein_variance",genetics,"PE variances, kg$^2$ (≥ 0)","863.6, 422.0"
 permanent_environment_correlation,genetics,PE correlation between fat and protein,0.95
 "temporary_environment_fat_variance, ..._protein_variance",genetics,"TE variances, kg$^2$ (≥ 0)","1,439.4, 703.4"
 temporary_environment_correlation,genetics,TE correlation between fat and protein,0.78
-selective_repro_strategy,animal_config.farm_level.repro,Turns on semen allocation by ranking,FALSE
+selective_repro_strategy,animal_config.farm_level.repro,Turns on semen allocation by ranking,false
 ranking_method,animal_config.farm_level.repro,"Ranking criterion. Set to ""genetic"" to rank animals by genetic merit, measured by the ranking index",null
 genetic_selection_index_weights,animal_config.farm_level.repro,Index weights w$_\text{F}$ and w$_\text{P}$ (0 to 1),"fat 0.318, protein 0.13"
 semen_allocation_proportions,...repro.heifers,Proportions for Heifer II,"sexed 0.5, conventional 0.5, beef 0.0"

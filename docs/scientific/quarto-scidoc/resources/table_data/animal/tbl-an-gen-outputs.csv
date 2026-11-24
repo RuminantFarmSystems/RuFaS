@@ -1,5 +1,5 @@
 ﻿Output variable,Frequency,Content
-"herd_average_genetics, calves_average_genetics, heiferI_average_genetics, heiferII_average_genetics, heiferIII_average_genetics, cow_average_genetics",Daily,Arithmetic mean of each of the eleven genetic values over the animals in the group. Reported as empty when the group has no animals
-Genetic columns in the milk report,Whenever the milk report is written,"The eleven genetic values of each cow alongside her milk, fat and protein outputs, parity and days in milk"
+"herd_average_genetics, calves_average_genetics, heiferI_average_genetics, heiferII_average_genetics, heiferIII_average_genetics, cow_average_genetics",Daily,Arithmetic means of each of the eleven genetic values over the animals in the group. Reported as empty when the group has no animals
+Genetic columns in the milk report (AnimalModuleReporter.report_milk.*),Whenever the milk report is written,"The eleven genetic values of each cow alongside her milk, fat and protein outputs, parity and days in milk"
 animals_genetic_history,End of simulation,"For every animal in the herd, the full sequence of genetic records"
-"genetic_history in sold, culled and dead animal records",At removal,Genetic records of the animal up to the day it left the herd
+"genetic_history in sold, culled, and dead animal records",At removal,Genetic records of the animal up to the day it left the herd
