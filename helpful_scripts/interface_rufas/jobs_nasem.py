@@ -1,5 +1,6 @@
-"""Local cancellable queue for the isolated NASEM engine."""
+"""Local cancellable queue for the native RuFaS worker (NRC and NASEM)."""
 import json
+import sys
 from pathlib import Path
 import subprocess
 import tempfile
@@ -50,9 +51,9 @@ def run(key,scenario):
     with SLOTS:
         with LOCK:
             if JOBS[key]['estado']=='cancelado':return
-            JOBS[key].update(estado='executando',progresso='Iniciando NASEM…',atualizado=time.time())
-        runtime=ROOT/'helpful_scripts/interface_rufas/.venv_nasem/bin/python'
-        worker=ROOT/'helpful_scripts/interface_rufas/worker_nasem.py'
+            JOBS[key].update(estado='executando',progresso='Iniciando motor nativo RuFaS…',atualizado=time.time())
+        runtime=sys.executable
+        worker=ROOT/'helpful_scripts/interface_rufas/worker_rufas.py'
         proc=None;timer=None;timed_out=threading.Event()
         try:
             with tempfile.TemporaryFile(mode='w+t') as errors:
@@ -82,7 +83,7 @@ def run(key,scenario):
                     result={'sucesso':False,'status':'limite_tempo' if timed_out.is_set() else 'falha_motor','mensagem':'Tempo máximo de 10 minutos atingido. Reduza o horizonte/intervalos.' if timed_out.is_set() else 'O motor foi interrompido. Confira o diagnóstico técnico.','detalhe_tecnico':detail}
             # Preserve failed diagnostics as well as validated plans, locally.
             folder=ROOT/'output/estudo_dieta';folder.mkdir(parents=True,exist_ok=True)
-            target=folder/f'nasem_{key}.json'
+            target=folder/f'rufas_{key}.json'
             target.write_text(json.dumps({'cenario':scenario,**result},ensure_ascii=False,indent=2,allow_nan=False))
             result['arquivo']=str(target)
             with LOCK:
