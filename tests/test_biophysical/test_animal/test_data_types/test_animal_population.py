@@ -407,6 +407,56 @@ def test_repr(
     "num_calf, num_heiferI, num_heiferII, num_heiferIII, num_cow, num_replacement",
     [(1, 1, 1, 1, 1, 1), (0, 0, 0, 0, 0, 0), (8, 44, 38, 5, 100, 500)],
 )
+def test_to_dict(
+    num_calf: int,
+    num_heiferI: int,
+    num_heiferII: int,
+    num_heiferIII: int,
+    num_cow: int,
+    num_replacement: int,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for to_dict()"""
+    AnimalPopulation.set_current_max_animal_id(0)
+
+    (
+        calves,
+        heiferIs,
+        heiferIIs,
+        heiferIIIs,
+        cows,
+        replacement,
+    ) = mock_herd(num_calf, num_heiferI, num_heiferII, num_heiferIII, num_cow, num_replacement, mocker)
+
+    animal_population = AnimalPopulation(
+        calves=calves, heiferIs=heiferIs, heiferIIs=heiferIIs, heiferIIIs=heiferIIIs, cows=cows, replacement=replacement
+    )
+
+    for cow in cows:
+        cow.calves = 1
+        cow.days_in_milk = 1
+        setattr(cow, "is_milking", True)
+    expected = {
+        "calves": [{"dummy": "animal"}] * num_calf,
+        "heiferIs": [{"dummy": "animal"}] * num_heiferI,
+        "heiferIIs": [{"dummy": "animal"}] * num_heiferII,
+        "heiferIIIs": [{"dummy": "animal"}] * num_heiferIII,
+        "cows": [{"dummy": "animal"}] * num_cow,
+        "replacement": [{"dummy": "animal"}] * num_replacement,
+    }
+
+    actual = animal_population.to_dict()
+
+    assert actual == expected
+    assert not any(key.startswith("cows_parity_") for key in actual)
+
+    AnimalPopulation.set_current_max_animal_id(0)
+
+
+@pytest.mark.parametrize(
+    "num_calf, num_heiferI, num_heiferII, num_heiferIII, num_cow, num_replacement",
+    [(1, 1, 1, 1, 1, 1), (0, 0, 0, 0, 0, 0), (8, 44, 38, 5, 100, 500)],
+)
 def test_post_init(
     num_calf: int,
     num_heiferI: int,
