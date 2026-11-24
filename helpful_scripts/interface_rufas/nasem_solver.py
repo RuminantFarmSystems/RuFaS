@@ -1,4 +1,4 @@
-"""NASEM 2021 via nasem_dairy 1.0.2; nonlinear milk-production planning.
+"""NASEM 2021 via nasem_dairy 1.0.2; nonlinear least-cost feeding for a specified milk target.
 
 The original RuFaS engine and inputs are not modified. Model scope: a homogeneous
 lactating cohort, fixed BW/BCS, no reserve mobilization, reoptimized time blocks.
@@ -15,10 +15,14 @@ import warnings
 import nasem_dairy as nd
 import numpy as np
 import pandas as pd
-from scipy.optimize import minimize
+from scipy.optimize import minimize, linprog, least_squares
 
 ROOT = Path(__file__).resolve().parents[2]
 VERSION = 'nasem_dairy ' + nd.__version__
+MAX_PERIOD_SECONDS = 120
+
+class SearchTimeout(RuntimeError):
+    pass
 
 
 def library():
@@ -42,13 +46,13 @@ def library():
 
 
 def validate(s):
-    defaults = dict(peso_vivo=680, leite_kg=45, gordura_pct=3.5, proteina_pct=3,
+    defaults = dict(peso_vivo=680, leite_kg=40, gordura_pct=3.5, proteina_pct=3,
                     lactose_pct=4.8, del_dias=90, preco_leite_kg=2.75, teto_caroco=2.53,
                     dias_simulacao=30, intervalo_dieta=30, vacas_lactacao=100,
                     tamanho_rebanho=100, paridade=2, escore_corporal=3,
                     peso_adulto=700, dias_gestacao=0, temperatura=22, idade_dias=1100,
-                    orcamento_dia=45, pico_del=60, declinio_curva=.2,
-                    objetivo='producao', precos_custom={}, alimentos_bloqueados=[], estoques={},
+                    orcamento_dia=None,
+                    objetivo='custo', precos_custom={}, alimentos_bloqueados=[], estoques={},
                     premix_composicao={}, data_inicio='2026-11-23')
     unknown = set(s)-set(defaults)
     if unknown:
@@ -59,7 +63,7 @@ def validate(s):
                   lactose_pct=(3,6),del_dias=(1,304),preco_leite_kg=(0,30),dias_simulacao=(1,304),
                   intervalo_dieta=(1,30),vacas_lactacao=(1,100000),tamanho_rebanho=(1,100000),
                   paridade=(1,10),escore_corporal=(1,5),peso_adulto=(300,1000),dias_gestacao=(0,220),
-                  temperatura=(-10,40),idade_dias=(500,6000),orcamento_dia=(1,1000),pico_del=(20,100),declinio_curva=(.05,.5))
+                  temperatura=(-10,40),idade_dias=(500,6000))
     integers={'dias_simulacao','intervalo_dieta','vacas_lactacao','tamanho_rebanho','paridade','del_dias','dias_gestacao'}
     for key,(lo,hi) in limits.items():
         v=float(c[key])
@@ -74,8 +78,12 @@ def validate(s):
         raise ValueError('Máximo de 31 períodos por cenário. Aumente o intervalo de reformulação.')
     if c['dias_gestacao'] and c['dias_gestacao']+c['dias_simulacao']>250:
         raise ValueError('O horizonte alcança o período seco: use um cenário específico para vacas secas.')
-    if c['objetivo'] not in ('producao','margem'):
-        raise ValueError('Objetivo inválido.')
+    if c['objetivo'] != 'custo':
+        raise ValueError('O objetivo deste estudo é custo mínimo para produção informada.')
+    if c['orcamento_dia'] is not None:
+        c['orcamento_dia']=float(c['orcamento_dia'])
+        if not math.isfinite(c['orcamento_dia']) or c['orcamento_dia']<=0:
+            raise ValueError('Orçamento opcional deve ser positivo.')
     if c['teto_caroco'] is not None:
         c['teto_caroco']=float(c['teto_caroco'])
         if not math.isfinite(c['teto_caroco']) or c['teto_caroco']<0:
@@ -139,12 +147,24 @@ class Formulator:
         self.cachekey=None
         self.point_cache={}
         self.calls=0
+        self.deadline=math.inf
+        self.progress=None
+        self.last_notice=0.
+        self.phase='preparação'
+        self.period_started=0.
+        self.history=[]
 
     def evaluate(self,z,day):
+        now=time.monotonic()
+        if now>self.deadline:
+            raise SearchTimeout('Limite de tempo do período atingido; nenhuma dieta não validada foi aceita.')
+        if self.progress and now-self.last_notice>=2:
+            self.progress(f'{self.phase}: {self.calls} avaliações nutricionais; {max(0,now-self.period_started):.0f}s no período.')
+            self.last_notice=now
         key=(day,np.asarray(z).tobytes())
         if key in self.point_cache:
             return self.point_cache[key]
-        x=z[:-1];y=float(z[-1]);dmi=float(x.sum()+self.q);s=self.s
+        x=np.asarray(z);s=self.s;y=s['leite_kg'];dmi=float(x.sum()+self.q)
         a=dict(self.base_animal,An_BW=s['peso_vivo'],An_BW_mature=s['peso_adulto'],An_BCS=s['escore_corporal'],
                An_Parity_rl=s['paridade'],An_LactDay=s['del_dias']+day,Trg_MilkProd=y,
                Trg_MilkFatp=s['gordura_pct'],Trg_MilkTPp=s['proteina_pct'],Trg_MilkLacp=s['lactose_pct'],
@@ -158,7 +178,8 @@ class Formulator:
         checks=[]
         def add(name,slack,scale,unit):checks.append(dict(nome=name,folga=float(slack),escala=scale,unidade=unit))
         cost=float(self.prices@x+self.q*self.qprice)
-        add('Orçamento alimentar',s['orcamento_dia']-cost,10.,'R$/vaca/dia')
+        if s['orcamento_dia'] is not None:
+            add('Orçamento alimentar',s['orcamento_dia']-cost,10.,'R$/vaca/dia')
         add('Capacidade de ingestão NASEM',capacity-dmi,10.,'kg MS/dia')
         add('Energia para a produção escolhida',val('Trg_NELbal'),10.,'Mcal/dia')
         add('Proteína metabolizável',val('An_MPIn_g')-val('Trg_MPIn_req'),1000.,'g/dia')
@@ -189,51 +210,101 @@ class Formulator:
         self.point_cache[key]=self.cached
         return self.cached
 
+    def _linear_seed(self, days):
+        """Necessary linear checks plus a bounds-aware candidate, never a substitute for nutrition validation."""
+        s=self.s
+        milk_energy=.0929*s['gordura_pct']+.0547/.93*s['proteina_pct']+.0395*s['lactose_pct']
+        capacity=min(nd.calculate_Dt_DMIn_Lact1(s['peso_vivo'],s['escore_corporal'],s['del_dias']+d,s['paridade'],milk_energy*s['leite_kg']) for d in days)
+        a=[];b=[]
+        # All are the same concentration inequalities used by evaluate().
+        for col,limit,lower in [('Fd_NDF',25,True),('Fd_CFat',7,False),('Fd_CP',19,False),('Fd_Ca',1,False),('Fd_P',.42,False)]:
+            coeff=self.f[col].to_numpy()-limit
+            rhs=(limit-float(self.premix[col]))*self.q
+            a.append(-coeff if lower else coeff);b.append(-rhs if lower else rhs)
+        coeff=(self.f.Fd_NDF*(1-self.f.Fd_Conc/100)).to_numpy()-15
+        a.append(-coeff);b.append(-15*self.q)
+        a.append(np.ones(len(self.f)));b.append(capacity-self.q)
+        if s['orcamento_dia'] is not None:
+            a.append(self.prices);b.append(s['orcamento_dia']-self.q*self.qprice)
+        linear=linprog(self.prices,A_ub=np.array(a),b_ub=np.array(b),bounds=self.bounds,method='highs')
+        if not linear.success:
+            return None,dict(sucesso=False,status='inviavel_linear',mensagem='Os estoques, alimentos, teto de custo ou limites de fibra/minerais são incompatíveis. Confira as quantidades por vaca/dia.',limites=self.limit_report())
+        # Use a near-capacity seed if compatible with the linear restrictions.
+        target=min(.95*capacity-self.q,sum(hi for _,hi in self.bounds))
+        balanced=linprog(self.prices,A_ub=np.array(a),b_ub=np.array(b),A_eq=np.ones((1,len(self.f))),b_eq=[max(.01,target)],bounds=self.bounds,method='highs')
+        return balanced.x if balanced.success else linear.x,None
+
+    def limit_report(self):
+        return [dict(id=int(r.id),nome=r.nome,kg_ms_vaca_dia=float(self.bounds[j][1]),estoque_total_ms=self.s['estoques'].get(str(int(r.id)))) for j,(_,r) in enumerate(self.f.iterrows())]
+
+    @staticmethod
+    def violations(checks):
+        return sorted([dict(c,violacao=-c['folga']) for c in checks if c['folga'] < -1e-5*c['escala']],key=lambda c:c['folga']/c['escala'])[:8]
+
     def solve(self,day,initial=None,span=1,progress=None):
         s=self.s
-        b=s['declinio_curva'];peak=s['pico_del'];dim=s['del_dias']
-        potential=min(min(80.,s['leite_kg']*((dim+d)/dim)**b*math.exp(-b/peak*d)) for d in range(day,day+span))
-        seed=json.loads(Path(__file__).with_name('nasem_seed.json').read_text())
-        x=np.array([seed.get(str(int(r.id)),.01) for _,r in self.f.iterrows()])
-        if initial is not None:x=initial[:-1].copy()
-        x=np.array([min(max(v,.0001),hi) for v,(_,hi) in zip(x,self.bounds)])
-        z=np.r_[x,min(potential,42.) if initial is None else min(potential,initial[-1])]
-        bounds=self.bounds+[(1.,potential)]
-        def objective(z):
-            cost=self.prices@z[:-1]+self.q*self.qprice
-            return -z[-1] if s['objetivo']=='producao' else (cost-s['preco_leite_kg']*z[-1])
-        checkdays=sorted({day,day+span-1,*[d for d in range(day,day+span) if s['del_dias']+d in (99,100,101)]})
-        cons={'type':'ineq','fun':lambda z:np.concatenate([self.evaluate(z,d)[0] for d in checkdays])}
-        started=time.monotonic()
-        iteration=[0]
-        def tick(z):
-            iteration[0]+=1
-            if progress and iteration[0]%10==0:progress(f'Iteração {iteration[0]}: leite {z[-1]:.2f} kg/vaca/dia; conferindo restrições.')
-        result=minimize(objective,z,method='SLSQP',bounds=bounds,constraints=[cons],callback=tick,
-                        options={'maxiter':150,'ftol':1e-5,'eps':1e-4})
-        # Lexicographic tie-break: minimum feed cost at the attained milk optimum.
-        if result.success and s['objetivo']=='producao' and result.x[-1]>=potential-1e-3:
-            target=float(result.x[-1])
-            second=minimize(lambda z:float(self.prices@z[:-1]),result.x,method='SLSQP',
-                            bounds=self.bounds+[(target,target)],constraints=[cons],
-                            options={'maxiter':80,'ftol':1e-5,'eps':1e-4})
-            if second.success and min(cons['fun'](second.x))>=-1e-5:
-                result=second
+        started=time.monotonic();self.period_started=started;self.deadline=started+MAX_PERIOD_SECONDS
+        self.progress=progress;self.last_notice=0;self.history=[]
+        self.phase='Preparando dieta para os alimentos disponíveis'
+        checkdays=sorted({day,day+span-1,*[d for d in range(day,day+span) if s['del_dias']+d == 100]})
+        z,failure=self._linear_seed(checkdays)
+        if failure:return failure,None
+        bounds=self.bounds
+        all_constraints=lambda x:np.concatenate([self.evaluate(x,d)[0] for d in checkdays])
+        def objective(x):return float(self.prices@x+self.q*self.qprice)
+        try:
+            candidates=[z]
+            seed=json.loads(Path(__file__).with_name('nasem_seed.json').read_text())
+            candidates.append(np.array([min(max(seed.get(str(int(r.id)),.01),0),hi) for (_,r),(_,hi) in zip(self.f.iterrows(),bounds)]))
+            if initial is not None:candidates.append(np.clip(initial,[lo for lo,hi in bounds],[hi for lo,hi in bounds]))
+            def merit(x):return float(np.maximum(-all_constraints(x),0)@np.maximum(-all_constraints(x),0))
+            z=min(candidates,key=merit)
+            # Restore feasibility before asking cost minimization to work from a changed catalogue.
+            if min(all_constraints(z)) < -.1:
+                self.phase='Buscando uma dieta viável'
+                free=np.array([j for j,(lo,hi) in enumerate(bounds) if hi>lo+1e-10])
+                if not len(free):
+                    return dict(sucesso=False,status='sem_dieta',mensagem='Todos os ingredientes estão bloqueados por limites/estoques.',limites=self.limit_report()),None
+                fixed=z.copy()
+                def unpack(u):
+                    x=fixed.copy();x[free]=u;return x
+                restore=least_squares(lambda u:np.minimum(all_constraints(unpack(u)),0),z[free],
+                                      bounds=([bounds[j][0] for j in free],[bounds[j][1] for j in free]),
+                                      max_nfev=20,ftol=1e-6,xtol=1e-6,gtol=1e-6,diff_step=1e-4)
+                z=unpack(restore.x)
+            self.phase='Minimizando custo'
+            iteration=[0]
+            def tick(x):
+                iteration[0]+=1
+                residual=all_constraints(x)
+                _,_,nutr,cost,dmi=self.evaluate(x,day)
+                starch=float(nutr.get_value('An_StIn'))
+                starch_energy=float(nutr.get_value('An_DEStIn'))
+                self.history.append(dict(iteracao=iteration[0],custo=float(cost),menor_residuo=float(min(residual)),
+                                         consumo_ms=float(dmi),amido_pct=100*starch/dmi,
+                                         ed_amido_mcal_dia=starch_energy,
+                                         ed_amido_mcal_kg_amido=starch_energy/starch if starch>1e-10 else None))
+                if progress:progress(f'Iteração {iteration[0]}: custo R$ {objective(x):.2f}/vaca/dia; meta fixa {s["leite_kg"]:.2f} kg; maior violação normalizada {max(0,-min(residual)):.3g}.')
+            result=minimize(objective,z,method='SLSQP',jac=lambda x:self.prices,bounds=bounds,
+                            constraints=[{'type':'ineq','fun':all_constraints}],callback=tick,
+                            options={'maxiter':60,'ftol':1e-7,'eps':1e-4})
+        except SearchTimeout as exc:
+            return dict(sucesso=False,status='limite_tempo',mensagem=str(exc),historico=self.history,limites=self.limit_report()),None
+        self.deadline=math.inf
         self.cachekey=None
         self.point_cache.clear()
         residual,checks,out,cost,dmi=self.evaluate(result.x,day)
         for c in checks:c['atendida']=c['folga']>=-1e-5*c['escala']
-        success=bool(result.success and min(cons['fun'](result.x))>=-1e-5)
+        success=bool(result.success and min(all_constraints(result.x))>=-1e-5)
         if not success:
-            return dict(sucesso=False,mensagem='Sem ótimo local convergido e validado: '+result.message,
-                        restricoes=checks,menor_residuo=float(min(residual))),None
+            return dict(sucesso=False,status='sem_convergencia',mensagem='Não foi encontrada dieta convergida e validada para esta meta. Reveja os limites indicados ou reduza o intervalo de reformulação.',detalhe_solver=str(result.message),restricoes=checks,violacoes=self.violations(checks),menor_residuo=float(min(residual)),historico=self.history,limites=self.limit_report()),None
         items=[dict(id=int(r.id),nome=r.nome,kg_ms=float(result.x[j]),kg_natural=float(result.x[j]/(r.Fd_DM/100)),custo_dia=float(result.x[j]*self.prices[j])) for j,(_,r) in enumerate(self.f.iterrows()) if result.x[j]>1e-7]
         items.append(dict(id=999,nome='Premix declarado',kg_ms=self.q,kg_natural=self.q,custo_dia=self.q*self.qprice))
         aa=out.get_value('Abs_AA_g');req=out.get_value('Trg_AbsAA_g')
         output=dict(sucesso=True,padrao='NASEM 2021',motor=VERSION,objetivo=s['objetivo'],
-                    leite_otimizado=float(result.x[-1]),potencial=potential,custo_total_dia=cost,
-                    iofc_margem_dia=float(s['preco_leite_kg']*result.x[-1]-cost),consumo_total_ms=dmi,
-                    ingredientes=items,restricoes=checks,iteracoes=int(result.nit),tempo_segundos=time.monotonic()-started,
+                    leite_meta=s['leite_kg'],custo_total_dia=cost,
+                    iofc_margem_dia=float(s['preco_leite_kg']*s['leite_kg']-cost),consumo_total_ms=dmi,
+                    ingredientes=items,restricoes=checks,iteracoes=int(result.nit),tempo_segundos=time.monotonic()-started,historico=self.history,limites=self.limit_report(),
                     aminoacidos={k:{'oferta':float(aa[k]),'exigencia':float(req[k])} for k in req.index if k!='Arg'},
                     diagnosticos={k:float(out.get_value(k)) for k in ('Trg_NELbal','Mlk_Prod_NEalow','Mlk_Prod_MPalow','An_MPIn_g','Trg_MPIn_req')})
         return output,result.x
@@ -245,20 +316,22 @@ def planejar(scenario,progress=None):
     for day in range(0,s['dias_simulacao'],s['intervalo_dieta']):
         length=min(s['intervalo_dieta'],s['dias_simulacao']-day)
         if progress:progress(f'Formulando período {len(periods)+1}: dias {day+1}–{day+length}.')
-        # Constant milk target bounded by the minimum potential over each block; verify daily.
+        # Fixed exogenous milk target; only feed quantities are optimized.
         result,solution=f.solve(day,initial,span=length,progress=progress)
-        if not result['sucesso']:return dict(sucesso=False,mensagem=result['mensagem'],periodo=day+1,restricoes=result.get('restricoes'))
-        # Keep a single ration and conservative milk target per block;
-        # daily capacity and potential checks can reject coarse blocks rather than hide violations.
+        if not result['sucesso']:return dict(result,periodo=day+1)
+        # Keep one ration per block and preserve the specified milk target;
+        # daily nutrient checks reject invalid blocks rather than hide violations.
+        f.deadline=time.monotonic()+MAX_PERIOD_SECONDS
+        f.phase='Verificando todos os dias do período'
         daily=[]
         for offset in range(length):
             current=day+offset
-            b=s['declinio_curva'];dim=s['del_dias'];cap=min(80.,s['leite_kg']*((dim+current)/dim)**b*math.exp(-b/s['pico_del']*current))
-            z=solution.copy();z[-1]=min(z[-1],cap)
+            dim=s['del_dias']
+            z=solution.copy()
             residual,checks,out,cost,dmi=f.evaluate(z,current)
             if min(residual)<-1e-5:
                 return dict(sucesso=False,mensagem='A dieta não atende todos os dias do bloco. Reduza o intervalo de reformulação.',dia=current+1,restricoes=checks)
-            daily.append(dict(dia=current+1,data=(datetime.date.fromisoformat(s['data_inicio'])+datetime.timedelta(days=current)).isoformat(),del_dias=dim+current,leite_vaca=float(z[-1]),leite_rebanho=float(z[-1]*s['vacas_lactacao']),custo_rebanho=cost*s['vacas_lactacao']))
+            daily.append(dict(dia=current+1,data=(datetime.date.fromisoformat(s['data_inicio'])+datetime.timedelta(days=current)).isoformat(),del_dias=dim+current,leite_vaca=s['leite_kg'],leite_rebanho=s['leite_kg']*s['vacas_lactacao'],custo_rebanho=cost*s['vacas_lactacao']))
         periods.append(dict(inicio=day+1,fim=day+length,dias=length,resultado=result,diario=daily))
         initial=solution
     daily=[d for p in periods for d in p['diario']]
@@ -268,12 +341,12 @@ def planejar(scenario,progress=None):
                 media_leite_vaca=milk/s['vacas_lactacao']/s['dias_simulacao'],
                 escopo='Planejamento nutricional por lote homogêneo; não é simulação de fazenda completa.',
                 avisos=['Ótimo local SLSQP; sem certificado de ótimo global.',
-                         'Potencial e curva de lactação são hipóteses informadas, não genética estimada.',
+                         'Produção é uma meta fixa informada; o solver minimiza o custo sem reduzi-la.',
                          'Sem reprodução, secagem, mortalidade ou variação de reservas corporais; horizonte limitado à lactação.',
                          'Custos e produção abrangem somente as vacas em lactação.',
-                         'Cada bloco maximiza uma produção diária constante limitada ao menor potencial do período.',
+                         'A meta de leite é constante no horizonte; somente as dietas são otimizadas.',
                          'Microminerais/vitaminas só são restrições quando declarados na composição do premix; adequação completa não garantida.',
                          'Estoques são distribuídos como limites diários uniformes para todo o horizonte.'],
-                proveniencia={'versao':VERSION,'numpy':np.__version__,
-                              'implementacao_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'biblioteca_sha256':hashlib.sha256(Path(f.source).read_bytes()).hexdigest(),
+                proveniencia={'modelo':'custo-minimo-meta-fixa-v3','versao':VERSION,'numpy':np.__version__,
+                              'implementacao_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'partida_sha256':hashlib.sha256(Path(__file__).with_name('nasem_seed.json').read_bytes()).hexdigest(),'biblioteca_sha256':hashlib.sha256(Path(f.source).read_bytes()).hexdigest(),
                               'precos_sha256':hashlib.sha256((ROOT/'helpful_scripts/nrc2001_dieta_lp/alimentos_precos.csv').read_bytes()).hexdigest()})

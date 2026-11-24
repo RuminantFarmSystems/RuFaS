@@ -11,7 +11,7 @@ from helpful_scripts.interface_rufas.solver_dinamico import (
     carregar_dataframe_alimentos, otimizar_dieta, gerar_curva_otimizacao_leite,
 )
 
-from helpful_scripts.interface_rufas.jobs_nasem import submit, snapshot
+from helpful_scripts.interface_rufas.jobs_nasem import submit, snapshot, cancel
 
 ROOT = Path(__file__).resolve().parent
 ALLOWED = {"peso_vivo", "leite_kg", "gordura_pct", "proteina_pct", "del_dias",
@@ -72,6 +72,10 @@ class Handler(SimpleHTTPRequestHandler):
             if not 0 < size <= 100000:
                 raise ValueError("Tamanho de solicitação inválido.")
             body = json.loads(self.rfile.read(size))
+            if self.path.startswith('/api/nasem/jobs/') and self.path.endswith('/cancel'):
+                job=cancel(self.path.split('/')[-2])
+                self.send_json(200 if job else 404,job or {'mensagem':'Cálculo não encontrado.'})
+                return
             if self.path == '/api/nasem/jobs':
                 key=submit(body)
                 self.send_json(202, {'job_id':key})
@@ -108,6 +112,10 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
+        # Stop this application's workers when the local server is closed.
+        from helpful_scripts.interface_rufas.jobs_nasem import JOBS, LOCK
+        with LOCK: active=[key for key,job in JOBS.items() if job['estado'] in ('fila','executando')]
+        for key in active: cancel(key)
         server.server_close()
 
 

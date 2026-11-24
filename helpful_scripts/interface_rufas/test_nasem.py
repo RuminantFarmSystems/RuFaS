@@ -34,8 +34,11 @@ class NasemTests(unittest.TestCase):
         f=Formulator({})
         seed=__import__('json').loads(__import__('pathlib').Path(__file__).with_name('nasem_seed.json').read_text())
         x=np.array([seed.get(str(int(r.id)),0) for _,r in f.f.iterrows()])
-        low=f.evaluate(np.r_[x,30.],0)
-        high=f.evaluate(np.r_[x,40.],0)
+        f.s['leite_kg']=30.
+        low=f.evaluate(x,0)
+        f.s['leite_kg']=40.
+        f.point_cache.clear()
+        high=f.evaluate(x,0)
         for key in ['Energia para a produção escolhida','Proteína metabolizável','Aminoácido Met']:
             l=next(c['folga'] for c in low[1] if c['nome']==key)
             h=next(c['folga'] for c in high[1] if c['nome']==key)
@@ -49,6 +52,34 @@ class NasemTests(unittest.TestCase):
         self.assertEqual(f.premix['Fd_Ca'],20)
         self.assertEqual(f.premix['Fd_Zn'],5000)
         with self.assertRaises(ValueError):Formulator({'premix_composicao':{'Ca':1200}})
+
+    def test_fixed_milk_and_optional_budget(self):
+        self.assertEqual(validate({})['objetivo'],'custo')
+        self.assertIsNone(validate({})['orcamento_dia'])
+        for goal in ('producao','margem'):
+            with self.assertRaises(ValueError):validate({'objetivo':goal})
+        with self.assertRaises(ValueError):validate({'orcamento_dia':0})
+
+    def test_objective_has_only_feed_variables(self):
+        from unittest.mock import patch
+        from scipy.optimize import OptimizeResult
+        f=Formulator({'leite_kg':40})
+        def fake_minimize(fun,x0,**kwargs):
+            self.assertEqual(len(x0),len(f.f))
+            self.assertEqual(len(kwargs['bounds']),len(f.f))
+            self.assertAlmostEqual(fun(x0),f.prices@x0+f.q*f.qprice)
+            return OptimizeResult(x=x0,success=False,message='intentional test stop',nit=1)
+        with patch('nasem_solver.minimize',side_effect=fake_minimize):
+            result,_=f.solve(0)
+        self.assertFalse(result['sucesso'])
+
+    def test_budget_is_a_constraint_not_a_milk_adjustment(self):
+        f=Formulator({'leite_kg':40,'orcamento_dia':1})
+        x=np.ones(len(f.f))
+        residual,checks,*_=f.evaluate(x,0)
+        self.assertLess(next(c['folga'] for c in checks if c['nome']=='Orçamento alimentar'),0)
+        self.assertEqual(f.s['leite_kg'],40)
+
 
 
 if __name__=='__main__':unittest.main()

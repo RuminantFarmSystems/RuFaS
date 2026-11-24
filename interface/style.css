@@ -3,3 +3,6 @@
 select,textarea{width:100%;font:inherit;padding:9px;background:#fffef9;border:1px solid #bfc9bf;color:var(--ink);margin-top:6px;border-radius:3px}#milklabel{float:none;color:var(--ink);font-weight:650}body.nrc .nasem{display:none}#planning{margin-bottom:30px}#periods button{font-size:11px;padding:5px 10px}.layout{grid-template-columns:305px minmax(0,1fr)}@media(max-width:800px){.layout{grid-template-columns:1fr}}
 
 body:not(.nrc) .nrc-only{display:none}
+
+.stock-help{display:block;max-width:180px;font-size:11px;color:var(--muted);margin-top:4px}#diagnostic{padding:18px;background:#f1e7dc;border-left:3px solid #9d633d;margin:18px 0}#diagnostic h2{margin:0 0 8px}#diagnostic li{margin-bottom:7px}#cancel{border-color:#9d633d;color:#7c4b2c}input[type=text]{width:110px;padding:7px;border:1px solid #bfc9bf;background:#fffef9;color:var(--ink);font:inherit}button:disabled{cursor:default}
+.layout>aside,.layout>section,.pair>*{min-width:0}input,select,textarea{min-width:0;max-width:100%}@media(max-width:800px){.layout{grid-template-columns:minmax(0,1fr)}}
