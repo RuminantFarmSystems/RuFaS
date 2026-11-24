@@ -1,5 +1,6 @@
 from enum import Enum
 import json
+import os
 from pathlib import Path
 from RUFAS.post_processing.rufas_logger import get_logger
 from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
@@ -426,27 +427,19 @@ class FileManager:
             return f" ({units[variable_name]})"
 
         if subkey is None:
-            self.add_error(
-                "units_subkey_missing",
+            logger.error(
                 f"Variable {variable_name} has a dictionary for its 'units' property, "
                 f"but the 'values' associated with this variable are not dictionaries themselves.",
-                info_map={
-                    "class": self.__class__.__name__,
-                    "function": self._get_units_substr.__name__,
-                },
+                extra={"rufas_log_name": "Units Subkey Missing"},
             )
             return ""
 
         if subkey in units:
             return f" ({units[subkey]})"
 
-        self.add_error(
-            "units_key_error",
+        logger.error(
             f"Key '{subkey}' not found in the units dictionary for variable '{variable_name}'.",
-            info_map={
-                "class": self.__class__.__name__,
-                "function": self._get_units_substr.__name__,
-            },
+            extra={"rufas_log_name": "Units Key Error"},
         )
 
         return ""
@@ -710,7 +703,6 @@ class FileManager:
     def read_variables_pool_file(
         self,
         file_path: Path,
-        info_map: dict[str, Any],
     ) -> dict[str, list[Any]]:
         """Reads a ``variables_pool`` JSON file and returns its contents."""
         logger.info(
@@ -832,7 +824,7 @@ class FileManager:
         This method checks the value of the ``origin_label`` key in the provided ``filter_content`` dictionary.
         If the value is a valid string matching one of the supported options defined in the ``OriginLabel`` enum,
         the corresponding ``OriginLabel`` member is returned. If the value is invalid or the key is not present,
-        ``OriginLabel.NONE`` is returned, and an error is added to the Output Manager's errors pool.
+        ``OriginLabel.NONE`` is returned, and an error is logged.
         """
         if "origin_label" not in filter_content:
             return OriginLabel.NONE
@@ -867,3 +859,77 @@ class FileManager:
         if module == "manure":
             return "Manure"
         return json_key.split(".", 1)[0]
+
+    def read_e2e_comparison_files(
+        self,
+        json_output_directory: Path,
+        output_prefixes: list[str],
+        failed_e2e_groups: list[str] | None = None,
+    ) -> dict[str, list[dict[str, Any]]]:
+        """
+        Reads end-to-end test comparison files and groups their contents by output prefix.
+
+        Parameters
+        ----------
+        json_output_directory : Path
+            The directory containing the JSON comparison files.
+        output_prefixes : list[str]
+            The output prefixes used to identify relevant comparison files.
+        failed_e2e_groups : list[str] | None, default None
+            The output prefixes of failed tasks whose comparison files should
+            be ignored because they may have been left by an earlier run.
+
+        Returns
+        -------
+        dict[str, list[dict[str, Any]]]
+            The contents of the comparison files grouped by output prefix.
+
+        """
+        failed_e2e_groups = failed_e2e_groups or []
+        comparison_results: dict[str, list[dict[str, Any]]] = {}
+
+        logger.info(
+            f"Attempting to read E2E comparison files from {json_output_directory}.",
+            extra={"rufas_log_name": "Reading E2E Comparison Files Attempt"},
+        )
+
+        for filename in os.listdir(json_output_directory):
+            if "comparison" not in filename.lower() or not filename.endswith(".json"):
+                continue
+
+            matched_prefix = next(
+                (prefix for prefix in output_prefixes if prefix.lower() in filename.lower()),
+                None,
+            )
+
+            if matched_prefix is None:
+                logger.error(
+                    f"No matching output prefix found in filename: {filename}",
+                    extra={"rufas_log_name": "Invalid E2E Output Prefix"},
+                )
+                continue
+
+            if matched_prefix in failed_e2e_groups:
+                continue
+
+            file_path = json_output_directory / filename
+
+            try:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    data: dict[str, Any] = json.load(file)
+            except (OSError, ValueError) as exc:
+                logger.error(
+                    f"Failed to read {file_path}: {exc}",
+                    extra={"rufas_log_name": "E2E Comparison File Reading Error"},
+                )
+                continue
+
+            comparison_results.setdefault(matched_prefix, []).append(data)
+
+        logger.info(
+            f"Finished reading E2E comparison files from {json_output_directory}. "
+            f"Successfully read {sum(len(files) for files in comparison_results.values())} files.",
+            extra={"rufas_log_name": "E2E Comparison File Reading Complete"},
+        )
+
+        return comparison_results
