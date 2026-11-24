@@ -54,6 +54,7 @@ Tools
 -----
 .. toctree::
    :maxdepth: 1
+   :caption: Tools:
 
    _wiki/Github-Actions
    _wiki/Using-Mypy
@@ -65,10 +66,11 @@ Team Culture
 ------------
 .. toctree::
    :maxdepth: 1
+   :caption: Team Culture:
 
    _wiki/RuFaS-Versioning-Policy
    _wiki/SCRUM-at-RuFaS
-   _wiki/Version-Update-Workflows
+   _wiki/Version-Update-Workflow
 
 Release Notes
 -------------
