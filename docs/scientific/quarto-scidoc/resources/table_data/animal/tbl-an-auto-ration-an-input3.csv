@@ -3,7 +3,7 @@ Feeds,,"Specifies the complete feeds available for use in ration formulation, in
 ,feed_type,Unique identifier for a feed in standard or user feed library,
 ,purchased_feed_cost ,Cost of the feed (US$/kg DM) ,
 ,buffer,Fractional number 0 to 1 used as a cushion for feed purchases to help plan for herd fluctuations and feed shrink,0.15
-,max_daily_feed_recalculations_per_year,The maximum number of purchased feed feed recalculations that can be performed per year,4
+,max_daily_feed_recalculations_per_year,The maximum number of times in each year that the daily purchased feed allowance limit can be recalculated,4
 ,runtime_purchase_allowance,Upper limit of feed masses that can be purchased for this feed on a single day (kg),
 ,advance_purchase_allowance,Upper limit of feed masses that can be purchased for this feed at the beginning of a ration interval (kg),
 ,planning_cycle_allowance,Upper limit of feed masses that can be purchased for this feed at the beginning of a new planning cycle (kg),
