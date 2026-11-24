@@ -1346,7 +1346,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
 
     mock_om_create_directory.assert_called_once_with(Path("dummy_path"))
     mock_om_dict_to_file_json.assert_called_once_with(
-        mock_herd_factory.pre_animal_population.__repr__(),
+        mock_herd_factory.pre_animal_population.to_dict(),
         expected_save_path,
         minify_output_file=True,
     )
