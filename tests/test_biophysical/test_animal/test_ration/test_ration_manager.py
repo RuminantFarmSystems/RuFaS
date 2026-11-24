@@ -417,9 +417,7 @@ def test_get_intake_option_defaults_to_predict_when_unset() -> None:
         (IntakeOption.SET_DMI_PER_X, 0.0, 1.0),
     ],
 )
-def test_effective_dmi_constants(
-    option: IntakeOption, expected_fraction: float, expected_retry: float
-) -> None:
+def test_effective_dmi_constants(option: IntakeOption, expected_fraction: float, expected_retry: float) -> None:
     """DMI input options neutralize the internal DMI adjustment constants."""
     RationManager.intake_options = {AnimalCombination.LAC_COW: option}
     RationManager.intake_values = {AnimalCombination.LAC_COW: 24.0}
