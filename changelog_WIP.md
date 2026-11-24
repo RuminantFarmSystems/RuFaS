@@ -161,3 +161,4 @@ This **WIP Changelog** records development changes in progress and not yet inclu
 - [3264](https://github.com/RuminantFarmSystems/RuFaS/pull/3264) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Labels cow as pregnant using ReproStateEnum during initialization.
 - [3384](https://github.com/RuminantFarmSystems/RuFaS/pull/3384) - [minor change] [PostProcessing] [ReportGenerator] [NoInputChange] [NoOutputChange] Refactors the overhauled ReportGenerator and moves its unit handling into a dedicated UnitHandler.
 - [3392](https://github.com/RuminantFarmSystems/RuFaS/pull/3392) - [minor change] [Docs] [NoInputChange] [NoOutputChange] Adds sidebar captions for the Tools and Team Culture sections of the docs index and fixes the link to the Version Update Workflow page.
+- [3393](https://github.com/RuminantFarmSystems/RuFaS/pull/3393) - [minor change] [Animal] [NoInputChange] [NoOutputChange] Removed dry matter intake boost method.
