@@ -1,3 +1,0 @@
-﻿ Variable , Definition , Default , Min , Max 
-milk_fat_percent,Section: `animal_properties` The average or most common milk fat percentage in cow milk,3.5,0,--
-milk_protein_percent,Section: `animal_properties` The average or most common milk protein percentage in cow milk,3.2,0,--
