@@ -114,7 +114,9 @@ class UnitHandler:
 
         """
         if len(report_data) == 0:
-            raise ValueError("Report Generator error: No report data available to aggregate units from.")
+            message = "Report Generator error: No report data available to aggregate units from."
+            logger.error(message, extra={"rufas_log_name": "Report Generator Units Error"})
+            raise ValueError(message)
         elif len(report_data) == 1 or len(report_data) > 2:
             var_units_match = re.search(r"\((.*?)\)", next(iter(report_data)))
             if var_units_match:

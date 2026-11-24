@@ -127,10 +127,6 @@ class ReportGenerator:
             The cross-referenced reports followed by the data in the filtered pool, or the filtered pool itself if the
             filter content has no ``cross_references``.
 
-        Raises
-        ------
-        KeyError
-            If any of the cross-referenced reports are missing.
         """
         if "cross_references" not in filter_content:
             return filtered_pool

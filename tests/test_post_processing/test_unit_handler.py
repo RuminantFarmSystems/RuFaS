@@ -194,10 +194,19 @@ def test_aggregate_units_combines_units_of_two_columns(unit_handler: UnitHandler
     mock_combine_units.assert_called_once_with({"kg": 1}, {"day": 1}, {"animal": 1}, {}, "division", False)
 
 
-def test_aggregate_units_no_report_data(unit_handler: UnitHandler) -> None:
+def test_aggregate_units_no_report_data(unit_handler: UnitHandler, mocker: MockerFixture) -> None:
     """Unit test for the aggregate_units method of UnitHandler when there is no report data."""
+    mock_logger = mocker.patch("RUFAS.post_processing.unit_handler.logger")
+
     with pytest.raises(ValueError, match="No report data available to aggregate units from."):
         unit_handler.aggregate_units({}, "sum", True)
+
+    assert mock_logger.mock_calls == [
+        mocker.call.error(
+            "Report Generator error: No report data available to aggregate units from.",
+            extra={"rufas_log_name": "Report Generator Units Error"},
+        )
+    ]
 
 
 @pytest.mark.parametrize(
