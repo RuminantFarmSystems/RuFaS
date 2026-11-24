@@ -3,17 +3,17 @@ Feeds,,"Specifies the complete feeds available for use in ration formulation, in
 ,feed_type,Unique identifier for a feed in standard or user feed library,
 ,purchased_feed_cost ,Cost of the feed (US$/kg DM) ,
 ,buffer,Fractional number 0 to 1 used as a cushion for feed purchases to help plan for herd fluctuations and feed shrink,0.15
-,runtime_purchase_allowance,Upper limit of purchased feed masses and/or money that can be spent on this feed on a single day (kg or $),
-,advance_purchase_allowance,Upper limit of purchased feed masses and/or money that can be spent on this feed at the beginning of a ration interval (kg or $),
-,planning_cycle_allowance,Upper limit of purchased feed masses and/or money that can be spent on this feed at the beginning of a new planning cycle (kg or $),
+,max_daily_feed_recalculations_per_year,The maximum number of purchased feed feed recalculations that can be performed per year,4
+,runtime_purchase_allowance,Upper limit of feed masses that can be purchased for this feed on a single day (kg),
+,advance_purchase_allowance,Upper limit of feed masses that can be purchased for this feed at the beginning of a ration interval (kg),
+,planning_cycle_allowance,Upper limit of feed masses that can be purchased for this feed at the beginning of a new planning cycle (kg),
 Ration formulation parameters,,,
 ,milk_reduction_maximum,allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements ,0 kg
-,max_daily_feed_recalculations_per_year,The maximum number of feed recalculations that can be performed per year,4
 ,user_defined_ration_tolerance,"Allowable +/- fractional deviation applied to each user-defined ration inclusion percentage (a single value applies to all feeds and animal combinations). E.g., a feed with a user-defined ration percentage of 20% DM and a tolerance of 0.1 would have an allowable range of 18% to 22% DM",0%
 Rations,,"Inputs for DMI and ration composition for each animal combination. Exactly one array must be provided for each animal combination. When auto-formulation option is used, ration_percentage, intake_option, and intake_value inputs here are ignored.",
 ,animal_combination,Animal combination a given ration corresponds to,
-,intake_option,"Dry matter intake option used for this animal combination's ration. Options: predict_DMI, set_DMI, or set_DMI_per_X (set_DMI_per_X is available only for lactating and growing combinations)",predict_DMI
+,intake_option,"Dry matter intake option used for this animal combination's ration. Options: predict_DMI, set_DMI, or set_DMI_per_X (set_DMI_per_X is available only for lactating and growing combinations)",predict_DMI (set_DMI for calves)
 ,intake_value,"Dry matter intake value used for the ration of this animal combination. Units are kg/animal/day for set_DMI, and kg dry matter intake per kg milk yield (lac_cow) or per kg average daily gain (growing) for set_DMI_per_X. Required when intake_option is set_DMI or set_DMI_per_X; ignored when intake_option is predict_DMI",null
 ,feeds,Array of feeds available to the specified animal combination (one array per feed used in the ration),
 ,feed_type,Unique identifier for a feed in standard or user feed library,
-,ration_percentage,Ration inclusion percentage (%DM) for this feed; utilized only in user-defined ration option,
+,ration_percentage,Ration inclusion percentage (%DM) for this feed; utilized only in user-defined ration option (values for each ration must sum to 100 across included feeds),
