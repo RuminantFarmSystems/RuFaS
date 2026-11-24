@@ -130,10 +130,11 @@ class AnimalModuleReporter:
 
             parity_data[parity_group]["milk"].append(milk_stats.estimated_daily_milk_produced)
             parity_data[parity_group]["days_in_milk"].append(milk_stats.days_in_milk)
-            if milk_stats.days_in_milk < 50:
-                fresh_cows += 1
-            else:
-                cows_at_or_above_50_dim += 1
+            if milk_stats.is_milking:
+                if milk_stats.days_in_milk < animal_constants.FRESH_COW_DAYS_IN_MILK_THRESHOLD:
+                    fresh_cows += 1
+                else:
+                    cows_at_or_above_50_dim += 1
 
             updated_milk_data: dict[str, int | float | str] = {
                 "cow_id": milk_stats.cow_id,

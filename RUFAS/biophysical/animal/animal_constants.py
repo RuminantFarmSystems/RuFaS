@@ -140,3 +140,8 @@ SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER = 0.85
 """
 Conception rate of sexed dairy semen relative to conventional semen, (unitless).
 """
+
+FRESH_COW_DAYS_IN_MILK_THRESHOLD = 50
+"""
+Lactating cows below this many days in milk are considered fresh, (simulation days).
+"""
