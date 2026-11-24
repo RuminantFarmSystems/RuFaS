@@ -188,51 +188,46 @@ Pens are initiated from the Pen class by the `HerdManager` at the beginning of t
 `set_animal_nutritional_requirements`
 :::
 
-### Ration Formulation
+### Nutrient Requirements, Feed Intake, and Diet Formulation
 
 #### Introduction
 
-The diet recipes in RuFaS are either formulated through least-cost formulation [@Li_2022] or provided by the user for each of 4 animal categories 
-(calves, growing heifers, dry and close-up cows, and lactating cows). The composition of the available feeds are provided by a feed library that 
-was adapted from the @nrc_2021. The amount of feed required by the farm is tracked by pen and multiple pens of each animal category can be simulated; 
-however, at this time, the RuFaS model can only accept one user-defined diet per animal category even if there are multiple simulated pens for that animal category.  
+Feed intake and nutrient metabolism are essential processes within a dairy farm system through which animals convert feeds into productive outputs (frame growth, fetal growth, milk, etc.) and excretions (heat loss, enteric methane, manure, etc.). Further, research in dairy cattle nutrition and metabolism are active areas of research due to the significance of these fields to farm productivity, profitability, and sustainability and the subject's complexity. Because of this significance and the range of possible applications, RuFaS offers a variety of options to represent these processes and their outcomes. These range from detailed replications of user-specified feeding scenarios to exploratory "if, then"-type modeling that build on feedback mechanisms to maximize responsiveness to user inputs. Thus, the feed intake and metabolism processes in RuFaS are designed to be highly customizable, offering user control in several key areas:
+ 
+1. Prediction of animal requirements based on their attributes (age, weight, stage of lactation, etc.)
+    * User-selectable nutrient supply model: @nrc_2001 or @nrc_2021 
+2. Diet and intake configuration
+    * Animal combination-level dry matter intake (DMI) specification or prediction
+    * Least-cost formulation of dietary ingredient proportion (%DM) or user-defined formulation
+    * Optional user specification of feed nutritive compositions and costs
+3. Prediction of metabolizable nutrient supplies and their relation to requirements
+    * User-selectable NRC or NASEM nutrient requirements model
+4. Response to discrepancies in nutrient requirements vs. supply
+    * User-defined DMI changes or milk production penalties in response to inadequate nutrient supplies or other constraints
+ 
+The configuration options should be thought of as a spectrum of control where the selected control point(s) reflects user's objectives. High-control options allow the user to replicate a diet exactly, and remove or limit the role of nutritional models by overriding the connection between calculated nutrient supplies and productive outcomes. Low-control options allow users to explore "if, then"-type outcomes when diet or animal factors change, and observe modeled responses to these changes. Though complex, this system of configuration options is intended to support a broad range of use cases for this component of RuFaS.
 
-In practice, animal feeding on dairy farms is a constantly evolving process that responds to fluctuations in feed availability, animal requirements 
-and responses, and management goals. Although the feed delivery algorithms will make small modifications to the diet recipe in response to animal 
-nutrient requirements and adjust the total amount of feed delivered based on the number of animals and their requirements, the diversity and degree 
-of fluctuation in the diets is less than what is expected on a commercial dairy. The RuFaS feed library can also be modified or expanded on by 
-changing the compositions of the existing feeds or by adding new feeds. 
 
-Regardless of whether or not a user chooses to provide their own ration or have RuFaS build and feed a ration optimized for least-cost, 
-RuFaS needs a set of ingredients to work from. The RuFaS feed library should be consulted for the full list of ingredients and ingredients that 
-are in both the NASEM and NRC libraries. Users interested in feeding a ration that they define, need to provide a list of ingredients 
-and their relative % dry matter intake for each animal class (pre-weaned calves, growing heifers, close-up animals, and lactating cows). 
-
-If a user would like RuFaS to use the list of ingredients to formulate a least-cost ration, providing the proper costs for each 
-ingredient listed is essential, but the % dry matter intake in the user defined ration percentages does not need to be included. Feed costs need to be entered in 
-kg/DM. RuFaS will then use all the ingredients available (based on costs and inventory available if the feed is homegrown) to create a ration that 
-meets the nutritional requirements of the animal class and is cost-optimized. 
+#### Nutrient requirement and supply calculations
+The nutrition model utilized as the basis of nutrient requirement and supply calculations in RuFaS may be configured by the user in the configuration input file (`nutrient_standard` = `NASEM` or `NRC`). The calculations for each nutrition model are detailed below. Note that some calculations are shared between models. 
 
 ::: {.callout-note}
-At this time, only one set of feeds and ration recipe can be provided for each animal class. 
+Nutrient requirements are calculated for each animal then averaged within pen before being passed to the diet formulation components of RuFaS (see Feed Consumption section).
 :::
 
-Below are the calculations utilized based on the energy and nutrient requirements of dairy cattle as reported by @nrc_2001 and more 
-recently the @nrc_2021.
+Jump to [NASEM section](#NASEMsection)
 
-Calculations are included for the following requirement categories:
+##### Nutrient Requirements of Dairy Cattle: NRC (2001)
 
-* Energy (Maintenance, Activity, Growth, Pregnancy, Lactation)
-* Protein (Maintenance, Growth, Pregnancy, Lactation)
-* Minerals (Maintenance, Growth, Pregnancy, Lactation)
-* Dry Matter Intake (DMI)
-* Amino Acids (NASEM only) 
+Jump to:  
 
-Where appropriate, requirement calculations are differentiated by animal age and reproductive status.
+* [Energy Requirements](#nrcenergyreq)
+* [Protein Requirements](#nrcproteinreq)
+* [Mineral Requirements](#nrcmineralsreq)
+* [Energy Supply](#nrcenergysup)
+* **Protein and minerals**: The same set of calculations are used in both models for protein and mineral supplies; please see the corresponding subsections ([protein](#nasemproteinsup), [minerals](#nasemmineralsup)) in the NASEM, 2021 methods section.
 
-#### Nutrient Requirements of Dairy Cattle: NRC
-
-##### Energy Requirements
+###### Energy Requirements (NRC) {#nrcenergyreq}
 For details about the variables included in each calculation, please refer to @tbl-an-energy-nrc for a full list.
 
 **Maintenance** <br>
@@ -273,7 +268,7 @@ $$
 
 The maintenance requirement is calculated based on metabolic body weight (BW$^{0.75}$), body condition score, and the previous month's temperatures.
 
-First the body condition score must be translated to a 9 point scale (BSC9). The conceptus weight (CW) is calculated the same as for lactating and dry cows.
+First, the body condition score must be translated to a 9 point scale (BSC9). The conceptus weight (CW) is calculated according to the same method used for lactating and dry cows.
 
 :::{#eq-an-nrc-6}
 [[**AN.NRC.6**]]{.aside .content-visible when-format="html"}
@@ -339,6 +334,7 @@ $$
 **Growth** <br>
 
 * Lactating and Dry Cows
+
 Cows will continue to grow toward their mature body weight until the end of their second lactation. Their growth rate is estimated as a linear increase to reach the expected proportion of their mature bodyweight (MW) at the beginning of their next parity. 
 
 First the shrunk bodweight (SBW), the mature shrunk bodyweight (MSBW) and the equivalent shrunk bodyweight are calculated (EQSBW) to remove the effect of gut fill on bodyweight, the conceptus, and relate the animal's weight to the reference animal of 478 kg. 
@@ -476,7 +472,7 @@ $$
 $$
 :::
 
-##### Protein Requirements
+###### Protein Requirements (NRC){#nrcproteinreq}
 
 **Total Protein** <br>
 Reporting of protein requirements is divided into four components: maintenance (MPm), growth (MPg), pregnancy (MPpreg), and lactation (MPlact) (all in metabolizable protein). For details about the variables included in each calculation, please refer to the protein requirements key.
@@ -610,7 +606,7 @@ import_table(
 )
 ```
 
-##### Mineral Requirements
+###### Mineral Requirements (NRC){#nrcmineralsreq}
 Only calcium (Ca) and phosphorus (P) requirements are considered currently. For details about the variables included in each calculation, please refer to the @tbl-an-min-req-var.
 
 **Maintenance** <br>
@@ -759,75 +755,135 @@ import_table(
 )
 ```
 
-##### DMI Estimation
+###### Energy Supply (NRC){#nrcenergysup}
 
-Methods for estimating DMI are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-dmi-var. The sum of DMI of each feed is assumed to be less or equal to than the estimated DMI:
-
-$$
-\sum_{i} \text{Feed}_{i} \le \text{DMIest}
-$$
-
-**Lactating Cows** <br>
-
-For lactating cows, the estimated DMI (DIMest) is calculated as a function of the fat corrected milk (FCM), bodyweight (BW), and week of lactation (WOL). 
-
-:::{#eq-an-nrc-51}
-[[**AN.NRC.51**]]{.aside .content-visible when-format="html"}
-$$
-\text{FCM} = (0.4 \times \text{Milk}) + (15 \times \text{Fat\_Milk} \times \frac{\text{Milk}}{100})
-$$
-:::
-
-:::{#eq-an-nrc-52}
-[[**AN.NRC.52**]]{.aside .content-visible when-format="html"}
-$$
-\text{DMIest} = (0.372 \times \text{FCM} + 0.0968 \times \text{BW}^{0.75}) \times (1 - e^{(-0.192 \times \text{WOL} + 3.67)})
-$$
-:::
-
-**Dry Cows** <br>
-
-For dry cows, DIMest is a function of day of pregnancy (DOP) and BW.
-
-:::{#eq-an-nrc-53}
-[[**AN.NRC.53**]]{.aside .content-visible when-format="html"}
-$$
-\text{DMIest} = (\frac{1.97 - 0.75 \times e^{0.16 \times (\text{DOP} - 280)}}{100}) \times \text{BW}
-$$
-:::
-
-**Heifers** <br>
-
-* If a heifer is *LESS* than 365 days old her DIMest is calculated as a function of her metabolic bodyweight (BW$^{0.75}$) with an adjustment for the energy concentration of the diet:
-
-:::{#eq-an-nrc-54}
-[[**AN.NRC.54**]]{.aside .content-visible when-format="html"}
-$$
-\text{DMIest} = (\text{BW}^{0.75} \times \frac{(0.2435 \times \text{NEadj}) - (0.0466 \times \text{NEadj}^{2}) - 0.0869}{\text{NEadj}})
-$$
-:::
-
-* If the heifer is *MORE* than 365 days old, a separate intercept is used and adjustment is also made for the pregnacy status if she is greater than 210 DOP:
-
-:::{#eq-an-nrc-55}
-[[**AN.NRC.55**]]{.aside .content-visible when-format="html"}
-$$
-\text{DMIest} = (\text{BW}^{0.75} \times \frac{(0.2435 \times \text{NEadj}) - (0.0466 \times \text{NEadj}^{2}) - 0.1128}{\text{NEadj}}) - \text{PREGadj}
-$$
-:::
+Energy supply from the feed includes NEm, NEl, and NEg. NEm provides energy for maintenance and activity requirements, NEl provides energy for 
+lactation and pregnancy, and NEg provides energy for growth. Feed actual energy contents are corrected from standard values provided by @nrc_2001. 
+Minerals do not provide any energy.
 
 ```{python}
-#| label: tbl-an-dmi-var
-#| tbl-cap: Key variables used in DMI calculations.
+#| label: tbl-an-energy-nrc
+#| tbl-cap: Key variables used in calculation of net energy in NRC (2001).
 import_table(
-  "../resources/table_data/animal/tbl-an-dmi-var.csv",
-  colalign = ["left", "left", "left"]
+  "../resources/table_data/animal/tbl-an-energy-nrc.csv",
+  colalign = ["left", "left", "center"]
 )
 ```
 
-#### Nutrient Requirements of Dairy Cattle: NASEM
+**Total Digestible Nutrients (TDN)**
 
-##### Energy Requirements
+:::{#eq-an-sup-1-1}
+[[**AN.SUP.1.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{TDNconc} = \frac{\text{TotalTDN}}{\text{DMI}} \times 100
+$$
+:::
+
+:::{#eq-an-sup-2-1}
+[[**AN.SUP.2.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMI\_to\_maint} = 1, if  \text{TotalTDN} < 0.035 \times \text{BW}^{0.75}, \frac{\text{TotalTDN}}{0.035 \times \text{SBW}^{0.75}}
+$$
+:::
+
+Otherwise:
+
+:::{#eq-an-sup-3-1 style="font-size:90%"}
+[[**AN.SUP.3.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{Discount} = 1, \quad if \quad \text{TDNconc} < 60 \frac{\text{TDNconc} - (0.18 \times \text{TDNconc} - 10.3) \times (\text{DMI}_{\text{to,maint}} - 1)}{\text{TDNconc}}
+$$
+:::
+
+:::{#eq-an-sup-4-1}
+[[**AN.SUP.4.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{TDNact}_{\text{i}} = \text{TDN}_{\text{i}} \times \text{Discount}
+$$
+:::
+
+**Digestible Energy (DE)**
+
+:::{#eq-an-sup-4}
+[[**AN.SUP.4**]]{.aside .content-visible when-format="html"}
+$$
+\text{DEact}_{\text{i}} = \text{DE}_{\text{i}} \times \text{Discount}
+$$
+:::
+
+**Metabolizable Energy (ME)**
+
+:::{#eq-an-sup-5-1 style="font-size:85%"}
+[[**AN.SUP.5.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{MEacti} =
+\begin{cases}
+(1.01 \times \text{DEact}_{i}) + (0.0046 \times 0.0046 \times \text{EE}_{i}) - 3,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
+(1.01 \times \text{DEact}_{i}) - 0.45,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
+(1.01 \times \text{DEact}_{i}),& \text{if feed type is fat}
+\end{cases}
+$$
+:::
+
+**Net Energy**
+
+* Maintenance
+
+:::{#eq-an-sup-7-1 style="font-size:90%"}
+[[**AN.SUP.7.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEmacti} =
+\begin{cases}
+(1.37 \times \text{MEact}_{i}) - (0.138 \times \text{MEact}_{i}^2) + (0.0105 \times \text{MEact}_{i}^3) - 1.12 ,& \text{if feed type is not fat} \\[8pt]
+(0.8 \times \text{MEact}_{i}) ,& \text{if feed type is fat} 
+\end{cases}
+$$
+:::
+
+* Lactation
+
+:::{#eq-an-sup-6-1 style="font-size:80%"}
+[[**AN.SUP.6.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{NElacti}=
+\begin{cases}
+(0.703 \times \text{MEact}_{i}) - 0.019 + (0.097 \times \text{MEact}_{i}) + (0.1997 \times \text{EE}_{i}) - 3 ,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
+(0.703 \times \text{MEact}_{i}) - 0.19 ,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
+(0.8 \times \text{DEact}_{i}) ,& \text{if feed type is fat}
+\end{cases}
+$$
+:::
+
+* Activity
+
+:::{#eq-an-sup-8-1 style="font-size:90%"}
+[[**AN.SUP.8.1**]]{.aside .content-visible when-format="html"}
+$$
+\text{NEgacti}
+=
+\begin{cases}
+(1.42 \times \text{MEact}_{i}) - (0.174 \times \text{MEact}_{i}^2) + (0.0122 \times \text{MEact}_{i}^3) - 1.65 ,& \text{if feed type is not fat} \\[8pt]
+(0.55 \times \text{MEact}_{i}) ,& \text{if feed type is fat} 
+\end{cases}
+$$
+:::
+
+
+
+
+##### Nutrient Requirements of Dairy Cattle: NASEM (2021){#NASEMsection}
+
+Jump to:  
+
+* [Energy Requirements](#nasemcenergyreq)
+* [Protein Requirements](#nasemproteinreq)
+* [Mineral Requirements](#nasemmineralsreq)
+* [Amino Acid Requirements](#nasemAAreqs)
+* [Energy Supply](#nasemenergysup)
+* [Protein Supply](#nasemproteinsup)
+* [Mineral Supply](#nasemmineralsup)
+
+###### Energy Requirements (NASEM){#nasemenergyreq}
 The maintenance requirement is calculated based on metabolic body weight (MBW, body weight $^{0.75}$) adjusted for the tissues associated with pregnancy. For details about the variables included in each calculation, please refer to @tbl-an-energy-nasem.
 
 **Maintenance** <br>
@@ -1019,7 +1075,7 @@ $$
 $$
 :::
 
-##### Protein Requirements
+###### Protein Requirements (NASEM){#nasemproteinreq}
 These are divided into 4 components: maintenance, growth, pregnancy, and lactation (all in Metabolizable Protein or MP). Requirements for EEA are also included in @nrc_2021 but have not yet been implemented.
 
 The requirements for each physiological function are first quantified in terms of the net TP (true protein), instead of CP (crude protein).
@@ -1205,7 +1261,7 @@ AA = Amino Acids; MFP= Metabolic Fecal Protein
 Fixed values are establish by NASEM and are not user defined (@nrc_2021)
 :::
 
-##### Mineral Requirements
+###### Mineral Requirements (NASEM){#nasemmineralsreq}
 Only calcium and phosphorus requirements are included in the code at present. For details about the variables included in each calculation, please refer to the @tbl-an-min-req-var.
 
 **Maintenance** <br>
@@ -1333,48 +1389,8 @@ import_table(
 )
 ```
 
-##### DMI Estimation
-Dry matter intake estimation is different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-nasem-dmi-var. The sum of the dry matter intake of each feed is assumed to be less than the dry matter intake estimation:
 
-$$
-\sum_{i} \text{Feed}_{i} < \text{DMIest}
-$$
-
-**Lactating Cows** 
-
-:::{#eq-an-nsm-50}
-[[**AN.NSM.50**]]{.aside .content-visible when-format="html"}
-$$
-\begin{aligned}
-\text{DMIest} &= ((3.7 + \text{Parity} \times 5.7) + (0.305 \times \text{MilkE}) + (0.022 \times \text{BW}) \\[8pt]
-& \qquad + (-0.689 - 1.87 \times \text{Parity}) \times \text{BCS}) \\[8pt]
-& \qquad \times (1- (0.212 + \text{Parity} \times 0.136) \times e^{(-0.053 \times \text{DIM})})
-\end{aligned}
-$$
-:::
-
-**Dry Cows and Growing Heifers** 
-
-:::{#eq-an-nsm-51}
-[[**AN.NSM.51**]]{.aside .content-visible when-format="html"}
-$$
-\begin{aligned}
-\text{DMIest} &= (0.0226 \times \text{MW} \times(1 - e^{(-1.47 \times \frac{\text{BW}}{\text{MW}})}) \\[10pt]
-& \qquad - (0.082 \times (\text{NDF} - (23.1 + 56 \times \frac{\text{BW}}{\text{MW}} - 30.6 \times (\frac{\text{BW}}{\text{MW}})^2)))
-\end{aligned}
-$$
-:::
-
-```{python}
-#| label: tbl-an-nasem-dmi-var
-#| tbl-cap: Key variables used in DMI estimation calculations.
-import_table(
-  "../resources/table_data/animal/tbl-an-nasem-dmi-var.csv",
-  colalign = ["left", "left", "center"]
-)
-```
-
-##### Amino Acid Requirements
+###### Amino Acid Requirements (NASEM){#nasemAAreqs}
 
 The methods for estimating the amino acids requirements for lactating cows based on the @nrc_2021, in RuFaS are described below.
 
@@ -1474,122 +1490,8 @@ import_table(
 Variables marked with * are from @nrc_2021.
 :::
 
-#### Energy and Nutrition Supply
 
-##### Energy Supply: NRC
-
-Energy supply from the feed includes NEm, NEl, and NEg. NEm provides energy for maintenance and activity requirements, NEl provides energy for 
-lactation and pregnancy, and NEg provides energy for growth. Feed actual energy contents are corrected from standard values provided by @nrc_2001. 
-Minerals do not provide any energy.
-
-```{python}
-#| label: tbl-an-energy-nrc
-#| tbl-cap: Key variables used in calculation of net energy in NRC (2001).
-import_table(
-  "../resources/table_data/animal/tbl-an-energy-nrc.csv",
-  colalign = ["left", "left", "center"]
-)
-```
-
-**Total Digestible Nutrients (TDN)**
-
-:::{#eq-an-sup-1-1}
-[[**AN.SUP.1.1**]]{.aside .content-visible when-format="html"}
-$$
-\text{TDNconc} = \frac{\text{TotalTDN}}{\text{DMI}} \times 100
-$$
-:::
-
-:::{#eq-an-sup-2-1}
-[[**AN.SUP.2.1**]]{.aside .content-visible when-format="html"}
-$$
-\text{DMI\_to\_maint} = 1, if  \text{TotalTDN} < 0.035 \times \text{BW}^{0.75}, \frac{\text{TotalTDN}}{0.035 \times \text{SBW}^{0.75}}
-$$
-:::
-
-Otherwise:
-
-:::{#eq-an-sup-3-1 style="font-size:90%"}
-[[**AN.SUP.3.1**]]{.aside .content-visible when-format="html"}
-$$
-\text{Discount} = 1, \quad if \quad \text{TDNconc} < 60 \frac{\text{TDNconc} - (0.18 \times \text{TDNconc} - 10.3) \times (\text{DMI}_{\text{to,maint}} - 1)}{\text{TDNconc}}
-$$
-:::
-
-:::{#eq-an-sup-4-1}
-[[**AN.SUP.4.1**]]{.aside .content-visible when-format="html"}
-$$
-\text{TDNact}_{\text{i}} = \text{TDN}_{\text{i}} \times \text{Discount}
-$$
-:::
-
-**Digestible Energy (DE)**
-
-:::{#eq-an-sup-4}
-[[**AN.SUP.4**]]{.aside .content-visible when-format="html"}
-$$
-\text{DEact}_{\text{i}} = \text{DE}_{\text{i}} \times \text{Discount}
-$$
-:::
-
-**Metabolizable Energy (ME)**
-
-:::{#eq-an-sup-5-1 style="font-size:85%"}
-[[**AN.SUP.5.1**]]{.aside .content-visible when-format="html"}
-$$
-\text{MEacti} =
-\begin{cases}
-(1.01 \times \text{DEact}_{i}) + (0.0046 \times 0.0046 \times \text{EE}_{i}) - 3,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
-(1.01 \times \text{DEact}_{i}) - 0.45,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
-(1.01 \times \text{DEact}_{i}),& \text{if feed type is fat}
-\end{cases}
-$$
-:::
-
-**Net Energy**
-
-* Maintenance
-
-:::{#eq-an-sup-7-1 style="font-size:90%"}
-[[**AN.SUP.7.1**]]{.aside .content-visible when-format="html"}
-$$
-\text{NEmacti} =
-\begin{cases}
-(1.37 \times \text{MEact}_{i}) - (0.138 \times \text{MEact}_{i}^2) + (0.0105 \times \text{MEact}_{i}^3) - 1.12 ,& \text{if feed type is not fat} \\[8pt]
-(0.8 \times \text{MEact}_{i}) ,& \text{if feed type is fat} 
-\end{cases}
-$$
-:::
-
-* Lactation
-
-:::{#eq-an-sup-6-1 style="font-size:80%"}
-[[**AN.SUP.6.1**]]{.aside .content-visible when-format="html"}
-$$
-\text{NElacti}=
-\begin{cases}
-(0.703 \times \text{MEact}_{i}) - 0.019 + (0.097 \times \text{MEact}_{i}) + (0.1997 \times \text{EE}_{i}) - 3 ,& \text{if feed type is not fat and fat content is} \geq3\% \\[8pt]
-(0.703 \times \text{MEact}_{i}) - 0.19 ,& \text{if feed type is not fat and fat content is} \leq3\% \\[8pt]
-(0.8 \times \text{DEact}_{i}) ,& \text{if feed type is fat}
-\end{cases}
-$$
-:::
-
-* Activity
-
-:::{#eq-an-sup-8-1 style="font-size:90%"}
-[[**AN.SUP.8.1**]]{.aside .content-visible when-format="html"}
-$$
-\text{NEgacti}
-=
-\begin{cases}
-(1.42 \times \text{MEact}_{i}) - (0.174 \times \text{MEact}_{i}^2) + (0.0122 \times \text{MEact}_{i}^3) - 1.65 ,& \text{if feed type is not fat} \\[8pt]
-(0.55 \times \text{MEact}_{i}) ,& \text{if feed type is fat} 
-\end{cases}
-$$
-:::
-
-##### Energy Supply: NASEM
+###### Energy Supply (NASEM){#nasemenergysup}
 
 Energy supply in the updated 2021 Nutrient Requirement model [@nrc_2021] is estimated based only on the NEl and follows a simplified estimation method when compared 
 to the 2001 model [@nrc_2001].
@@ -1735,7 +1637,7 @@ $$
 $$
 ::: 
 
-##### Protein Supply
+###### Protein Supply (NASEM) {#nasemproteinsup}
 
 Protein supply from the feed includes 3 parts: digestible RUP, digestible MCP, which is produced through RDP, and endogenous protein supply from sloughed cells and enzyme secretion into the gut lumen. MCP production requires a nitrogen source and an energy source, so MCP is either nitrogen-limited (when energy is sufficient) or energy-limited (when nitrogen is sufficient). Minerals do not provide any protein.
 
@@ -1800,7 +1702,7 @@ $$
 \text{EndP} = 0.4 \times 11.8 \times \text{DMI}
 $$
 
-##### Mineral Supply
+###### Mineral Supply (NASEM) {#nasemmineralsup}
 
 We use calcium as an example, but phosphorus calculations are analagous.
 
@@ -1811,143 +1713,285 @@ $$
 $$
 :::
 
-#### Automated Ration Formulation
+#### Feed Consumption
 
 ##### Introduction
+Feed consumption in RuFaS consists of 4 key components, which are defined for each animal combination (see @tbl-an-def-grp): 1) the total DMI amount, 2) the feeds available, 3) the available feed costs and nutritive composition, and 4) the proportional inclusion of each ingredient in the diet. RuFaS provides several options for configuring these components in order to represent feed consumption. The two ends of this range of options are:
 
-Automated ration formulation in RuFaS optimizes a ration for a single objective (least cost), utilizing sequential least squares quadratic programming, as described in @Li_2022. This process is carried out on an individual pen level, and uses the mean animal requirements and body weight of the pen on the day of the formulation. The ration formulation process includes information not only from the Animal Module’s inputs (@tbl-an-auto-ration-an-input), but the primary Feed input file (@tbl-an-auto-ration-feed-input-purch and @tbl-an-auto-ration-feed-input-perc), and Feed ingredient inclusion rates defined in the Feed Storage module’s input files.
+* In the least-controlled formulation context, the user specifies only the list of feeds available to use for each animal combination, and allows a least-cost optimization procedure (@Li_2022) to formulate a ration that meets each pen’s nutrient requirements. Individual feed inclusions are unlimited, and DMI may increase by up to 30% from the initial value predicted by NASEM or NRC. If formulation of a diet that meets requirements is not possible with the given feeds and allowable DMI, milk production is penalized and the process is reattempted at a lower milk production.
+* In the most-controlled context, the user specifies the exact DMI or DMI per unit of milk or gain, the exact inclusion rate of each feed, and prohibits any milk penalization.
 
-##### Required User Inputs
+The input options detailed in this section allow the user to define the level of control exerted over the intake amounts and composition of the ration, depending on their use case. 
 
-```{python}
-#| label: tbl-an-auto-ration-an-input
-#| tbl-cap: Key inputs found in the animal input file.
-import_table(
-  "../resources/table_data/animal/tbl-an-auto-ration-an-input.csv",
-  colalign = ["left", "left", "center", "center", "center"]
-)
-```
-
-```{python}
-#| label: tbl-an-auto-ration-feed-input-purch
-#| tbl-cap: Key inputs found in the feed input file for `purchased_feeds`.
-import_table(
-  "../resources/table_data/animal/tbl-an-auto-ration-feed-input-purch.csv",
-  colalign = ["left", "left", "center", "center", "center"]
-)
-```
-
-```{python}
-#| label: tbl-an-auto-ration-feed-input-perc
-#| tbl-cap: Key inputs found in the feed input file for 'User_defined_ration_percentages`.
-import_table(
-  "../resources/table_data/animal/tbl-an-auto-ration-feed-input-perc.csv",
-  colalign = ["left", "left", "center", "center", "center"]
-)
-```
-
-##### Relevant Outputs
-
-Average nutrient requirements, on a per animal basis, for each pen.
-
-* Class and function: `AnimalModuleReporter.report_ration_interval_data`
-* Output variable: `avg_rqmts_pen_pen.id_pen.animal_combination.name`
-
-Each formulation interval's mean animal ration, on a per animal basis, for each pen.
-
-* Class and function: `AnimalModuleReporter.report_ration_interval_data`
-* Output variable: `ration_per_animal_for_pen_pen.id_pen.animal_combination.name`
-
-Nutrient and energetic composition of ration, on a per animal basis, for each pen.
-
-* Class and function: `AnimalModuleReporter.report_ration_interval_data`
-* Output variable: `ration_nutrient_amount_pen_pen.id_pen.animal_combination.name`
-
-The total amount of Feeds, per pen.
-
-* Class and function: `AnimalModuleReporter.report_daily_ration`
-* Output variable: `ration_daily_feed_totals_for_pen_pen.id_pen.animal_combination.name`
-
-In cases of ration formulation failure, a summary of the constraints that failed, and the attempted ration and its supply will be supplied in a report.
-
-* Class and function: `RationOptimizer.handle_failed_constraints`
-* Output variable: `failed_constraint_summary_for_pen_pen_id`
-
-##### Methodology
-
-Ration formulation is carried out at the pen level on a user-defined formulation interval (@tbl-an-auto-ration-an-input). The mean requirements for a given pen are 
-calculated prior to first formulation. This process then proceeds to utilize a series of constraints methods (@tbl-an-ration-input-constr) that compares the
-animal requirements against the supply of the optimizer’s ration attempt, all while abiding feed ingredient-specific inclusion rates, as defined in @nrc_2001 and @nrc_2021. 
-If a ration cannot be formulated  that meets the constraints given the pen-level requirements and limits to inclusion rates, then one of the following things will happen.
-
-**For lactacting cow pens**
-
-* Record failed constraints and formulation attempt to OutputManager.
-* Milk production will be reduced.
-  * If average milk production for the pen drops below the values defined in the Milk Production Section (below), then the simulation halts with an error.
-* Recalculation of the nutritional requirements for all animals in the pen.
-* Ration formulation reattempt (repeat).
-
-**For growing and close-up pens**
-
-* Record failed constraints and formulation attempt to OutputManager.
-* IF a successful ration from a prior formulation is available, said ration will be used.
-* IF no previously successful ration is available, the simulation will stop.
+Rations for each animal combination are formulated at the beginning of each user-defined formulation interval (`formulation_interval`; the number of days between formulations). A formulation attempt will occur at least once at the beginning of the interval. If the initial attempt fails, formulation will be reattempted as described in the [Diet Formulation](#diet-formulation) section. Available feeds, nutritive composition, feed costs, etc. do not vary over time in RuFaS. However, at the beginning of each formulation interval, nutrient requirements are recalculated to reflect the updated population of animals in each pen. 
 
 ::: {.callout-note}
-A graphical overview of this process can be found in @fig-ani-nutr-req-feeding.
+Because intake and/or diet composition information is provided at the animal combination level, only one list of ingredients (and, optionally, ingredient inclusions) can be provided per animal combination. Ration inputs cannot be configured at the pen level. However, if multiple pens are defined within an animal combination, and intake and ingredient composition are not fixed, pen-level intake of DMI and individual feeds may vary due to differing nutrient requirements of pens.
 :::
 
-The generalized equation for sequential quadratic programming is as follows and gi(x) is constraint i, which must be twice continuously differentiable with respect to all xj in x (@Li_2022).
+###### Inputs
+All feed inputs are provided in the feed input JSON file (@tbl-an-ration-input-feed), with the exception of four inputs that are provided in the animal input file (@tbl-an-ration-input-animal).
 
 ```{python}
-#| label: tbl-an-ration-input-constr
-#| tbl-cap: Constraints used to formulate a ration for both automated and user-defined methods.
+#| label: tbl-an-ration-input-animal
+#| tbl-cap: Key inputs found in the animal input file.
+import_table(
+  "../resources/table_data/animal/tbl-an-auto-ration-an-input2.csv",
+  colalign = ["left", "left", "left", "center"]
+)
+```
+
+```{python}
+#| label: tbl-an-ration-input-feed
+#| tbl-cap: Key inputs found in the feed input file.
+import_table(
+  "../resources/table_data/animal/tbl-an-auto-ration-an-input3.csv",
+  colalign = ["left", "left", "left", "center"]
+)
+```
+
+
+###### Outputs
+
+Ration outputs are reported by several classes and functions, each of which includes a number of individual output variables.
+
+**AnimalModuleReporter.report_average_nutrient_requirements.avg_rqmts**  
+
+* **Description**: Lists the average nutrient requirements by animal, per pen. Reported for each ration formulation interval.
+* **Variables** (listed by unit): 
+  + mcal: NEg_requirement, NEpreg_requirement, NEl_requirement
+  + g: MP_requirement, Ca_requirement, P_req, P_req_process, avg_essential_amino_acid_requirement 
+  + kg: DMIest_requirement, avg_BW, avg_milk_production_reduction_pen (kg/animal/day)
+
+
+**AnimalModuleReporter.report_nutrient_amounts.ration_nutrient_amount**  
+
+* **Description**: Lists the quantity of DM and nutritive constituents provided per animal in each ration interval, by pen.  
+* **Variables** (listed by unit):
+  + Kg: Total DM, total as-fed, CP, NDF, ADF, lignin, ash, P, K, N, EE, starch, TDN, Ca, forage NDF
+  + g: fat, metabolizable protein 
+  + %DM: fat percentage, forage NDF
+  + mcal: DE, ME, NE maintenance and activity, NE lactation, NE growth
+
+
+**RationOptimizer.handle_failed_constraints.failed_constraint_summary_for_pen**
+
+* **Description:** Lists variables related to ration formulation failure. Reported once for each formulation failure.
+* **Variables:**
+  + simulation_day: simulation day on which the formulation failure occurred
+  + attempt number: formulation attempt number within formulation interval
+  + constraints_failed_dict: list of constraints the ration violated
+  + ration_attempted: list of feed IDs and kg inclusions in failed ration
+  + pen requirements: pen-level requirements for maintenance, growth, lactation, and activity energy, metabolizable protein, P, and DMI
+
+**AnimalModuleReporter.report_ration_per_animal.ration_per_animal**  
+
+* **Description**: Lists the quantity of each feed fed per animal per day in each ration interval, by pen.  
+* **Variables**: One kg/animal/day value for each feed consumed (indicated by feed ID)
+
+
+**AnimalModuleReporter.report_daily_ration_per_pen.ration_daily_feed_totals**  
+
+* **Description**: Lists the total daily consumption (kg) of each feed fed in the ration interval, by pen. Reported on every simulation day.  
+* **Variables**: One kg/day value for each feed consumed (indicated by feed ID), daily total dry matter intake (kg), and daily total byproduct intake (kg)  
+
+
+
+##### Dry Matter Intake {#dmi-section}
+
+###### Basic options for configuring dry matter intake
+Dry matter intake is set at the beginning of each ration formulation attempt, and is based on the user-defined DMI input options described in this section. There are 3 distinct options available to the user to configure DMI of each animal combination, which are detailed below:
+
+1. `predict_DMI`: DMI is predicted using the equations of the user-selected nutritional model (NRC or NASEM).
+2. `set_DMI`: DMI is set to a user-specified value (kg/animal/day).
+3. `set_DMI_per_X`: DMI is set to a user-specified value per kg of milk yield (lactating cows) or per kg of average daily gain (growing animals).
+
+The `intake_option` value in the feed input JSON sets the desired DMI option, and `intake_value` sets the DMI value, if required by the DMI option used. 
+
+If the initial ration formulation attempt fails, formulation will be reattempted as described in the [Diet Formulation](#diet-formulation) section. Importantly, if allowable by the selected DMI input option and tolerance value, DMI may increase or decrease at each formulation reattempt. See the [Diet Formulation](#diet-formulation) section for more information on how DMI may be modulated in the formulation reattempt process. The global tolerance parameter (`user_defined_ration_tolerance`) may also be used to enable user-controlled variation in DMI and ingredient inclusion. At this time, only a single tolerance value applicable to all animal combinations can be set; tolerance cannot be set by combination.
+
+###### Predict DMI option
+With the `predict_DMI` option, DMI prediction equations from the user-selected nutritional model (@nrc_2001 or @nrc_2021) are utilized to predict a DMI value based on each animal's attributes at the time of formulation. Importantly, input values to these equations may be modulated by the formulation reattempt process and the DMI re-estimated from the updated values. For example, milk production may be reduced, thereby reducing the estimated DMI of lactating cows. See [Diet Formulation](#diet-formulation) for more details. At this time, this option is not usable with the Calf animal combination.
+
+***NRC DMI Estimation***
+
+Methods for estimating DMI are different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-dmi-var. The sum of DMI of each feed is assumed to be less than or equal to the estimated DMI:
+
+$$
+\sum_{i} \text{Feed}_{i} \le \text{DMIest}
+$$
+
+**Lactating Cows** <br>
+
+For lactating cows, the estimated DMI (DMIest) is calculated as a function of the fat corrected milk (FCM), bodyweight (BW), and week of lactation (WOL). 
+
+:::{#eq-an-nrc-51}
+[[**AN.NRC.51**]]{.aside .content-visible when-format="html"}
+$$
+\text{FCM} = (0.4 \times \text{Milk}) + (15 \times \text{Fat\_Milk} \times \frac{\text{Milk}}{100})
+$$
+:::
+
+:::{#eq-an-nrc-52}
+[[**AN.NRC.52**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest} = (0.372 \times \text{FCM} + 0.0968 \times \text{BW}^{0.75}) \times (1 - e^{(-0.192 \times \text{WOL} + 3.67)})
+$$
+:::
+
+**Dry Cows** <br>
+
+For dry cows, DMIest is a function of day of pregnancy (DOP) and BW.
+
+:::{#eq-an-nrc-53}
+[[**AN.NRC.53**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest} = (\frac{1.97 - 0.75 \times e^{0.16 \times (\text{DOP} - 280)}}{100}) \times \text{BW}
+$$
+:::
+
+**Heifers** <br>
+
+* If a heifer is *LESS* than 365 days old her DMIest is calculated as a function of her metabolic bodyweight (BW$^{0.75}$) with an adjustment for the energy concentration of the diet:
+
+:::{#eq-an-nrc-54}
+[[**AN.NRC.54**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest} = (\text{BW}^{0.75} \times \frac{(0.2435 \times \text{NEadj}) - (0.0466 \times \text{NEadj}^{2}) - 0.0869}{\text{NEadj}})
+$$
+:::
+
+* If the heifer is *MORE* than 365 days old, a separate intercept is used and adjustment is also made for the pregnancy status if she is greater than 210 DOP:
+
+:::{#eq-an-nrc-55}
+[[**AN.NRC.55**]]{.aside .content-visible when-format="html"}
+$$
+\text{DMIest} = (\text{BW}^{0.75} \times \frac{(0.2435 \times \text{NEadj}) - (0.0466 \times \text{NEadj}^{2}) - 0.1128}{\text{NEadj}}) - \text{PREGadj}
+$$
+:::
+
+```{python}
+#| label: tbl-an-dmi-var
+#| tbl-cap: Key variables used in NRC DMI calculations.
+import_table(
+  "../resources/table_data/animal/tbl-an-dmi-var.csv",
+  colalign = ["left", "left", "left"]
+)
+```
+
+
+
+***NASEM DMI Estimation***
+
+Dry matter intake estimation is different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-nasem-dmi-var. For all animal classes, the sum of the DMI of each feed is assumed to be less than or equal to the DMI estimate:
+
+$$
+\sum_{i} \text{Feed}_{i} \le \text{DMIest}
+$$
+
+**Lactating Cows** 
+
+:::{#eq-an-nsm-50}
+[[**AN.NSM.50**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+\text{DMIest} &= ((3.7 + \text{Parity} \times 5.7) + (0.305 \times \text{MilkE}) + (0.022 \times \text{BW}) \\[8pt]
+& \qquad + (-0.689 - 1.87 \times \text{Parity}) \times \text{BCS}) \\[8pt]
+& \qquad \times (1- (0.212 + \text{Parity} \times 0.136) \times e^{(-0.053 \times \text{DIM})})
+\end{aligned}
+$$
+:::
+
+**Dry Cows and Growing Heifers** 
+
+:::{#eq-an-nsm-51}
+[[**AN.NSM.51**]]{.aside .content-visible when-format="html"}
+$$
+\begin{aligned}
+\text{DMIest} &= (0.0226 \times \text{MW} \times(1 - e^{(-1.47 \times \frac{\text{BW}}{\text{MW}})}) \\[10pt]
+& \qquad - (0.082 \times (\text{NDF} - (23.1 + 56 \times \frac{\text{BW}}{\text{MW}} - 30.6 \times (\frac{\text{BW}}{\text{MW}})^2)))
+\end{aligned}
+$$
+:::
+
+```{python}
+#| label: tbl-an-nasem-dmi-var
+#| tbl-cap: Key variables used in NASEM DMI estimation calculations.
+import_table(
+  "../resources/table_data/animal/tbl-an-nasem-dmi-var.csv",
+  colalign = ["left", "left", "center"]
+)
+```
+
+
+
+###### `set_DMI` and `set_DMI_per_X` options
+
+Two options exist to control DMI of each animal combination. The `set_DMI` option will force the formulation process to utilize the same user-specified DMI (kg) at every formulation attempt. As a result, animals in this combination will consume the same amount of DM every single day of the simulation. However, the user may elect to allow DMI to vary by a user-defined percentage value, which is configured by the `user_defined_ration_tolerance` input value. For example, if the `intake_value` is 20 kg and `user_defined_ration_tolerance` is 0.01 (1%), the DMI will range between 19.8 and 20.2 kg. `set_DMI` is usable with all animal combinations.
+
+The `set_DMI_per_X` option sets the DMI of all animals in an animal combination according to a user-provided value for feed intake (kg) per kg of milk yield (for lactating) or average daily gain (for growing). The provided DMI per X value is multiplied by the milk production or average daily gain value for the pen at the beginning of the ration formulation interval. Allowable variance in the ratio between DMI and X can also be set by the `user_defined_ration_tolerance` value. For example, if an input value of 0.65 kg DMI/kg milk is provided, with a `user_defined_ration_tolerance` of 0.05 (5%), the ratio of DMI to milk may range from 0.6175 to 0.6825. Though pen-level daily milk production and gain will vary from day to day in the simulation, the DMI is based only on the milk production or average daily gain at the beginning of the ration formulation interval, and is fixed for the duration of the interval. The `set_DMI_per_X` option is usable with lactating and growing animal combinations.
+
+::: {.callout-note}
+At this time, DMI of calves must be set to a kg/day amount using the `set_DMI` option; calf DMI cannot be predicted or set per unit of daily gain.
+:::
+
+
+##### Feed parameters and library
+
+The RuFaS feed libraries were adapted from @nrc_2001 and @nrc_2021 and include >300 feeds categorized into 9 groups (Grain Crop Forage, Grass/Legume Forage, Pasture, Energy Source, Plant Protein, By-Product/Other, Vitamin/Mineral, Calf Liquid Feed, and NPN Supplement). A complete set of nutritive information is provided for each feed. Because the nutritional model used (@nrc_2001 or @nrc_2021) is selected by the user, and the two models do not share identical feed libraries, two library files are present in the repository (`NRC_comp.csv` and `NASEM_Comp_with_TDN_urea.csv` for NRC and NASEM, respectively).
+
+If desired, users may also provide their own nutritive composition information by either modifying the library feeds or adding additional feeds to the library. These changes can be made directly in the feed library .csv file (note that feed libraries for NRC and NASEM are referenced in metadata files as `NRC_Comp` and `NASEM_Comp`, respectively). Users are encouraged to utilize library values as “templates” for adding new or modified versions of feeds, to ensure all required nutritive information is present. 
+
+#### Diet Formulation {#diet-formulation}
+
+##### Overview
+Ration formulation is carried out at the pen level on a user-defined interval (`formulation_interval`), and uses a user-provided list of feeds available per animal combination. Broadly speaking, there are two methods to formulate rations: the fully automated method (@fig-ani_auto_ration), and the user-defined method (@fig-ani_UDR). In both cases, nutrient and energy requirements are first calculated for each animal in a given pen, and then the pen average requirements are calculated and used in subsequent steps. Ration formulation is then attempted using a least-cost optimization method (`minimize` from the package SciPy; @Li_2022). A set of internal constraints (@tbl-an-diet-const) serve to prevent formulation of inappropriate rations when optimization logic is in use, and ingredient-specific minimum and maximum inclusions (kg or %DM) are also definable by the user. Successful formulation occurs if the ration meets all ingredient inclusion bounds and passes all constraints. 
+
+```{python}
+#| label: tbl-an-diet-const
+#| tbl-cap: Constraints utilized in ration formulation.
 import_table(
   "../resources/table_data/animal/tbl-an-ration-input-constr.csv",
-  colalign = ["left", "left", "center", "center", "center"]
+  colalign = ["left", "left", "left", "left"]
 )
 ```
 
-#### User-Defined Ration Formulation
 
-##### Introduction
+##### Feed library ingredient inclusion ranges
+Bounds for individual feed ingredient inclusion on a DM mass basis (kg) are set as raw minimum and maximum values for all animal combinations via the `lower_limit` and `limit` columns in the feed library file. These values by default are set to a minimum of 0 kg and maximum of 100 kg/animal/day, and thus do not restrict formulation unless modified by the user. Note: if these limits are more restrictive than the user-defined ranges for feed ingredient inclusion percentages, then the feed library value(s) take precedence.
 
-The user-defined ration methodology follows the same process as described in the Automated ration formulation methodology, with the addition of the
-inputs found in this section, as described in the Methodology section below.
+##### Feed ingredient inclusion percentages
+When utilizing the user-defined ration formulation option (`user_input` set to true in @tbl-an-ration-input-animal), ingredient inclusion percentages are defined for each animal combination. The DMI value is used as reference for the inclusion percentage, so a feed ingredient with a given value of 0.2 (20%) in a diet at 25 kg total DMI would result in 5 kg of said feed ingredient allowed in a successful ration. User-defined ingredient inclusion proportions may be further modified by the tolerance value (`user_defined_ration_tolerance` in @tbl-an-ration-input-feed). A single value of `user_defined_ration_tolerance` is specified for the entire ration; it applies to every ingredient and to all animal combinations. The tolerance value determines the “width” of the bounds by defining a +/- fractional variance for each ration inclusion percentage value. The primary role of `user_defined_ration_tolerance` is to allow the intake and diet composition to be adjusted as necessary to avoid violating constraints (@tbl-an-diet-const) as the population and requirements of animals vary over time.
 
-##### Required User Inputs
+* Tolerance value example: a feed with a user-defined ration percentage value of 0.2 (20% of DM) and tolerance of 0.1 (10%) would correspond to an allowable range for said feed ingredient of 18% to 22% of the DMI value.
+* Note: setting a tolerance of 0.0 collapses the bounds to a single value for each inclusion percentage, meaning that the resultant ration will precisely match the user-defined ingredient inclusion percentages.
 
-```{python}
-#| label: tbl-an-user-ration-feed-input
-#| tbl-cap: Key inputs found in the feed input file specific to user defined ration methodology.
-import_table(
-  "../resources/table_data/animal/tbl-an-user-ration-feed-input.csv",
-  colalign = ["left", "left", "center", "center", "center"]
-)
-```
+##### Ration formulation failure: overview
+Failure of a ration to be formulated successfully indicates that the requirement constraints were violated, and an output (**RationOptimizer.handle_failed_constraints.failed_constraint_summary_for_pen**) will be generated to inform the user which specific constraint(s) are failing. There are multiple possible outcomes following formulation failure, and next steps after failure depend on the user configuration of feed-related inputs.
 
-##### Methodology
+##### Ration formulation failure: automated methodology
+![Graphic of automated ration formulation methodology.](../resources/images/RuFaS_auto_ration_figure.png){#fig-ani_auto_ration}
 
-The key difference in the methodology for the user-defined ration methodology is that the feed inclusion rates are bounded by the 
-`user_defined_ration_percentage` values defined for each feed item. Those percentage values become the minimum and maximum 
-inclusion value for each feed, with +/- the tolerance value as a fraction of the percentage.
+**Non-lactating animals**: if the ration was successfully formulated in the prior ration formulation interval, the previous ration will be used. Otherwise, the simulation will halt.
 
-The ration formulation will proceed as described in the Automated Methodology above, but when formulation fails, different outcomes will occur.
+**Lactating animals**: an attempt to reduce milk yield may be made if the lower limit of pen-average milk production has not been reached, and the value in the feed input file allows for a reduction in lactation (@tbl-an-ration-input-feed). Milk yield reduction occurs by reducing the milk production of every individual by 0.25 kg/d, regardless of production level, thereby reducing the pen average in 0.25 kg/d increments. Every time a reduction occurs, the formulation process begins again at the step where individual animal requirements are calculated. The process continues from there using the newly reduced requirements, making a successful formulation more likely. Note that because milk energy output is a component of the equations to estimate DMI, when requirements are recalculated after a milk reduction occurs, DMI will decrease. The DMI reduction amount is capped at 30% of the initial DMI estimate (i.e., before milk yield reductions were attempted).
 
-**For lactating cow pens**
+* The milk yield reduction process repeats until either: A. successful ration formulation, or B. further reduction in milk is precluded (reaching either the minimum pen-level production of 15 kg/cow/d, or the user-defined per-animal maximum level of milk yield reduction is reached cumulatively within a ration formulation interval), whereupon the simulation is halted.
 
-* Record failed constraints and formulation attempt to OutputManager.
-* Milk production will be reduced.
-  * IF if the `milk_reduction_maximum` is exceeded, then the simulation proceeds by using the user-defined ration percentages exactly.
-* Recalculation of the nutritional requirements for all animals in the pen.
-* Ration formulation reattempt (repeat).
 
-**For growing and close-up pens**
+##### Ration formulation failure: user-defined methodology
+![Graphic of user-defined ration formulation methodology.](../resources/images/RuFaS_user_defined_ration_figure.png){#fig-ani_UDR}
 
-* Record failed constraints and formulation attempt to OutputManager.
-* Recording of which constraints were unable to be met.
-* The simulation proceeds by using the user-defined ration percentages exactly.
+**Non-lactating animals**: the user defined inclusion percentages will be used to formulate the ration, and it will be considered successful.
+
+**Lactating animals**: the following steps will be attempted, in sequence.
+
+1. Given that the DMI value (based on the `intake_option` setting; see [DMI section](#dmi-section) above) drives overall intake, and a user may want to increase intake without deviating from feed ingredient inclusion rates, intake is increased (only when a failed constraint could be fixed via increasing DMI) and optimization is attempted either until 1. a successful formulation occurs, or 2. the upper intake limit is reached. When the `predict_DMI` option is used, intake may increase by up to 30%, in 10% increments. When `set_DMI` or `set_DMI_per_X` is used, intake may increase only up to the tolerance value. Once the upper intake limit is reached, the process continues to the next step.
+2. If milk yield can be reduced (see Automated method: Lactating animals section above for more details), milk yield will be reduced and the process loops back to recalculate nutritional requirements for all animals in a pen. Note that when the `predict_DMI` option is used, DMI will decrease when milk reductions occur, as milk energy output is a factor in DMI prediction equations. The DMI reduction amount is capped at 30% of the initial DMI estimation, before milk yield reductions are attempted.
+3. If both Steps 1 and 2 are no longer possible to carry out, then the user defined inclusion percentages are used to generate a ration, using the target DMI recalculated after any milk reductions; milk reductions made during the attempt remain in effect until the next formulation interval. This allows the simulation to continue, but the final “failure” is still recorded for the user to inspect as needed.
+
+
+
 
 ::: {#sec-an-hsm}
 ### Herd Size Management  
@@ -2748,7 +2792,7 @@ reduction values are used.
 **User Inputs and Constants**
 
 * `Milk_reduction_maximum`: Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements 
-* Tolerance: Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently 
+* `Tolerance`: Allowable +/- percentage variance in each of the defined ration inclusion percentage values. This variable is default to 0.0 and it currently 
 has no effect due to no implementation of automatic ration optimizer. 
 * `Milk_reduction_kg` is set to 0.25 kg: Milk reduction amount for each failed ration attempt, kg. 
 * `Minimum_avg_pen_milk` is set to 15 kg: Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal
