@@ -2432,9 +2432,7 @@ class HerdManager:
                 if previous_average is None:
                     new_average = sum(values) / low_production_cow_count
                 else:
-                    new_average = (
-                        previous_average * previous_count + sum(values)
-                    ) / total_low_production_cow_count
+                    new_average = (previous_average * previous_count + sum(values)) / total_low_production_cow_count
                 setattr(self.herd_statistics, attribute, new_average)
 
         self.herd_statistics.sold_cow_low_production_num = total_low_production_cow_count
