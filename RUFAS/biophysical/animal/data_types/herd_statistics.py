@@ -375,6 +375,9 @@ class HerdStatistics:
     cull_reason_stats_percent: dict[str, float]
     percent_cow_for_parity: dict[str, float]
 
+    heifer_average_daily_gain_by_pen: dict[str, float | None]
+    heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
+
     daily_milk_production = 0.0
     herd_milk_fat_kg = 0.0
     herd_milk_fat_percent = 0.0
@@ -382,13 +385,10 @@ class HerdStatistics:
     herd_milk_protein_percent = 0.0
     milk_production_at_removal_sum = 0.0
     milk_production_at_removal_count = 0
-    milk_production_at_low_production_sale_avg = 0.0
-    days_in_milk_at_low_production_sale_avg = 0.0
-    parity_at_low_production_sale_avg = 0.0
-    days_pregnant_at_low_production_sale_avg = 0.0
-
-    heifer_average_daily_gain_by_pen: dict[str, float | None]
-    heifer_average_daily_gain_by_animal_type: dict[AnimalType, float | None]
+    milk_production_at_low_production_sale_avg: float | None = None
+    days_in_milk_at_low_production_sale_avg: float | None = None
+    parity_at_low_production_sale_avg: float | None = None
+    days_pregnant_at_low_production_sale_avg: float | None = None
 
     average_age_at_weaning: float | None = None
     average_age_at_heiferII_graduation: float | None = None
@@ -572,10 +572,10 @@ class HerdStatistics:
         self.herd_milk_protein_percent = 0.0
         self.milk_production_at_removal_sum = 0.0
         self.milk_production_at_removal_count = 0
-        self.milk_production_at_low_production_sale_avg = 0.0
-        self.days_in_milk_at_low_production_sale_avg = 0.0
-        self.parity_at_low_production_sale_avg = 0.0
-        self.days_pregnant_at_low_production_sale_avg = 0.0
+        self.milk_production_at_low_production_sale_avg = None
+        self.days_in_milk_at_low_production_sale_avg = None
+        self.parity_at_low_production_sale_avg = None
+        self.days_pregnant_at_low_production_sale_avg = None
 
         for pen_id in self.heifer_average_daily_gain_by_pen:
             self.heifer_average_daily_gain_by_pen[pen_id] = None

@@ -794,7 +794,7 @@ class HerdManager:
                     heifer for heifer in group_graduated_animals if heifer.animal_type == AnimalType.HEIFER_III
                 ]
 
-                self.herd_statistics.average_age_at_heiferII_graduation = (
+                self.herd_statistics.average_age_at_heiferIII_graduation = (
                     sum(heifer.days_born for heifer in graduated_heifers) / len(graduated_heifers)
                     if graduated_heifers
                     else None
@@ -811,7 +811,7 @@ class HerdManager:
                 daily_herd_updates.sold_and_died_cows.extend(dead_cows)
             elif animal_group_name == "cows":
                 self.herd_statistics.multiparous_calvings += sum(
-                    animal.events.get_most_recent_date(animal_constants.NEW_BIRTH) == time.simulation_day
+                    animal.events.get_most_recent_date(animal_constants.NEW_BIRTH) == animal.days_born
                     and animal.reproduction.calves >= 2
                     for animal in animals
                 )
@@ -2429,7 +2429,12 @@ class HerdManager:
                 ),
             ):
                 previous_average = getattr(self.herd_statistics, attribute)
-                new_average = (previous_average * previous_count + sum(values)) / total_low_production_cow_count
+                if previous_average is None:
+                    new_average = sum(values) / low_production_cow_count
+                else:
+                    new_average = (
+                        previous_average * previous_count + sum(values)
+                    ) / total_low_production_cow_count
                 setattr(self.herd_statistics, attribute, new_average)
 
         self.herd_statistics.sold_cow_low_production_num = total_low_production_cow_count
