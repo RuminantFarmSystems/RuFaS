@@ -615,8 +615,7 @@ class OutputManager:
 
         e2e_results_summary: dict[str, dict[str, bool | str]] = {
             prefix: {
-                header: "not run (task failed)" if prefix in failed_e2e_groups else "n/a"
-                for header in module_headers
+                header: "not run (task failed)" if prefix in failed_e2e_groups else "n/a" for header in module_headers
             }
             for prefix in output_prefixes
         }
