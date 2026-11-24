@@ -166,13 +166,13 @@
       "tbv_fat_variance": {
         "type": "number",
         "description": "True Breeding Value Fat Variance (kg^2) -- The variance of the true breeding value (TBV) for fat yield in the herd. Defaults to the CDCB national average",
-        "default": 25.8,
+        "default": 575.8,
         "minimum": 0
       },
       "tbv_protein_variance": {
         "type": "number",
         "description": "True Breeding Value Protein Variance (kg^2) -- The variance of the true breeding value (TBV) for protein yield in the herd. Defaults to the CDCB national average",
-        "default": 13.4,
+        "default": 281.4,
         "minimum": 0
       },
       "tbv_correlation": {
@@ -185,13 +185,13 @@
       "permanent_environment_fat_variance": {
         "type": "number",
         "description": "Permanent Environmental Effect Fat Variance (kg^2) -- The variance of the permanent environmental effect on fat yield in the herd. Defaults to the CDCB national average",
-        "default": 38.8,
+        "default": 863.6,
         "minimum": 0
       },
       "permanent_environment_protein_variance": {
         "type": "number",
         "description": "Permanent Environmental Effect Protein Variance (kg^2) -- The variance of the permanent environmental effect on protein yield in the herd. Defaults to the CDCB national average",
-        "default": 20.1,
+        "default": 422.0,
         "minimum": 0
       },
       "permanent_environment_correlation": {
@@ -204,13 +204,13 @@
       "temporary_environment_fat_variance": {
         "type": "number",
         "description": "Temporary Environmental Effect Fat Variance (kg^2) -- The variance of the temporary environmental effect on fat yield in the herd. Defaults to the CDCB national average",
-        "default": 64.5,
+        "default": 1439.4,
         "minimum": 0
       },
       "temporary_environment_protein_variance": {
         "type": "number",
         "description": "Temporary Environmental Effect Protein Variance (kg^2) -- The variance of the temporary environmental effect on protein yield in the herd. Defaults to the CDCB national average",
-        "default": 33.4,
+        "default": 703.4,
         "minimum": 0
       },
       "temporary_environment_correlation": {
