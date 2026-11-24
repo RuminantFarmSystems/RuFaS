@@ -202,38 +202,43 @@ class AnimalPopulation:
             AnimalPopulation.set_current_max_animal_id(max(ids))
 
     def __repr__(self) -> dict[str, list[dict[str, Any]]]:
-        """Dictionary representation of the AnimalPopulation object, including cows grouped by parity and milking."""
-        population = self.to_dict()
-        replacement = population.pop("replacement")
-        cows_by_parity_and_milking = {
-            f"cows_parity_{parity}_{'milking' if is_milking else 'not_milking'}": [
-                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=parity, is_milking=is_milking)
-            ]
-            for is_milking in (True, False)
-            for parity in range(1, 6)
-        }
-        return {**population, **cows_by_parity_and_milking, "replacement": replacement}
-
-    def to_dict(self) -> dict[str, list[dict[str, Any]]]:
-        """
-        Convert the population into the format of an animal population input file.
-
-        Each animal appears exactly once, in the group it belongs to. The output can be saved and later loaded as
-        the ``animal_population`` input.
-
-        Returns
-        -------
-        dict[str, list[dict[str, Any]]]
-            The animal values of each animal, keyed by group: ``calves``, ``heiferIs``, ``heiferIIs``,
-            ``heiferIIIs``, ``cows`` and ``replacement``.
-
-        """
+        """Dictionary representation of the AnimalPopulation object"""
         return {
             "calves": [dict(calf.get_animal_values()) for calf in self.calves],
             "heiferIs": [dict(heiferI.get_animal_values()) for heiferI in self.heiferIs],
             "heiferIIs": [dict(heiferII.get_animal_values()) for heiferII in self.heiferIIs],
             "heiferIIIs": [dict(heiferIII.get_animal_values()) for heiferIII in self.heiferIIIs],
             "cows": [dict(cow.get_animal_values()) for cow in self.cows],
+            "cows_parity_1_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=1, is_milking=True)
+            ],
+            "cows_parity_2_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=2, is_milking=True)
+            ],
+            "cows_parity_3_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=3, is_milking=True)
+            ],
+            "cows_parity_4_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=4, is_milking=True)
+            ],
+            "cows_parity_5_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=5, is_milking=True)
+            ],
+            "cows_parity_1_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=1, is_milking=False)
+            ],
+            "cows_parity_2_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=2, is_milking=False)
+            ],
+            "cows_parity_3_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=3, is_milking=False)
+            ],
+            "cows_parity_4_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=4, is_milking=False)
+            ],
+            "cows_parity_5_not_milking": [
+                dict(cow.get_animal_values()) for cow in self.filter_cow_status(parity=5, is_milking=False)
+            ],
             "replacement": [dict(replacement.get_animal_values()) for replacement in self.replacement],
         }
 
