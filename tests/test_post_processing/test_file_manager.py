@@ -87,17 +87,23 @@ def test_write_failure(
     assert exc.value.__cause__ is error
 
 
-@pytest.mark.parametrize("label, prefix", [
-    (OriginLabel.TRUE_AND_REPORT_ORIGINS, "[Cow.update]->[Reporter.value]: "),
-    (OriginLabel.TRUE_ORIGIN, "[Cow.update]: "),
-    (OriginLabel.REPORT_ORIGIN, "[Reporter.value]: "),
-    (OriginLabel.NONE, ""),
-])
-@pytest.mark.parametrize("value, units, suffix", [
-    (3, "kg", "3 (kg)"),
-    ({"min": 1, "max": 3}, {"min": "kg", "max": "kg"}, "min = 1 (kg), max = 3 (kg)"),
-    (None, "kg", "None (kg)"),
-])
+@pytest.mark.parametrize(
+    "label, prefix",
+    [
+        (OriginLabel.TRUE_AND_REPORT_ORIGINS, "[Cow.update]->[Reporter.value]: "),
+        (OriginLabel.TRUE_ORIGIN, "[Cow.update]: "),
+        (OriginLabel.REPORT_ORIGIN, "[Reporter.value]: "),
+        (OriginLabel.NONE, ""),
+    ],
+)
+@pytest.mark.parametrize(
+    "value, units, suffix",
+    [
+        (3, "kg", "3 (kg)"),
+        ({"min": 1, "max": 3}, {"min": "kg", "max": "kg"}, "min = 1 (kg), max = 3 (kg)"),
+        (None, "kg", "None (kg)"),
+    ],
+)
 def test_format_detailed_value_str(
     file_manager: FileManager,
     label: OriginLabel,
@@ -107,38 +113,61 @@ def test_format_detailed_value_str(
     suffix: str,
 ) -> None:
     """Test formatting of scalar and dictionary values for each origin label."""
-    data = {"true_origin_class": "Cow", "true_origin_function": "update", "report_origin": "Reporter.value",
-            "value": value, "units": units}
+    data = {
+        "true_origin_class": "Cow",
+        "true_origin_function": "update",
+        "report_origin": "Reporter.value",
+        "value": value,
+        "units": units,
+    }
     assert file_manager._format_detailed_value_str(label, data) == prefix + suffix
 
 
-@pytest.mark.parametrize("data, expected", [
-    (None, False), ([], False), ("text", False), ({}, False),
-    ({"values": [1]}, False), ({"info_maps": [{}]}, False),
-    ({"info_maps": [], "values": [1]}, False),
-    ({"info_maps": [{}], "values": []}, False),
-    ({"info_maps": [{}], "values": [1, 2]}, False),
-    ({"info_maps": [{}], "values": [0]}, True),
-    ({"info_maps": [{}], "values": [None]}, True),
-])
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        (None, False),
+        ([], False),
+        ("text", False),
+        ({}, False),
+        ({"values": [1]}, False),
+        ({"info_maps": [{}]}, False),
+        ({"info_maps": [], "values": [1]}, False),
+        ({"info_maps": [{}], "values": []}, False),
+        ({"info_maps": [{}], "values": [1, 2]}, False),
+        ({"info_maps": [{}], "values": [0]}, True),
+        ({"info_maps": [{}], "values": [None]}, True),
+    ],
+)
 def test_can_add_detailed_values(file_manager: FileManager, data: Any, expected: bool) -> None:
     """Test validation of data structures for detailed value generation."""
     assert file_manager._can_add_detailed_values(data) is expected
 
 
-@pytest.mark.parametrize("label, expected", [
-    (OriginLabel.NONE, None),
-    (OriginLabel.TRUE_ORIGIN, ["[Cow.update]: 3 (kg)", "[Herd.update]: 3 (kg)", "[Cow.update]: 4 (kg)"]),
-    (OriginLabel.REPORT_ORIGIN, ["[report]: 3 (kg)", "[report]: 3 (kg)", "[report]: 4 (kg)"]),
-    (OriginLabel.TRUE_AND_REPORT_ORIGINS, ["[Cow.update]->[report]: 3 (kg)",
-                                          "[Herd.update]->[report]: 3 (kg)", "[Cow.update]->[report]: 4 (kg)"]),
-])
+@pytest.mark.parametrize(
+    "label, expected",
+    [
+        (OriginLabel.NONE, None),
+        (OriginLabel.TRUE_ORIGIN, ["[Cow.update]: 3 (kg)", "[Herd.update]: 3 (kg)", "[Cow.update]: 4 (kg)"]),
+        (OriginLabel.REPORT_ORIGIN, ["[report]: 3 (kg)", "[report]: 3 (kg)", "[report]: 4 (kg)"]),
+        (
+            OriginLabel.TRUE_AND_REPORT_ORIGINS,
+            ["[Cow.update]->[report]: 3 (kg)", "[Herd.update]->[report]: 3 (kg)", "[Cow.update]->[report]: 4 (kg)"],
+        ),
+    ],
+)
 def test_add_detailed_values(file_manager: FileManager, label: OriginLabel, expected: list[str] | None) -> None:
     """Test detailed values for multiple origins without removing original values."""
-    data = {"report": {"values": [3, 4], "info_maps": [
-        {"data_origin": [["Cow", "update"], ["Herd", "update"]], "units": "kg"},
-        {"data_origin": [["Cow", "update"]], "units": "kg"},
-    ]}, "unrelated": "text"}
+    data = {
+        "report": {
+            "values": [3, 4],
+            "info_maps": [
+                {"data_origin": [["Cow", "update"], ["Herd", "update"]], "units": "kg"},
+                {"data_origin": [["Cow", "update"]], "units": "kg"},
+            ],
+        },
+        "unrelated": "text",
+    }
     result = file_manager._add_detailed_values(data, label)
     assert result is data
     assert result["report"].get("detailed_values") == expected
@@ -149,20 +178,27 @@ def test_add_detailed_values(file_manager: FileManager, label: OriginLabel, expe
 @pytest.mark.parametrize("info_map", [{}, {"units": "kg"}, {"data_origin": [["Cow", "update"]]}])
 def test_add_detailed_values_missing_metadata(file_manager: FileManager, info_map: dict[str, Any]) -> None:
     """Test that incomplete metadata is skipped without affecting valid data."""
-    data = {"bad": {"values": [1], "info_maps": [info_map]},
-            "good": {"values": [2], "info_maps": [{"data_origin": [["Cow", "update"]], "units": "kg"}]}}
+    data = {
+        "bad": {"values": [1], "info_maps": [info_map]},
+        "good": {"values": [2], "info_maps": [{"data_origin": [["Cow", "update"]], "units": "kg"}]},
+    }
     result = file_manager._add_detailed_values(data, OriginLabel.TRUE_ORIGIN)
     assert "detailed_values" not in result["bad"]
     assert result["good"]["detailed_values"] == ["[Cow.update]: 2 (kg)"]
 
 
-@pytest.mark.parametrize("units, subkey, expected, error", [
-    (None, None, "", None), ("", None, "", None), ("kg", None, " (kg)", None),
-    ({"weight": "kg", "min": "g"}, "min", " (kg)", None),
-    ({"min": "g"}, "min", " (g)", None),
-    ({"min": "g"}, None, "", "Units Subkey Missing"),
-    ({"min": "g"}, "max", "", "Units Key Error"),
-])
+@pytest.mark.parametrize(
+    "units, subkey, expected, error",
+    [
+        (None, None, "", None),
+        ("", None, "", None),
+        ("kg", None, " (kg)", None),
+        ({"weight": "kg", "min": "g"}, "min", " (kg)", None),
+        ({"min": "g"}, "min", " (g)", None),
+        ({"min": "g"}, None, "", "Units Subkey Missing"),
+        ({"min": "g"}, "max", "", "Units Key Error"),
+    ],
+)
 def test_get_units_substr(
     file_manager: FileManager,
     mock_logger: MagicMock,
@@ -180,16 +216,25 @@ def test_get_units_substr(
         mock_logger.error.assert_not_called()
 
 
-@pytest.mark.parametrize("data, expected", [
-    ({"values": [1, None, 3], "info_maps": [{"units": "kg"}]}, [("weight (kg)", [1, None, 3])]),
-    ({"values": [1, 2]}, [("weight", [1, 2])]),
-    ({"values": [], "info_maps": []}, [("weight", [])]),
-    ({"values": [{"min": 1, "max": 3}, {"min": 2, "max": 4}],
-      "info_maps": [{"units": {"min": "kg", "max": "kg"}}]},
-     [("weight.min (kg)", [1, 2]), ("weight.max (kg)", [3, 4])]),
-    ({"values": [{"min": 1, "max": 3}], "info_maps": [{"units": "kg"}]},
-     [("weight.min (kg)", [1]), ("weight.max (kg)", [3])]),
-])
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        ({"values": [1, None, 3], "info_maps": [{"units": "kg"}]}, [("weight (kg)", [1, None, 3])]),
+        ({"values": [1, 2]}, [("weight", [1, 2])]),
+        ({"values": [], "info_maps": []}, [("weight", [])]),
+        (
+            {
+                "values": [{"min": 1, "max": 3}, {"min": 2, "max": 4}],
+                "info_maps": [{"units": {"min": "kg", "max": "kg"}}],
+            },
+            [("weight.min (kg)", [1, 2]), ("weight.max (kg)", [3, 4])],
+        ),
+        (
+            {"values": [{"min": 1, "max": 3}], "info_maps": [{"units": "kg"}]},
+            [("weight.min (kg)", [1]), ("weight.max (kg)", [3])],
+        ),
+    ],
+)
 def test_dict_to_csv_column_list(
     file_manager: FileManager,
     data: dict[str, list[Any]],
@@ -211,14 +256,17 @@ def test_dict_to_file_csv(
 ) -> None:
     """Test CSV orientations, unequal column lengths, and invalid direction fallback."""
     path = tmp_path / "output.csv"
-    data = {"weight": {"values": [1, 2], "info_maps": [{"units": "kg"}]},
-            "count": {"values": [3]}}
+    data = {"weight": {"values": [1, 2], "info_maps": [{"units": "kg"}]}, "count": {"values": [3]}}
     file_manager.dict_to_file_csv(data, path, direction)
     with path.open(encoding="utf-8", newline="") as file:
         rows = list(csv.reader(file))
     if direction == "landscape":
-        assert rows == [["", "0", "1"], ["DISCLAIMER", DISCLAIMER_MESSAGE, ""],
-                        ["weight (kg)", "1", "2"], ["count", "3", ""]]
+        assert rows == [
+            ["", "0", "1"],
+            ["DISCLAIMER", DISCLAIMER_MESSAGE, ""],
+            ["weight (kg)", "1", "2"],
+            ["count", "3", ""],
+        ]
     else:
         assert rows == [["DISCLAIMER", "weight (kg)", "count"], [DISCLAIMER_MESSAGE, "1", "3"], ["", "2", ""]]
     if direction == "invalid":
@@ -259,13 +307,18 @@ def test_generate_file_name(file_manager: FileManager, mocker: MockerFixture, in
     timestamp.assert_called_once_with(include_millis=include_millis)
 
 
-@pytest.mark.parametrize("content, expected", [
-    ({"filters": ["a"]}, ([{"filters": ["a"]}], None)),
-    ({"filters": ["a"], "direction": "landscape"}, ([{"filters": ["a"], "direction": "landscape"}], "landscape")),
-    ({"multiple": [{"filters": ["a"]}, {"filters": ["b"]}], "direction": "portrait"},
-     ([{"filters": ["a"]}, {"filters": ["b"]}], "portrait")),
-    ({"multiple": []}, ([], None)),
-])
+@pytest.mark.parametrize(
+    "content, expected",
+    [
+        ({"filters": ["a"]}, ([{"filters": ["a"]}], None)),
+        ({"filters": ["a"], "direction": "landscape"}, ([{"filters": ["a"], "direction": "landscape"}], "landscape")),
+        (
+            {"multiple": [{"filters": ["a"]}, {"filters": ["b"]}], "direction": "portrait"},
+            ([{"filters": ["a"]}, {"filters": ["b"]}], "portrait"),
+        ),
+        ({"multiple": []}, ([], None)),
+    ],
+)
 def test_load_filter_file_content_json(
     file_manager: FileManager,
     tmp_path: Path,
@@ -278,10 +331,15 @@ def test_load_filter_file_content_json(
     assert file_manager.load_filter_file_content(path) == expected
 
 
-@pytest.mark.parametrize("content, filters, exclude", [
-    ("a\n\nb\n", ["a", "b"], False), ("exclude\na\nb\n", ["a", "b"], True),
-    ("exclude\n", [], True), ("a\nexclude\n", ["a", "exclude"], False),
-])
+@pytest.mark.parametrize(
+    "content, filters, exclude",
+    [
+        ("a\n\nb\n", ["a", "b"], False),
+        ("exclude\na\nb\n", ["a", "b"], True),
+        ("exclude\n", [], True),
+        ("a\nexclude\n", ["a", "exclude"], False),
+    ],
+)
 def test_load_filter_file_content_txt(
     file_manager: FileManager,
     tmp_path: Path,
@@ -295,12 +353,15 @@ def test_load_filter_file_content_txt(
     assert file_manager.load_filter_file_content(path) == ([{"filters": filters, "filter_by_exclusion": exclude}], None)
 
 
-@pytest.mark.parametrize("filename, content, error, log_name", [
-    ("missing.json", None, FileNotFoundError, "Filter File Not Found Error"),
-    ("bad.json", b"{", json.JSONDecodeError, "Filter File JSON Parsing Error"),
-    ("bad.txt", b"\xff", UnicodeDecodeError, "Filter File Text Decoding Error"),
-    ("bad.csv", b"a,b", Exception, "Filter File Unexpected Error"),
-])
+@pytest.mark.parametrize(
+    "filename, content, error, log_name",
+    [
+        ("missing.json", None, FileNotFoundError, "Filter File Not Found Error"),
+        ("bad.json", b"{", json.JSONDecodeError, "Filter File JSON Parsing Error"),
+        ("bad.txt", b"\xff", UnicodeDecodeError, "Filter File Text Decoding Error"),
+        ("bad.csv", b"a,b", Exception, "Filter File Unexpected Error"),
+    ],
+)
 def test_load_filter_file_content_errors(
     file_manager: FileManager,
     tmp_path: Path,
@@ -320,11 +381,14 @@ def test_load_filter_file_content_errors(
     assert mock_logger.error.call_args.kwargs["extra"]["rufas_log_name"] == log_name
 
 
-@pytest.mark.parametrize("filter_file, content, base_name", [
-    ("e2e_comparison.json", {"name": "Animal"}, "comparison_Animal"),
-    ("report.json", {"name": "Milk", "origin_label": "true origin"}, "saved_variables_Milk"),
-    ("report.json", {}, "saved_variables_report.json"),
-])
+@pytest.mark.parametrize(
+    "filter_file, content, base_name",
+    [
+        ("e2e_comparison.json", {"name": "Animal"}, "comparison_Animal"),
+        ("report.json", {"name": "Milk", "origin_label": "true origin"}, "saved_variables_Milk"),
+        ("report.json", {}, "saved_variables_report.json"),
+    ],
+)
 def test_save_to_json(
     file_manager: FileManager,
     tmp_path: Path,
@@ -339,7 +403,9 @@ def test_save_to_json(
     pool = {"variable": {"values": [1]}}
     file_manager.save_to_json(filter_file, tmp_path, pool, content)
     generate.assert_called_once_with(base_name, "json")
-    write.assert_called_once_with(pool, tmp_path / "output.json", origin_label=OriginLabel(content.get("origin_label", "none")))
+    write.assert_called_once_with(
+        pool, tmp_path / "output.json", origin_label=OriginLabel(content.get("origin_label", "none"))
+    )
 
 
 @pytest.mark.parametrize("disclaimer", [True, False])
@@ -351,10 +417,13 @@ def test_read_variables_pool_file(file_manager: FileManager, tmp_path: Path, dis
     assert file_manager.read_variables_pool_file(path) == pool
 
 
-@pytest.mark.parametrize("exists, error, log_name", [
-    (False, FileNotFoundError, "Pool File Not Found Error"),
-    (True, json.JSONDecodeError, "JSON Pool File Parsing Error"),
-])
+@pytest.mark.parametrize(
+    "exists, error, log_name",
+    [
+        (False, FileNotFoundError, "Pool File Not Found Error"),
+        (True, json.JSONDecodeError, "JSON Pool File Parsing Error"),
+    ],
+)
 def test_read_variables_pool_file_errors(
     file_manager: FileManager,
     tmp_path: Path,
@@ -372,11 +441,18 @@ def test_read_variables_pool_file_errors(
     assert mock_logger.error.call_args.kwargs["extra"]["rufas_log_name"] == log_name
 
 
-@pytest.mark.parametrize("relative_path, expected", [
-    ("output", True), ("output/file.json", True), ("output/nested/file.json", True),
-    ("other/file.json", False), ("output_backup/file.json", False),
-    ("output/../other/file.json", False), (None, False),
-])
+@pytest.mark.parametrize(
+    "relative_path, expected",
+    [
+        ("output", True),
+        ("output/file.json", True),
+        ("output/nested/file.json", True),
+        ("other/file.json", False),
+        ("output_backup/file.json", False),
+        ("output/../other/file.json", False),
+        (None, False),
+    ],
+)
 def test_is_file_in_dir(file_manager: FileManager, tmp_path: Path, relative_path: str | None, expected: bool) -> None:
     """Test directory containment for nested, sibling, and absent paths."""
     path = tmp_path / relative_path if relative_path is not None else None
@@ -413,10 +489,13 @@ def test_create_directory(file_manager: FileManager, tmp_path: Path) -> None:
     assert path.is_dir()
 
 
-@pytest.mark.parametrize("error, log_name", [
-    (PermissionError("denied"), "Directory Creation Permissions Error"),
-    (OSError("failed"), "Directory Creation mkdir Error"),
-])
+@pytest.mark.parametrize(
+    "error, log_name",
+    [
+        (PermissionError("denied"), "Directory Creation Permissions Error"),
+        (OSError("failed"), "Directory Creation mkdir Error"),
+    ],
+)
 def test_create_directory_errors(
     file_manager: FileManager,
     tmp_path: Path,
@@ -452,11 +531,21 @@ def test_get_origin_label_invalid(file_manager: FileManager, mock_logger: MagicM
     mock_logger.error.assert_called_once()
 
 
-@pytest.mark.parametrize("key, expected", [
-    ("animal.value", "Animal"), ("ANIMAL.value", "Animal"), ("crop_and_soil.value", "CropAndSoil"),
-    ("CROP_AND_SOIL.value", "CropAndSoil"), ("manure.value", "Manure"), ("Manure", "Manure"),
-    ("Feed.value", "Feed"), ("feed.value", "feed"), ("Unknown.a.b", "Unknown"), ("", ""),
-])
+@pytest.mark.parametrize(
+    "key, expected",
+    [
+        ("animal.value", "Animal"),
+        ("ANIMAL.value", "Animal"),
+        ("crop_and_soil.value", "CropAndSoil"),
+        ("CROP_AND_SOIL.value", "CropAndSoil"),
+        ("manure.value", "Manure"),
+        ("Manure", "Manure"),
+        ("Feed.value", "Feed"),
+        ("feed.value", "feed"),
+        ("Unknown.a.b", "Unknown"),
+        ("", ""),
+    ],
+)
 def test_normalize_module_header(key: str, expected: str) -> None:
     """Test normalization of known module names and preservation of unknown names."""
     assert FileManager.normalize_module_header(key) == expected
@@ -464,10 +553,14 @@ def test_normalize_module_header(key: str, expected: str) -> None:
 
 def test_read_e2e_comparison_files(file_manager: FileManager, tmp_path: Path, mock_logger: MagicMock) -> None:
     """Test grouping of comparison files by case-insensitive output prefix."""
-    files = {"FREESTALL_comparison_Animal.json": {"animal.pass": True},
-             "freestall_COMPARISON_Feed.json": {"Feed.pass": False},
-             "open_lot_comparison_Animal.json": {"animal.pass": False},
-             "unknown_comparison.json": {}, "freestall_output.json": {}, "freestall_comparison.txt": {}}
+    files = {
+        "FREESTALL_comparison_Animal.json": {"animal.pass": True},
+        "freestall_COMPARISON_Feed.json": {"Feed.pass": False},
+        "open_lot_comparison_Animal.json": {"animal.pass": False},
+        "unknown_comparison.json": {},
+        "freestall_output.json": {},
+        "freestall_comparison.txt": {},
+    }
     for name, data in files.items():
         (tmp_path / name).write_text(json.dumps(data))
     result = file_manager.read_e2e_comparison_files(tmp_path, ["freestall", "open_lot"])
