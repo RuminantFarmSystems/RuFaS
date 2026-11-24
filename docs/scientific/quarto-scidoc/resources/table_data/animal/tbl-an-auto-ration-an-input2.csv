@@ -1,6 +1,5 @@
-﻿Array,Variable,Description,Default
-Ration,,Herd-level inputs pertaining to ration formulation,
-,user_input,"A True/False value indicating if the user will provide the ration ingredients and prices only (automated formulation; FALSE) or ingredients, prices, and inclusion rate (%DM) for each ingredient (TRUE).",TRUE
-,formulation_interval,The length of time in days between diet formulations.,30 days
-,phosphorus_requirement_buffer,"Percentage increase in phosphorus nutrient requirement in calculation of animal requirements. The default value is highly recommended as the starting value (e.g. some testing may be required to find a reasonable buffer value). For example, if you wanted to supply 150% of the calculated requirement, you would use a value of 50.",75% (75.0)
-,maximum_ration_reformulation_attempts,"The maximum number of attempts the ration formulation logic will make before stopping. Meant only to catch edge cases that could cause infinite loops. In normal operation, this value should never be reached.",250 attempts
+﻿Variable,Description,Default
+user_input,"A True/False value indicating if the user will provide the ration ingredients and prices only (automated formulation; FALSE) or ingredients, prices, and inclusion rate (%DM) for each ingredient (TRUE).",TRUE
+formulation_interval,The length of time in days between diet formulations.,30 days
+phosphorus_requirement_buffer,"Percentage increase in phosphorus nutrient requirement in calculation of animal requirements. The default value is highly recommended as the starting value (e.g. some testing may be required to find a reasonable buffer value). For example, if you wanted to supply 150% of the calculated requirement, you would use a value of 50.",75% (75.0)
+maximum_ration_reformulation_attempts,"The maximum number of attempts the ration formulation logic will make before stopping. Meant only to catch edge cases that could cause infinite loops. In normal operation, this value should never be reached.",250 attempts

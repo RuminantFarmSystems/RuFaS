@@ -977,7 +977,7 @@ $$
 **Growth** <br>
 In @nrc_2021, body frame gain (fat + protein) corresponds to the true growth and it is part of the calculation which is further partitioned into body reserves or condition gain (or loss), and pregnancy-associated gain (considered a pregnancy requirement).
 
-First the empty bodyweight grain (EBG) is estimated from the $\text{ADG}$ which is calculated as described in [AN.NRC.17](#eq-an-nrc-17) and [AN.NRC.21](#eq-an-nrc-21). 
+First the empty bodyweight grain (EBG) is estimated from the ADG which is calculated as described in [AN.NRC.17](#eq-an-nrc-17) and [AN.NRC.21](#eq-an-nrc-21). 
 
 :::{#eq-an-nsm-12}
 [[**AN.NSM.12**]]{.aside .content-visible when-format="html"}
@@ -1389,7 +1389,6 @@ import_table(
 )
 ```
 
-
 ###### Amino Acid Requirements (NASEM){#nasemAAreqs}
 
 The methods for estimating the amino acids requirements for lactating cows based on the @nrc_2021, in RuFaS are described below.
@@ -1485,11 +1484,6 @@ import_table(
   colalign = ["left", "left", "center"]
 )
 ```
-
-::: {.callout-note}
-Variables marked with * are from @nrc_2021.
-:::
-
 
 ###### Energy Supply (NASEM){#nasemenergysup}
 
@@ -1730,11 +1724,11 @@ Because intake and/or diet composition information is provided at the animal com
 :::
 
 ###### Inputs
-All feed inputs are provided in the feed input JSON file (@tbl-an-ration-input-feed), with the exception of four inputs that are provided in the animal input file (@tbl-an-ration-input-animal).
+All feed inputs are provided in the feed input JSON file (@tbl-an-ration-input-feed-1, @tbl-an-ration-input-feed-2, and @tbl-an-ration-input-feed-3), with the exception of four inputs that are provided in the animal input file (@tbl-an-ration-input-animal).
 
 ```{python}
 #| label: tbl-an-ration-input-animal
-#| tbl-cap: Key inputs found in the animal input file.
+#| tbl-cap: Key ration inputs found in the animal input file.
 import_table(
   "../resources/table_data/animal/tbl-an-auto-ration-an-input2.csv",
   colalign = ["left", "left", "left", "center"]
@@ -1742,60 +1736,72 @@ import_table(
 ```
 
 ```{python}
-#| label: tbl-an-ration-input-feed
-#| tbl-cap: Key inputs found in the feed input file.
+#| label: tbl-an-ration-input-feed-1
+#| tbl-cap: Key feed inputs found in the feed input file. These inputs specify the complete feeds available for use in ration formulation, including each feed’s cost, as well as purchasing cycle allowances and buffer.
 import_table(
   "../resources/table_data/animal/tbl-an-auto-ration-an-input3.csv",
   colalign = ["left", "left", "left", "center"]
 )
 ```
 
+```{python}
+#| label: tbl-an-ration-input-feed-2
+#| tbl-cap: Key ration formulation parameter inputs found in the feed input file.
+import_table(
+  "../resources/table_data/animal/tbl-an-auto-ration-an-input4.csv",
+  colalign = ["left", "left", "left", "center"]
+)
+```
+
+```{python}
+#| label: tbl-an-ration-input-feed-3
+#| tbl-cap: Key DMI and ration composition inputs for each animal combination found in the feed input file. Exactly one array must be provided for each animal combination. When auto-formulation option is used, `ration_percentage`, `intake_option`, and `intake_value inputs` are ignored.	
+import_table(
+  "../resources/table_data/animal/tbl-an-auto-ration-an-input5.csv",
+  colalign = ["left", "left", "left", "center"]
+)
+```
 
 ###### Outputs
 
 Ration outputs are reported by several classes and functions, each of which includes a number of individual output variables.
 
-**AnimalModuleReporter.report_average_nutrient_requirements.avg_rqmts**  
+`AnimalModuleReporter.report_average_nutrient_requirements.avg_rqmts`
 
 * **Description**: Lists the average nutrient requirements by animal, per pen. Reported for each ration formulation interval.
 * **Variables** (listed by unit): 
-  + mcal: NEg_requirement, NEpreg_requirement, NEl_requirement
-  + g: MP_requirement, Ca_requirement, P_req, P_req_process, avg_essential_amino_acid_requirement 
-  + kg: DMIest_requirement, avg_BW, avg_milk_production_reduction_pen (kg/animal/day)
+  * mcal: NEg_requirement, NEpreg_requirement, NEl_requirement
+  * g: MP_requirement, Ca_requirement, P_req, P_req_process, avg_essential_amino_acid_requirement 
+  * kg: DMIest_requirement, avg_BW, avg_milk_production_reduction_pen (kg/animal/day)
 
-
-**AnimalModuleReporter.report_nutrient_amounts.ration_nutrient_amount**  
+`AnimalModuleReporter.report_nutrient_amounts.ration_nutrient_amount`  
 
 * **Description**: Lists the quantity of DM and nutritive constituents provided per animal in each ration interval, by pen.  
 * **Variables** (listed by unit):
-  + Kg: Total DM, total as-fed, CP, NDF, ADF, lignin, ash, P, K, N, EE, starch, TDN, Ca, forage NDF
-  + g: fat, metabolizable protein 
-  + %DM: fat percentage, forage NDF
-  + mcal: DE, ME, NE maintenance and activity, NE lactation, NE growth
+  * kg: Total DM, total as-fed, CP, NDF, ADF, lignin, ash, P, K, N, EE, starch, TDN, Ca, forage NDF
+  * g: fat, metabolizable protein 
+  * %DM: fat percentage, forage NDF
+  * mcal: DE, ME, NE maintenance and activity, NE lactation, NE growth
 
-
-**RationOptimizer.handle_failed_constraints.failed_constraint_summary_for_pen**
+`RationOptimizer.handle_failed_constraints.failed_constraint_summary_for_pen`
 
 * **Description:** Lists variables related to ration formulation failure. Reported once for each formulation failure.
 * **Variables:**
-  + simulation_day: simulation day on which the formulation failure occurred
-  + attempt number: formulation attempt number within formulation interval
-  + constraints_failed_dict: list of constraints the ration violated
-  + ration_attempted: list of feed IDs and kg inclusions in failed ration
-  + pen requirements: pen-level requirements for maintenance, growth, lactation, and activity energy, metabolizable protein, P, and DMI
+  * simulation_day: simulation day on which the formulation failure occurred
+  * attempt number: formulation attempt number within formulation interval
+  * constraints_failed_dict: list of constraints the ration violated
+  * ration_attempted: list of feed IDs and kg inclusions in failed ration
+  * pen requirements: pen-level requirements for maintenance, growth, lactation, and activity energy, metabolizable protein, P, and DMI
 
-**AnimalModuleReporter.report_ration_per_animal.ration_per_animal**  
+`AnimalModuleReporter.report_ration_per_animal.ration_per_animal`  
 
 * **Description**: Lists the quantity of each feed fed per animal per day in each ration interval, by pen.  
 * **Variables**: One kg/animal/day value for each feed consumed (indicated by feed ID)
 
-
-**AnimalModuleReporter.report_daily_ration_per_pen.ration_daily_feed_totals**  
+`AnimalModuleReporter.report_daily_ration_per_pen.ration_daily_feed_totals`  
 
 * **Description**: Lists the total daily consumption (kg) of each feed fed in the ration interval, by pen. Reported on every simulation day.  
 * **Variables**: One kg/day value for each feed consumed (indicated by feed ID), daily total dry matter intake (kg), and daily total byproduct intake (kg)  
-
-
 
 ##### Dry Matter Intake {#dmi-section}
 
@@ -1811,6 +1817,7 @@ The `intake_option` value in the feed input JSON sets the desired DMI option, an
 If the initial ration formulation attempt fails, formulation will be reattempted as described in the [Diet Formulation](#diet-formulation) section. Importantly, if allowable by the selected DMI input option and tolerance value, DMI may increase or decrease at each formulation reattempt. See the [Diet Formulation](#diet-formulation) section for more information on how DMI may be modulated in the formulation reattempt process. The global tolerance parameter (`user_defined_ration_tolerance`) may also be used to enable user-controlled variation in DMI and ingredient inclusion. At this time, only a single tolerance value applicable to all animal combinations can be set; tolerance cannot be set by combination.
 
 ###### Predict DMI option
+
 With the `predict_DMI` option, DMI prediction equations from the user-selected nutritional model (@nrc_2001 or @nrc_2021) are utilized to predict a DMI value based on each animal's attributes at the time of formulation. Importantly, input values to these equations may be modulated by the formulation reattempt process and the DMI re-estimated from the updated values. For example, milk production may be reduced, thereby reducing the estimated DMI of lactating cows. See [Diet Formulation](#diet-formulation) for more details. At this time, this option is not usable with the Calf animal combination.
 
 ***NRC DMI Estimation***
@@ -1879,8 +1886,6 @@ import_table(
 )
 ```
 
-
-
 ***NASEM DMI Estimation***
 
 Dry matter intake estimation is different for lactating cows and dry cows. For details about the variables included in each calculation, please refer to @tbl-an-nasem-dmi-var. For all animal classes, the sum of the DMI of each feed is assumed to be less than or equal to the DMI estimate:
@@ -1923,9 +1928,7 @@ import_table(
 )
 ```
 
-
-
-###### `set_DMI` and `set_DMI_per_X` options
+###### `set_DMI` and `set_DMI_per_X` Options
 
 Two options exist to control DMI of each animal combination. The `set_DMI` option will force the formulation process to utilize the same user-specified DMI (kg) at every formulation attempt. As a result, animals in this combination will consume the same amount of DM every single day of the simulation. However, the user may elect to allow DMI to vary by a user-defined percentage value, which is configured by the `user_defined_ration_tolerance` input value. For example, if the `intake_value` is 20 kg and `user_defined_ration_tolerance` is 0.01 (1%), the DMI will range between 19.8 and 20.2 kg. `set_DMI` is usable with all animal combinations.
 
@@ -1935,8 +1938,7 @@ The `set_DMI_per_X` option sets the DMI of all animals in an animal combination 
 At this time, DMI of calves must be set to a kg/day amount using the `set_DMI` option; calf DMI cannot be predicted or set per unit of daily gain.
 :::
 
-
-##### Feed parameters and library
+##### Feed Parameters and Library
 
 The RuFaS feed libraries were adapted from @nrc_2001 and @nrc_2021 and include >300 feeds categorized into 9 groups (Grain Crop Forage, Grass/Legume Forage, Pasture, Energy Source, Plant Protein, By-Product/Other, Vitamin/Mineral, Calf Liquid Feed, and NPN Supplement). A complete set of nutritive information is provided for each feed. Because the nutritional model used (@nrc_2001 or @nrc_2021) is selected by the user, and the two models do not share identical feed libraries, two library files are present in the repository (`NRC_comp.csv` and `NASEM_Comp_with_TDN_urea.csv` for NRC and NASEM, respectively).
 
@@ -1945,42 +1947,41 @@ If desired, users may also provide their own nutritive composition information b
 #### Diet Formulation {#diet-formulation}
 
 ##### Overview
-Ration formulation is carried out at the pen level on a user-defined interval (`formulation_interval`), and uses a user-provided list of feeds available per animal combination. Broadly speaking, there are two methods to formulate rations: the fully automated method (@fig-ani_auto_ration), and the user-defined method (@fig-ani_UDR). In both cases, nutrient and energy requirements are first calculated for each animal in a given pen, and then the pen average requirements are calculated and used in subsequent steps. Ration formulation is then attempted using a least-cost optimization method (`minimize` from the package SciPy; @Li_2022). A set of internal constraints (@tbl-an-diet-const) serve to prevent formulation of inappropriate rations when optimization logic is in use, and ingredient-specific minimum and maximum inclusions (kg or %DM) are also definable by the user. Successful formulation occurs if the ration meets all ingredient inclusion bounds and passes all constraints. 
+Ration formulation is carried out at the pen level on a user-defined interval (`formulation_interval`), and uses a user-provided list of feeds available per animal combination. Broadly speaking, there are two methods to formulate rations: the fully automated method (@fig-ani-auto-ration), and the user-defined method (@fig-ani-UDR). In both cases, nutrient and energy requirements are first calculated for each animal in a given pen, and then the pen average requirements are calculated and used in subsequent steps. Ration formulation is then attempted using a least-cost optimization method (`minimize` from the package SciPy; @Li_2022). A set of internal constraints (@tbl-an-diet-const) serve to prevent formulation of inappropriate rations when optimization logic is in use, and ingredient-specific minimum and maximum inclusions (kg or %DM) are also definable by the user. Successful formulation occurs if the ration meets all ingredient inclusion bounds and passes all constraints. 
 
 ```{python}
 #| label: tbl-an-diet-const
 #| tbl-cap: Constraints utilized in ration formulation.
 import_table(
   "../resources/table_data/animal/tbl-an-ration-input-constr.csv",
-  colalign = ["left", "left", "left", "left"]
+  colalign = ["left", "center", "center", "center"]
 )
 ```
-
 
 ##### Feed library ingredient inclusion ranges
 Bounds for individual feed ingredient inclusion on a DM mass basis (kg) are set as raw minimum and maximum values for all animal combinations via the `lower_limit` and `limit` columns in the feed library file. These values by default are set to a minimum of 0 kg and maximum of 100 kg/animal/day, and thus do not restrict formulation unless modified by the user. Note: if these limits are more restrictive than the user-defined ranges for feed ingredient inclusion percentages, then the feed library value(s) take precedence.
 
 ##### Feed ingredient inclusion percentages
-When utilizing the user-defined ration formulation option (`user_input` set to true in @tbl-an-ration-input-animal), ingredient inclusion percentages are defined for each animal combination. The DMI value is used as reference for the inclusion percentage, so a feed ingredient with a given value of 0.2 (20%) in a diet at 25 kg total DMI would result in 5 kg of said feed ingredient allowed in a successful ration. User-defined ingredient inclusion proportions may be further modified by the tolerance value (`user_defined_ration_tolerance` in @tbl-an-ration-input-feed). A single value of `user_defined_ration_tolerance` is specified for the entire ration; it applies to every ingredient and to all animal combinations. The tolerance value determines the “width” of the bounds by defining a +/- fractional variance for each ration inclusion percentage value. The primary role of `user_defined_ration_tolerance` is to allow the intake and diet composition to be adjusted as necessary to avoid violating constraints (@tbl-an-diet-const) as the population and requirements of animals vary over time.
+When utilizing the user-defined ration formulation option (`user_input` set to true in @tbl-an-ration-input-animal), ingredient inclusion percentages are defined for each animal combination. The DMI value is used as reference for the inclusion percentage, so a feed ingredient with a given value of 0.2 (20%) in a diet at 25 kg total DMI would result in 5 kg of said feed ingredient allowed in a successful ration. User-defined ingredient inclusion proportions may be further modified by the tolerance value (`user_defined_ration_tolerance` in @tbl-an-ration-input-feed-2). A single value of `user_defined_ration_tolerance` is specified for the entire ration; it applies to every ingredient and to all animal combinations. The tolerance value determines the “width” of the bounds by defining a +/- fractional variance for each ration inclusion percentage value. The primary role of `user_defined_ration_tolerance` is to allow the intake and diet composition to be adjusted as necessary to avoid violating constraints (@tbl-an-diet-const) as the population and requirements of animals vary over time.
 
 * Tolerance value example: a feed with a user-defined ration percentage value of 0.2 (20% of DM) and tolerance of 0.1 (10%) would correspond to an allowable range for said feed ingredient of 18% to 22% of the DMI value.
 * Note: setting a tolerance of 0.0 collapses the bounds to a single value for each inclusion percentage, meaning that the resultant ration will precisely match the user-defined ingredient inclusion percentages.
 
 ##### Ration formulation failure: overview
-Failure of a ration to be formulated successfully indicates that the requirement constraints were violated, and an output (**RationOptimizer.handle_failed_constraints.failed_constraint_summary_for_pen**) will be generated to inform the user which specific constraint(s) are failing. There are multiple possible outcomes following formulation failure, and next steps after failure depend on the user configuration of feed-related inputs.
+Failure of a ration to be formulated successfully indicates that the requirement constraints were violated, and an output (`RationOptimizer.handle_failed_constraints.failed_constraint_summary_for_pen`) will be generated to inform the user which specific constraint(s) are failing. There are multiple possible outcomes following formulation failure, and next steps after failure depend on the user configuration of feed-related inputs.
 
 ##### Ration formulation failure: automated methodology
-![Graphic of automated ration formulation methodology.](../resources/images/RuFaS_auto_ration_figure.png){#fig-ani_auto_ration}
+![Graphic of automated ration formulation methodology.](../resources/images/ani_ration_auto.png){#fig-ani-auto-ration}
 
 **Non-lactating animals**: if the ration was successfully formulated in the prior ration formulation interval, the previous ration will be used. Otherwise, the simulation will halt.
 
-**Lactating animals**: an attempt to reduce milk yield may be made if the lower limit of pen-average milk production has not been reached, and the value in the feed input file allows for a reduction in lactation (@tbl-an-ration-input-feed). Milk yield reduction occurs by reducing the milk production of every individual by 0.25 kg/d, regardless of production level, thereby reducing the pen average in 0.25 kg/d increments. Every time a reduction occurs, the formulation process begins again at the step where individual animal requirements are calculated. The process continues from there using the newly reduced requirements, making a successful formulation more likely. Note that because milk energy output is a component of the equations to estimate DMI, when requirements are recalculated after a milk reduction occurs, DMI will decrease. The DMI reduction amount is capped at 30% of the initial DMI estimate (i.e., before milk yield reductions were attempted).
+**Lactating animals**: an attempt to reduce milk yield may be made if the lower limit of pen-average milk production has not been reached, and the value in the feed input file allows for a reduction in lactation (@tbl-an-ration-input-feed-2). Milk yield reduction occurs by reducing the milk production of every individual by 0.25 kg/d, regardless of production level, thereby reducing the pen average in 0.25 kg/d increments. Every time a reduction occurs, the formulation process begins again at the step where individual animal requirements are calculated. The process continues from there using the newly reduced requirements, making a successful formulation more likely. Note that because milk energy output is a component of the equations to estimate DMI, when requirements are recalculated after a milk reduction occurs, DMI will decrease. The DMI reduction amount is capped at 30% of the initial DMI estimate (i.e., before milk yield reductions were attempted).
 
 * The milk yield reduction process repeats until either: A. successful ration formulation, or B. further reduction in milk is precluded (reaching either the minimum pen-level production of 15 kg/cow/d, or the user-defined per-animal maximum level of milk yield reduction is reached cumulatively within a ration formulation interval), whereupon the simulation is halted.
 
-
 ##### Ration formulation failure: user-defined methodology
-![Graphic of user-defined ration formulation methodology.](../resources/images/RuFaS_user_defined_ration_figure.png){#fig-ani_UDR}
+
+![Graphic of user-defined ration formulation methodology.](../resources/images/ani_ration_user_defined.png){#fig-ani-UDR}
 
 **Non-lactating animals**: the user defined inclusion percentages will be used to formulate the ration, and it will be considered successful.
 
@@ -1989,9 +1990,6 @@ Failure of a ration to be formulated successfully indicates that the requirement
 1. Given that the DMI value (based on the `intake_option` setting; see [DMI section](#dmi-section) above) drives overall intake, and a user may want to increase intake without deviating from feed ingredient inclusion rates, intake is increased (only when a failed constraint could be fixed via increasing DMI) and optimization is attempted either until 1. a successful formulation occurs, or 2. the upper intake limit is reached. When the `predict_DMI` option is used, intake may increase by up to 30%, in 10% increments. When `set_DMI` or `set_DMI_per_X` is used, intake may increase only up to the tolerance value. Once the upper intake limit is reached, the process continues to the next step.
 2. If milk yield can be reduced (see Automated method: Lactating animals section above for more details), milk yield will be reduced and the process loops back to recalculate nutritional requirements for all animals in a pen. Note that when the `predict_DMI` option is used, DMI will decrease when milk reductions occur, as milk energy output is a factor in DMI prediction equations. The DMI reduction amount is capped at 30% of the initial DMI estimation, before milk yield reductions are attempted.
 3. If both Steps 1 and 2 are no longer possible to carry out, then the user defined inclusion percentages are used to generate a ration, using the target DMI recalculated after any milk reductions; milk reductions made during the attempt remain in effect until the next formulation interval. This allows the simulation to continue, but the final “failure” is still recorded for the user to inspect as needed.
-
-
-
 
 ::: {#sec-an-hsm}
 ### Herd Size Management  

@@ -3,9 +3,9 @@
 <!-- reuse code to import functions from "../scripts/": -->
 {{< include ../scripts/_import-from-scripts.qmd >}}
 
-## v1.2.0
+## v1.1.0
 
-In v1.2.0 the scientific documents were transfered into a new format (Quarto) and the following changes were made:
+In v1.1.0 the scientific documents were transfered into a new format (Quarto) and the following changes were made:
 
 * **Animal module**:
     * Addition of herd dynamics section

@@ -1,0 +1,7 @@
+﻿Array,Variable,Description,Default
+animal_combination,Animal combination a given ration corresponds to, --
+intake_option,"Dry matter intake option used for this animal combination's ration. Options: predict_DMI, set_DMI, or set_DMI_per_X (set_DMI_per_X is available only for lactating and growing combinations)",predict_DMI (set_DMI for calves)
+intake_value,"Dry matter intake value used for the ration of this animal combination. Units are kg/animal/day for set_DMI, and kg dry matter intake per kg milk yield (lac_cow) or per kg average daily gain (growing) for set_DMI_per_X. Required when intake_option is set_DMI or set_DMI_per_X; ignored when intake_option is predict_DMI",null
+feeds,Array of feeds available to the specified animal combination (one array per feed used in the ration), --
+feed_type,Unique identifier for a feed in standard or user feed library, --
+ration_percentage,Ration inclusion percentage (%DM) for this feed; utilized only in user-defined ration option (values for each ration must sum to 100 across included feeds), --
