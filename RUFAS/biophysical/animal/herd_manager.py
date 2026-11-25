@@ -1254,14 +1254,29 @@ class HerdManager:
     def _update_replacement_animal_genetics(self, replacement: Animal, time: RufasTime) -> None:
         """
         Updates the genetic values of a replacement animal.
+
+        Parameters
+        ----------
+        replacement : Animal
+            The purchased replacement animal whose genetic values are to be updated.
+        time : RufasTime
+            RufasTime object containing the current date of the simulation, used to derive the replacement's
+            birth year.
+
+        Notes
+        -----
+        A purchased replacement comes from the national population rather than from this herd, so both its true
+        breeding values and its estimated breeding values are centered on the national average breeding values of
+        its birth year.
+
         """
-        mean_tbv_fat, mean_tbv_protein = Genetics.calculate_average_tbv(
-            [animal.genetics for animal in self.heiferIIIs if animal.genetics is not None]
-        )
         replacement_birth_date = time.current_date.date() - timedelta(days=replacement.days_born)
         replacement.genetics = Genetics(birth_year=replacement_birth_date.year, animal_type=replacement.animal_type)
+        national_average_fat, national_average_protein = Genetics.get_national_average_breeding_values(
+            replacement_birth_date.year
+        )
         replacement.genetics.calculate_ebv_and_ranking_index(
-            replacement.animal_type, mean_tbv_fat, mean_tbv_protein, replacement.calves
+            replacement.animal_type, national_average_fat, national_average_protein, replacement.calves
         )
 
     def _remove_animal_from_current_array(self, animal: Animal) -> None:

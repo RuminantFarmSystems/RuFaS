@@ -420,7 +420,33 @@ class HerdFactory:
             self._heiferIs_update()
             self._calves_update()
 
+        self._redraw_generated_animal_genetics()
         return self.pre_animal_population
+
+    def _redraw_generated_animal_genetics(self) -> None:
+        """
+        Redraws the genetics of the generated animals for their birth years.
+
+        Notes
+        -----
+        The herd is generated without advancing the simulation date, so every generated animal draws its genetics as
+        if it were born in the simulation start year. Once the herd is generated, the birth year of each animal is
+        backtracked from its age, the same way as for animals loaded from input data, and its genetics and genetic
+        history are reset for that birth year. Replacement animals are skipped because their genetics are drawn again
+        when they are bought.
+
+        """
+        if not AnimalConfig.simulate_genetics:
+            return
+        population = self.pre_animal_population
+        generated_animals = (
+            population.calves + population.heiferIs + population.heiferIIs + population.heiferIIIs + population.cows
+        )
+        for animal in generated_animals:
+            birth_year = Utility.back_track_birth_date(animal.days_born, self.time.current_date).year
+            animal.genetics = Genetics(birth_year=birth_year, animal_type=animal.animal_type)
+            animal.genetic_history.clear()
+            animal.update_genetic_history(simulation_day=self.time.simulation_day)
 
     def _backtrack_animal_birth_date(self, days_born: int, time: RufasTime) -> str:
         """

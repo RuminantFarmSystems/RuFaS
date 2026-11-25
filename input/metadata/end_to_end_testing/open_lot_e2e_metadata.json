@@ -42,6 +42,13 @@
       "type": "csv",
       "properties": "animal_top_listing_semen_properties"
     },
+    "animal_national_average_breeding_value": {
+      "title": "National average breeding value data by birth year",
+      "description": "The national average breeding values of cows by birth year, on the same genetic base as the top listing semen data.",
+      "path": "input/data/animal_genetics/national_average_BV_HO.csv",
+      "type": "csv",
+      "properties": "animal_national_average_breeding_value_properties"
+    },
     "lactation": {
       "title": "Lactation curve adjustment values",
       "description": "Values for the adjustment of the three wood parameters based on farm specific data",
