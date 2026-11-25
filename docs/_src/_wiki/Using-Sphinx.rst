@@ -60,14 +60,16 @@ regenerate the reST files:
 
 ::
 
-   sphinx-apidoc -f -o docs/ . tests --maxdepth=1 --separate
+   sphinx-apidoc -f -o docs/_src/_code/ . tests --maxdepth=1 --separate
 
 An explanation of what the arguments to ``sphinx-apidoc`` are and what
 they do:
 
 - ``-f``: "force"; this command overwrites existing reST files based on
   what it finds in the codebase.
-- ``-o docs/``: path where the new reST files should be written to.
+- ``-o docs/_src/_code/``: path where the new reST files should be
+  written to. Sphinx only reads the ``docs/_src`` folder, so files
+  written anywhere else are not part of the documentation.
 - ``.``: path to the modules and packages that reST files will be
   generated/regenerated for.
 - ``tests``: path the modules and packages that reST files will not be
@@ -79,64 +81,39 @@ they do:
   from the same directory next to each other, this argument gives each
   module a separate page for its documentation.
 
+The generated reST files are not committed, except
+``docs/_src/_code/modules.rst``. The GitHub workflow generates them
+again each time it builds the website (see the "Automatic" section).
+
 HTML
 ----
 
 Automatic
 ~~~~~~~~~
 
-Sphinx can be run via a GitHub Action on a pull request, but it must be
-manually triggered on a target branch. If the documentation is going to
-be updated, this is the recommended way of doing it because it ensures
-that it will be updated in the same way every time. Here are the steps
-for using the Sphinx workflow:
+The website is built and published by the "Build and Deploy Sphinx
+Docs" GitHub workflow (``.github/workflows/sphinx.yml``). It runs every
+time something is pushed to ``main``. It generates the reST files,
+builds the HTML, and publishes it to the
+`RuFaS documentation website <https://ruminantfarmsystems.github.io/RuFaS/>`__.
+It does not commit anything to a branch.
 
-1. Create a new branch and make a pull request with it.
-2. Navigate to the "Actions" tab of GitHub.
-
-.. figure:: /_static/sphinx1.png
-   :alt: RuFaS Overview - GG
-   :align: center
-   :name: rufas overview
-3. Click on "Build Sphinx" on the left-hand side of the page, underneath
-   "All workflows".
-.. figure:: /_static/sphinx2.png
-   :alt: RuFaS Overview - GG
-   :align: center
-   :name: rufas overview
-4. Click "Run workflow" and then select the branch associated with your
-   pull request in the drop down.
-.. figure:: /_static/sphinx3.png
-   :alt: RuFaS Overview - GG
-   :align: center
-   :name: rufas overview
-5. After selecting the desired target branch, click the green "Run
-   workflow" button underneath the branch-selector drop down.
-.. figure:: /_static/sphinx4.png
-   :alt: RuFaS Overview - GG
-   :align: center
-   :name: rufas overview
-
-After the workflow has finished running, navigate back to your pull
-request. There will be a new commit on with the message "Update Sphinx
-Documentation" and the rebuilt documentation files will be listed under
-the "Files changed" tab.
+The workflow can also be started by hand from the "Actions" tab of
+GitHub, with the "Run workflow" button. It publishes the documentation
+of the branch you select, so select ``main``.
 
 Manual
 ~~~~~~
 
-To preview Sphinx's output locally before submitting a pull request, go
-to the ``docs`` directory at the repository's root. Here, you'll find a
-batch file called ``make.bat``. Executing this file will activate Sphinx
-and compile the documents according to specified parameters.
+To preview Sphinx's output locally before submitting a pull request:
 
-Note
-~~~~
-
-The method to execute batch files can vary across different operating
-systems and runtime settings. For example, on MS Windows, the command
-``./make html`` will generate HTML files, while ``./make latexpdf`` will
-produce Latex files.
+1. Install the documentation tools once, from the root of the project:
+   ``pip install -e ".[build_docs]"``.
+2. To include the code pages, run the ``sphinx-apidoc`` command from the
+   "reStructuredText" section first. Without it, only the wiki pages are
+   built.
+3. From the ``docs`` directory, run ``make html``. On MS Windows, run
+   ``./make html``. Use ``make latexpdf`` to produce Latex files.
 
 Where are the generated files?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,7 +122,7 @@ Under the same ``docs`` folder, navigate to ``/_build/html`` to see
 generated HTML files.
 
 - ``index.html`` is the entry to the entire HTML pages.
-- ``RUFAS.html`` is the entry to the RUFAS codebase.
+- ``_code/RUFAS.html`` is the entry to the RUFAS codebase.
 
 Alternatively, you can open other HTML files, they are mostly HTMLs for
 all the different subpackages.
