@@ -9,6 +9,7 @@ Subpackages
 
    RUFAS.biophysical.animal
    RUFAS.biophysical.feed_storage
+   RUFAS.biophysical.field
    RUFAS.biophysical.manure
 
 Module contents

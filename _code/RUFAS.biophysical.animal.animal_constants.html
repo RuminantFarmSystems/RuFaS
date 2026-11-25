@@ -25,7 +25,7 @@
 <meta content="RUFAS.biophysical.animal.animal_constants module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
 <meta content="RUFAS.biophysical.animal.animal_constants module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
-<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -97,6 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tools:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
@@ -104,9 +106,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Team Culture:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Version-Update-Workflow.html">Maintainer Team Workflow and Communication during a Version Update</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Release Notes:</span></p>
 <ul>
@@ -148,6 +152,26 @@
 <section id="module-RUFAS.biophysical.animal.animal_constants">
 <span id="rufas-biophysical-animal-animal-constants-module"></span><h1>RUFAS.biophysical.animal.animal_constants module<a class="headerlink" href="#module-RUFAS.biophysical.animal.animal_constants" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_MILK">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_constants.</span></span><span class="sig-name descname"><span class="pre">CULL_RANKING_CRITERIA_MILK</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'milk'</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_MILK" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_MILK'"><span>#</span></a></dt>
+<dd><p>Cull ranking criterion that ranks eligible cows by their daily milk production.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_305_DAY_MILK">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_constants.</span></span><span class="sig-name descname"><span class="pre">CULL_RANKING_CRITERIA_305_DAY_MILK</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'305_day_milk'</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_305_DAY_MILK" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_305_DAY_MILK'"><span>#</span></a></dt>
+<dd><p>Cull ranking criterion that ranks eligible cows by their 305-day milk yield.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_OPTIONS">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_constants.</span></span><span class="sig-name descname"><span class="pre">CULL_RANKING_CRITERIA_OPTIONS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('milk',</span> <span class="pre">'305_day_milk')</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_OPTIONS" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_OPTIONS'"><span>#</span></a></dt>
+<dd><p>All valid options for the <code class="docutils literal notranslate"><span class="pre">cull_ranking_criteria</span></code> user input.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_constants.ACUTE_SALE_FRACTION">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_constants.</span></span><span class="sig-name descname"><span class="pre">ACUTE_SALE_FRACTION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.3</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_constants.ACUTE_SALE_FRACTION" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_constants.ACUTE_SALE_FRACTION'"><span>#</span></a></dt>
+<dd><p>Fraction of all annual cow sales that are acute (forced / involuntary) sales, (unitless).</p>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_constants.MITS_PARAMETER_A">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_constants.</span></span><span class="sig-name descname"><span class="pre">MITS_PARAMETER_A</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">45.98</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_constants.MITS_PARAMETER_A" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_constants.MITS_PARAMETER_A'"><span>#</span></a></dt>
 <dd><p>The parameter ‘a’ in the Mitscherlich Model 3 (Mills et al., 2003).</p>
@@ -157,12 +181,28 @@
 <span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_constants.</span></span><span class="sig-name descname"><span class="pre">MITS_PARAMETER_B</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_constants.MITS_PARAMETER_B" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_constants.MITS_PARAMETER_B'"><span>#</span></a></dt>
 <dd><p>The parameter ‘b’ in the Mitscherlich Model 3 (Mills et al., 2003).</p>
 </dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_constants.SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_constants.</span></span><span class="sig-name descname"><span class="pre">SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.85</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_constants.SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_constants.SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER'"><span>#</span></a></dt>
+<dd><p>Conception rate of sexed dairy semen relative to conventional semen, (unitless).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="RUFAS.biophysical.animal.animal_constants.FRESH_COW_DAYS_IN_MILK_THRESHOLD">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.animal.animal_constants.</span></span><span class="sig-name descname"><span class="pre">FRESH_COW_DAYS_IN_MILK_THRESHOLD</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></span><a class="headerlink" href="#RUFAS.biophysical.animal.animal_constants.FRESH_COW_DAYS_IN_MILK_THRESHOLD" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.animal.animal_constants.FRESH_COW_DAYS_IN_MILK_THRESHOLD'"><span>#</span></a></dt>
+<dd><p>Lactating cows below this many days in milk are considered fresh, (simulation days).</p>
+</dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_MILK'" class="reference internal" href="#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_MILK"><code class="docutils literal notranslate"><span class="pre">CULL_RANKING_CRITERIA_MILK</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_305_DAY_MILK'" class="reference internal" href="#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_305_DAY_MILK"><code class="docutils literal notranslate"><span class="pre">CULL_RANKING_CRITERIA_305_DAY_MILK</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_OPTIONS'" class="reference internal" href="#RUFAS.biophysical.animal.animal_constants.CULL_RANKING_CRITERIA_OPTIONS"><code class="docutils literal notranslate"><span class="pre">CULL_RANKING_CRITERIA_OPTIONS</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_constants.ACUTE_SALE_FRACTION'" class="reference internal" href="#RUFAS.biophysical.animal.animal_constants.ACUTE_SALE_FRACTION"><code class="docutils literal notranslate"><span class="pre">ACUTE_SALE_FRACTION</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_constants.MITS_PARAMETER_A'" class="reference internal" href="#RUFAS.biophysical.animal.animal_constants.MITS_PARAMETER_A"><code class="docutils literal notranslate"><span class="pre">MITS_PARAMETER_A</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_constants.MITS_PARAMETER_B'" class="reference internal" href="#RUFAS.biophysical.animal.animal_constants.MITS_PARAMETER_B"><code class="docutils literal notranslate"><span class="pre">MITS_PARAMETER_B</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_constants.SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER'" class="reference internal" href="#RUFAS.biophysical.animal.animal_constants.SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER"><code class="docutils literal notranslate"><span class="pre">SEXED_DAIRY_CONCEPTION_RATE_MULTIPLIER</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.animal.animal_constants.FRESH_COW_DAYS_IN_MILK_THRESHOLD'" class="reference internal" href="#RUFAS.biophysical.animal.animal_constants.FRESH_COW_DAYS_IN_MILK_THRESHOLD"><code class="docutils literal notranslate"><span class="pre">FRESH_COW_DAYS_IN_MILK_THRESHOLD</span></code></a></li>
 </ul>
 </div>
 </aside>
@@ -179,6 +219,6 @@
 <script src="../_static/documentation_options.js?v=5929fcd5"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
 </body>
 </html>

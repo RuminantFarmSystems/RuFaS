@@ -1,0 +1,7 @@
+RUFAS.main module
+=================
+
+.. automodule:: RUFAS.main
+   :members:
+   :show-inheritance:
+   :undoc-members:

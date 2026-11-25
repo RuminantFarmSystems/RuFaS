@@ -25,10 +25,12 @@
 <meta content="RUFAS.biophysical.field.crop.heat_units module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
 <meta content="RUFAS.biophysical.field.crop.heat_units module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
-<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.field.crop.leaf_area_index.html" rel="next" title="RUFAS.biophysical.field.crop.leaf_area_index module"/>
+<link href="RUFAS.biophysical.field.crop.harvest_operations.html" rel="prev" title="RUFAS.biophysical.field.crop.harvest_operations module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -95,6 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tools:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
@@ -102,9 +106,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Team Culture:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Version-Update-Workflow.html">Maintainer Team Workflow and Communication during a Version Update</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Release Notes:</span></p>
 <ul>
@@ -136,6 +142,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.crop.html">RUFAS.biophysical.field.crop package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.crop.heat_units module</span>
 </nav>
 <div id="content" role="main">
@@ -143,46 +154,45 @@
 <span id="rufas-biophysical-field-crop-heat-units-module"></span><h1>RUFAS.biophysical.field.crop.heat_units module<a class="headerlink" href="#module-RUFAS.biophysical.field.crop.heat_units" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.crop.heat_units.</span></span><span class="sig-name descname"><span class="pre">HeatUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData" title="RUFAS.biophysical.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">38.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_heat_units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.crop.heat_units.</span></span><span class="sig-name descname"><span class="pre">HeatUnits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData" title="RUFAS.biophysical.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">38.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_heat_units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class that manages heat units for crop growth.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>crop_data<span class="classifier">Optional[CropData], optional</span></dt><dd><p>An instance of <cite>CropData</cite> containing crop specifications and attributes. If not provided, a default
-<cite>CropData</cite> instance is initialized with default values.</p>
+<dt>crop_data<span class="classifier">CropData</span></dt><dd><p>An instance of <code class="docutils literal notranslate"><span class="pre">CropData</span></code> containing crop specifications and attributes.</p>
 </dd>
 <dt>maximum_temperature<span class="classifier">float, default 38</span></dt><dd><p>Maximum temperature for plant growth (Celsius).</p>
 </dd>
 <dt>use_heat_unit_temperature<span class="classifier">bool, default False</span></dt><dd><p>If alternative heat unit method is used.</p>
 </dd>
-<dt>new_heat_units<span class="classifier">Optional[float], default None</span></dt><dd><p>Heat units accumulated on the current day (Celsius).</p>
+<dt>new_heat_units<span class="classifier">float, default 0.0</span></dt><dd><p>Heat units accumulated on the current day (Celsius).</p>
 </dd>
-<dt>minimum_heat_unit_temperature<span class="classifier">Optional[float], default None</span></dt><dd><p>Minimum temperature for heat unit calculations (Celsius).</p>
+<dt>minimum_heat_unit_temperature<span class="classifier">float, optional</span></dt><dd><p>Minimum temperature for heat unit calculations (Celsius).</p>
 </dd>
-<dt>maximum_heat_unit_temperature<span class="classifier">Optional[float], default None</span></dt><dd><p>Maximum temperature for heat unit calculations (Celsius).</p>
+<dt>maximum_heat_unit_temperature<span class="classifier">float, optional</span></dt><dd><p>Maximum temperature for heat unit calculations (Celsius).</p>
 </dd>
-<dt>heat_unit_temperature<span class="classifier">Optional[float], default None</span></dt><dd><p>Heat unit temperature for alternative method (Celsius).</p>
+<dt>heat_unit_temperature<span class="classifier">float, optional</span></dt><dd><p>Heat unit temperature for alternative method (Celsius).</p>
 </dd>
 </dl>
 </section>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>data<span class="classifier">CropData</span></dt><dd><p>A reference to the <cite>crop_data</cite> object, used for accessing and updating crop-related data like
+<dt>data<span class="classifier">CropData</span></dt><dd><p>A reference to the <code class="docutils literal notranslate"><span class="pre">crop_data</span></code> object, used for accessing and updating crop-related data like
 temperature thresholds, accumulated heat units, and growth stages.</p>
 </dd>
 <dt>maximum_temperature<span class="classifier">float</span></dt><dd><p>Maximum temperature for plant growth (Celsius).</p>
 </dd>
 <dt>use_heat_unit_temperature<span class="classifier">bool</span></dt><dd><p>If alternative heat unit method is used.</p>
 </dd>
-<dt>new_heat_units<span class="classifier">Optional[float]</span></dt><dd><p>Heat units accumulated on the current day (Celsius*).</p>
+<dt>new_heat_units<span class="classifier">float</span></dt><dd><p>Heat units accumulated on the current day (Celsius*).</p>
 </dd>
-<dt>minimum_heat_unit_temperature<span class="classifier">Optional[float]</span></dt><dd><p>Minimum temperature for heat unit calculations (Celsius).</p>
+<dt>minimum_heat_unit_temperature<span class="classifier">float | None</span></dt><dd><p>Minimum temperature for heat unit calculations (Celsius).</p>
 </dd>
-<dt>maximum_heat_unit_temperature<span class="classifier">Optional[float]</span></dt><dd><p>Maximum temperature for heat unit calculations (Celsius).</p>
+<dt>maximum_heat_unit_temperature<span class="classifier">float | None</span></dt><dd><p>Maximum temperature for heat unit calculations (Celsius).</p>
 </dd>
-<dt>heat_unit_temperature<span class="classifier">Optional[float]</span></dt><dd><p>Heat unit temperature for alternative method (Celsius).</p>
+<dt>heat_unit_temperature<span class="classifier">float | None</span></dt><dd><p>Heat unit temperature for alternative method (Celsius).</p>
 </dd>
 </dl>
 </section>
@@ -191,7 +201,7 @@ temperature thresholds, accumulated heat units, and growth stages.</p>
 <p>This module primarily follows the Heat Units section of the SWAT model (5:3.1)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData" title="RUFAS.biophysical.field.crop.crop_data.CropData"><span class="pre">CropData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">38.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_heat_units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.crop.crop_data.html#RUFAS.biophysical.field.crop.crop_data.CropData" title="RUFAS.biophysical.field.crop.crop_data.CropData"><span class="pre">CropData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">38.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_heat_units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heat_unit_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.__init__'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits.absorb_heat_units">
@@ -200,18 +210,26 @@ temperature thresholds, accumulated heat units, and growth stages.</p>
 <section id="id1">
 <h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>mean_air_temperature<span class="classifier">Optional[float]</span></dt><dd><p>Average air temperature for the day (°C).</p>
+<dt>mean_air_temperature<span class="classifier">float, optional</span></dt><dd><p>Average air temperature for the day (°C).</p>
 </dd>
-<dt>min_air_temperature<span class="classifier">Optional[float]</span></dt><dd><p>Minimum air temperature for the day (°C).</p>
+<dt>min_air_temperature<span class="classifier">float, optional</span></dt><dd><p>Minimum air temperature for the day (°C).</p>
 </dd>
-<dt>max_air_temperature<span class="classifier">Optional[float]</span></dt><dd><p>Maximum air temperature for the day (°C).</p>
+<dt>max_air_temperature<span class="classifier">float, optional</span></dt><dd><p>Maximum air temperature for the day (°C).</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#raises'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the alternative heat unit method is used without the minimum and maximum air temperature, or if neither
+a mean air temperature nor a heat unit temperature is available.</p>
 </dd>
 </dl>
 </section>
 <section id="id2">
 <h3>Notes<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'"><span>#</span></a></h3>
-<p>If the attribute <cite>use_heat_unit_temperature</cite> in CropData is False, both <cite>min_air_temperature</cite> and
-<cite>max_air_temperature</cite> are optional. Otherwise, they are used to determine heat unit accumulation rather than
+<p>If the attribute <code class="docutils literal notranslate"><span class="pre">use_heat_unit_temperature</span></code> in CropData is False, both <code class="docutils literal notranslate"><span class="pre">min_air_temperature</span></code> and
+<code class="docutils literal notranslate"><span class="pre">max_air_temperature</span></code> are optional. Otherwise, they are used to determine heat unit accumulation rather than
 average air temperature.</p>
 </section>
 <section id="references">
@@ -222,44 +240,37 @@ average air temperature.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits.accumulate_heat_units">
 <span class="sig-name descname"><span class="pre">accumulate_heat_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">air_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.accumulate_heat_units" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.accumulate_heat_units'"><span>#</span></a></dt>
-<dd><p>Accumulates heat units during a day based on the air temperature.</p>
+<dd><p>Add the day’s heat unit value to the cumulative sum of heat unit values from previous days.</p>
 <section id="id3">
 <h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>air_temperature<span class="classifier">float</span></dt><dd><p>The average air temperature during the day (°C).</p>
+<dt>air_temperature<span class="classifier">float</span></dt><dd><p>The average air temperature for the day (Celsius).</p>
 </dd>
 </dl>
 </section>
 <section id="id4">
 <h3>Notes<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'"><span>#</span></a></h3>
-<p>The method of accumulation depends on the attribute <cite>use_heat_unit_temperature</cite>:
-- If <cite>use_heat_unit_temperature</cite> is False (default), the method accumulates every degree Celsius above the
-crop’s minimum temperature for growth as heat units, following the SWAT manual.
-- If <cite>use_heat_unit_temperature</cite> is True, or <cite>air_temperature</cite> is None, an alternative method is used. In this
-method, the <cite>heat_unit_temperature</cite> attribute is used in place of the average air temperature. The accumulation
-varies depending on the relationship between the air temperature range and the crop’s growth temperature range:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li><p>If both min and max air temperatures are higher than the crop’s min and max growth temperatures,
-accumulation is greater than the main method.</p></li>
-<li><p>If both min and max air temperatures are lower than the crop’s min and max temperatures,
-accumulation is greater than the main method.</p></li>
-<li><p>If the air temperature range is entirely within the crop’s temperature range, accumulation equals
-the middle of the crop temperature window.</p></li>
-<li><p>If the crop’s temperature range is entirely within the air temperature range, accumulation equals
-the middle of the air temperature range.</p></li>
-</ol>
-</div></blockquote>
+<p>The method for calculating the heat units depends on <code class="docutils literal notranslate"><span class="pre">self.use_heat_unit_temperature</span></code> and possibly
+<code class="docutils literal notranslate"><span class="pre">self.heat_unit_temperature</span></code>. See documentation of <code class="docutils literal notranslate"><span class="pre">self.assign_new_heat_units</span></code> for details.</p>
 </section>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_new_heat_units">
-<span class="sig-name descname"><span class="pre">assign_new_heat_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">air_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_new_heat_units" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_new_heat_units'"><span>#</span></a></dt>
-<dd><p>Assign new heat units based on whether the alternative accumulation method is to be used.</p>
+<dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_current_heat_units">
+<span class="sig-name descname"><span class="pre">assign_current_heat_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">air_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_current_heat_units" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_current_heat_units'"><span>#</span></a></dt>
+<dd><p>Determine and save the day’s “heat units”.</p>
 <section id="id5">
 <h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>air_temperature<span class="classifier">Optional[float], optional</span></dt><dd><p>The average air temperature during the day (°C).</p>
+<dt>air_temperature<span class="classifier">float, optional</span></dt><dd><p>The average air temperature during the day (°C) used to determine the heat units via
+<code class="docutils literal notranslate"><span class="pre">self._determine_heat_unit_value</span></code>. If None or if <code class="docutils literal notranslate"><span class="pre">self.use_heat_unit_temperature=True</span></code>, then
+<code class="docutils literal notranslate"><span class="pre">self.heat_unit_temperature</span></code> is used instead.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Raises<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">self.heat_unit_temperature</span></code> is needed but has not been set.</p>
 </dd>
 </dl>
 </section>
@@ -270,27 +281,30 @@ the middle of the air temperature range.</p></li>
 <dd><p>Add newly acquired heat units to accumulated heat units.</p>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_new_heat_units">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_new_heat_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_new_heat_units" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_new_heat_units'"><span>#</span></a></dt>
-<dd><p>Calculates the heat units that will be accumulated during a day.</p>
-<section id="id6">
-<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'"><span>#</span></a></h3>
+<dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_heat_unit_value">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_heat_unit_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">air_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_growing_temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_heat_unit_value" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_heat_unit_value'"><span>#</span></a></dt>
+<dd><p>Calculates heat units as the zero-bounded difference between an air temperature and a crop’s minimum
+growing temperature.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>temperature<span class="classifier">float</span></dt><dd><p>The temperature to be compared to min_temperature for accumulating heat units (°C).</p>
+<dt>air_temperature<span class="classifier">float</span></dt><dd><p>The air temperature to be compared with min_temperature (Celsius).</p>
 </dd>
-<dt>min_temperature<span class="classifier">float</span></dt><dd><p>The minimum temperature below which a crop cannot grow (°C).</p>
+<dt>min_growing_temperature<span class="classifier">float</span></dt><dd><p>The minimum temperature below which a crop cannot grow (Celsius).</p>
 </dd>
 </dl>
 </section>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>The calculated heat units to be accumulated based on the given temperature and minimum temperature (C).</p>
+<dt>float</dt><dd><p>The heat units for the day in degrees C, calculated by subtracting min_growing_temperature from
+<code class="docutils literal notranslate"><span class="pre">air_temperature</span></code>.
+If the temperature difference is negative, 0 the result is 0.</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h3>References<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'"><span>#</span></a></h3>
+<section id="id8">
+<h3>References<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
 <p>SWAT Reference 5:1.1</p>
 </section>
 </dd></dl>
@@ -298,8 +312,8 @@ the middle of the air temperature range.</p></li>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_minimum_heat_unit_temperature">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_minimum_heat_unit_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_growth_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_minimum_heat_unit_temperature" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_minimum_heat_unit_temperature'"><span>#</span></a></dt>
 <dd><p>Calculates the minimum heat unit temperature on the current day.</p>
-<section id="id8">
-<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'"><span>#</span></a></h3>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>min_air_temp<span class="classifier">float</span></dt><dd><p>Minimum air temperature on the current day (°C).</p>
 </dd>
@@ -307,8 +321,8 @@ the middle of the air temperature range.</p></li>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h3>Returns<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'"><span>#</span></a></h3>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The calculated minimum heat unit temperature for the day (°C).</p>
 </dd>
@@ -319,8 +333,8 @@ the middle of the air temperature range.</p></li>
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_maximum_heat_unit_temperature">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">_determine_maximum_heat_unit_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_air_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_growth_temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_maximum_heat_unit_temperature" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_maximum_heat_unit_temperature'"><span>#</span></a></dt>
 <dd><p>Calculates the maximum heat unit temperature on the current day.</p>
-<section id="id10">
-<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'"><span>#</span></a></h3>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>max_air_temp<span class="classifier">float</span></dt><dd><p>Maximum air temperature on the current day (°C).</p>
 </dd>
@@ -328,15 +342,15 @@ the middle of the air temperature range.</p></li>
 </dd>
 </dl>
 </section>
-<section id="id11">
-<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'"><span>#</span></a></h3>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
 <dl class="simple">
 <dt>float</dt><dd><p>The maximum heat unit temperature for the day.</p>
 </dd>
 </dl>
 </section>
-<section id="id12">
-<h3>References<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'"><span>#</span></a></h3>
+<section id="id13">
+<h3>References<a class="headerlink" href="#id13" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id13'"><span>#</span></a></h3>
 <p>“pseudocode_crop” C.2.A.4</p>
 </section>
 </dd></dl>
@@ -350,9 +364,9 @@ the middle of the air temperature range.</p></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.__init__'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.__init__"><code class="docutils literal notranslate"><span class="pre">HeatUnits.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.absorb_heat_units'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.absorb_heat_units"><code class="docutils literal notranslate"><span class="pre">HeatUnits.absorb_heat_units()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.accumulate_heat_units'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.accumulate_heat_units"><code class="docutils literal notranslate"><span class="pre">HeatUnits.accumulate_heat_units()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_new_heat_units'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_new_heat_units"><code class="docutils literal notranslate"><span class="pre">HeatUnits.assign_new_heat_units()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_current_heat_units'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.assign_current_heat_units"><code class="docutils literal notranslate"><span class="pre">HeatUnits.assign_current_heat_units()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits.add_heat_units'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits.add_heat_units"><code class="docutils literal notranslate"><span class="pre">HeatUnits.add_heat_units()</span></code></a></li>
-<li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_new_heat_units'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_new_heat_units"><code class="docutils literal notranslate"><span class="pre">HeatUnits._determine_new_heat_units()</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_heat_unit_value'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_heat_unit_value"><code class="docutils literal notranslate"><span class="pre">HeatUnits._determine_heat_unit_value()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_minimum_heat_unit_temperature'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_minimum_heat_unit_temperature"><code class="docutils literal notranslate"><span class="pre">HeatUnits._determine_minimum_heat_unit_temperature()</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_maximum_heat_unit_temperature'" class="reference internal" href="#RUFAS.biophysical.field.crop.heat_units.HeatUnits._determine_maximum_heat_unit_temperature"><code class="docutils literal notranslate"><span class="pre">HeatUnits._determine_maximum_heat_unit_temperature()</span></code></a></li>
 </ul>
@@ -373,6 +387,6 @@ the middle of the air temperature range.</p></li>
 <script src="../_static/documentation_options.js?v=5929fcd5"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
 </body>
 </html>

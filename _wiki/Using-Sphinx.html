@@ -25,7 +25,7 @@
 <meta content="Using Sphinx | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
 <meta content="Using Sphinx | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
-<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -97,6 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Data-Collection-App.html">Data Collection App</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tools:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Github-Actions.html">Github Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Using-Mypy.html">Using Mypy</a></li>
@@ -104,9 +106,11 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Using Sphinx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Using-Flake8.html">Using Flake8</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Team Culture:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Version-Update-Workflow.html">Maintainer Team Workflow and Communication during a Version Update</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Release Notes:</span></p>
 <ul>
@@ -192,7 +196,7 @@ to do the reST files <em>first</em>, then the HTML and/or Latex files.</p>
 command, an extension of Sphinx.</p>
 <p>Run the following command from the root of the project directory to
 regenerate the reST files:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">sphinx</span><span class="o">-</span><span class="n">apidoc</span> <span class="o">-</span><span class="n">f</span> <span class="o">-</span><span class="n">o</span> <span class="n">docs</span><span class="o">/</span> <span class="o">.</span> <span class="n">tests</span> <span class="o">--</span><span class="n">maxdepth</span><span class="o">=</span><span class="mi">1</span> <span class="o">--</span><span class="n">separate</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">sphinx</span><span class="o">-</span><span class="n">apidoc</span> <span class="o">-</span><span class="n">f</span> <span class="o">-</span><span class="n">o</span> <span class="n">docs</span><span class="o">/</span><span class="n">_src</span><span class="o">/</span><span class="n">_code</span><span class="o">/</span> <span class="o">.</span> <span class="n">tests</span> <span class="o">--</span><span class="n">maxdepth</span><span class="o">=</span><span class="mi">1</span> <span class="o">--</span><span class="n">separate</span>
 </span></code></pre></div>
 </div>
 <p>An explanation of what the arguments to <code class="docutils literal notranslate"><span class="pre">sphinx-apidoc</span></code> are and what
@@ -200,7 +204,9 @@ they do:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">-f</span></code>: “force”; this command overwrites existing reST files based on
 what it finds in the codebase.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">docs/</span></code>: path where the new reST files should be written to.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">docs/_src/_code/</span></code>: path where the new reST files should be
+written to. Sphinx only reads the <code class="docutils literal notranslate"><span class="pre">docs/_src</span></code> folder, so files
+written anywhere else are not part of the documentation.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">.</span></code>: path to the modules and packages that reST files will be
 generated/regenerated for.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">tests</span></code>: path the modules and packages that reST files will not be
@@ -212,62 +218,36 @@ the page.</p></li>
 from the same directory next to each other, this argument gives each
 module a separate page for its documentation.</p></li>
 </ul>
+<p>The generated reST files are not committed, except
+<code class="docutils literal notranslate"><span class="pre">docs/_src/_code/modules.rst</span></code>. The GitHub workflow generates them
+again each time it builds the website (see the “Automatic” section).</p>
 </section>
 <section id="html">
 <h2>HTML<a class="headerlink" href="#html" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#html'"><span>#</span></a></h2>
 <section id="automatic">
 <h3>Automatic<a class="headerlink" href="#automatic" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#automatic'"><span>#</span></a></h3>
-<p>Sphinx can be run via a GitHub Action on a pull request, but it must be
-manually triggered on a target branch. If the documentation is going to
-be updated, this is the recommended way of doing it because it ensures
-that it will be updated in the same way every time. Here are the steps
-for using the Sphinx workflow:</p>
-<ol class="arabic simple">
-<li><p>Create a new branch and make a pull request with it.</p></li>
-<li><p>Navigate to the “Actions” tab of GitHub.</p></li>
-</ol>
-<figure class="align-center" id="rufas-overview">
-<img alt="RuFaS Overview - GG" src="../_images/sphinx1.png"/>
-</figure>
-<ol class="arabic simple" start="3">
-<li><p>Click on “Build Sphinx” on the left-hand side of the page, underneath
-“All workflows”.</p></li>
-</ol>
-<figure class="align-center" id="id1">
-<img alt="RuFaS Overview - GG" src="../_images/sphinx2.png"/>
-</figure>
-<ol class="arabic simple" start="4">
-<li><p>Click “Run workflow” and then select the branch associated with your
-pull request in the drop down.</p></li>
-</ol>
-<figure class="align-center" id="id2">
-<img alt="RuFaS Overview - GG" src="../_images/sphinx3.png"/>
-</figure>
-<ol class="arabic simple" start="5">
-<li><p>After selecting the desired target branch, click the green “Run
-workflow” button underneath the branch-selector drop down.</p></li>
-</ol>
-<figure class="align-center" id="id3">
-<img alt="RuFaS Overview - GG" src="../_images/sphinx4.png"/>
-</figure>
-<p>After the workflow has finished running, navigate back to your pull
-request. There will be a new commit on with the message “Update Sphinx
-Documentation” and the rebuilt documentation files will be listed under
-the “Files changed” tab.</p>
+<p>The website is built and published by the “Build and Deploy Sphinx
+Docs” GitHub workflow (<code class="docutils literal notranslate"><span class="pre">.github/workflows/sphinx.yml</span></code>). It runs every
+time something is pushed to <code class="docutils literal notranslate"><span class="pre">main</span></code>. It generates the reST files,
+builds the HTML, and publishes it to the
+<a class="reference external" href="https://ruminantfarmsystems.github.io/RuFaS/">RuFaS documentation website</a>.
+It does not commit anything to a branch.</p>
+<p>The workflow can also be started by hand from the “Actions” tab of
+GitHub, with the “Run workflow” button. It publishes the documentation
+of the branch you select, so select <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p>
 </section>
 <section id="manual">
 <h3>Manual<a class="headerlink" href="#manual" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#manual'"><span>#</span></a></h3>
-<p>To preview Sphinx’s output locally before submitting a pull request, go
-to the <code class="docutils literal notranslate"><span class="pre">docs</span></code> directory at the repository’s root. Here, you’ll find a
-batch file called <code class="docutils literal notranslate"><span class="pre">make.bat</span></code>. Executing this file will activate Sphinx
-and compile the documents according to specified parameters.</p>
-</section>
-<section id="note">
-<h3>Note<a class="headerlink" href="#note" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#note'"><span>#</span></a></h3>
-<p>The method to execute batch files can vary across different operating
-systems and runtime settings. For example, on MS Windows, the command
-<code class="docutils literal notranslate"><span class="pre">./make</span> <span class="pre">html</span></code> will generate HTML files, while <code class="docutils literal notranslate"><span class="pre">./make</span> <span class="pre">latexpdf</span></code> will
-produce Latex files.</p>
+<p>To preview Sphinx’s output locally before submitting a pull request:</p>
+<ol class="arabic simple">
+<li><p>Install the documentation tools once, from the root of the project:
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">".[build_docs]"</span></code>.</p></li>
+<li><p>To include the code pages, run the <code class="docutils literal notranslate"><span class="pre">sphinx-apidoc</span></code> command from the
+“reStructuredText” section first. Without it, only the wiki pages are
+built.</p></li>
+<li><p>From the <code class="docutils literal notranslate"><span class="pre">docs</span></code> directory, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code>. On MS Windows, run
+<code class="docutils literal notranslate"><span class="pre">./make</span> <span class="pre">html</span></code>. Use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">latexpdf</span></code> to produce Latex files.</p></li>
+</ol>
 </section>
 <section id="where-are-the-generated-files">
 <h3>Where are the generated files?<a class="headerlink" href="#where-are-the-generated-files" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#where-are-the-generated-files'"><span>#</span></a></h3>
@@ -275,12 +255,12 @@ produce Latex files.</p>
 generated HTML files.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">index.html</span></code> is the entry to the entire HTML pages.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RUFAS.html</span></code> is the entry to the RUFAS codebase.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_code/RUFAS.html</span></code> is the entry to the RUFAS codebase.</p></li>
 </ul>
 <p>Alternatively, you can open other HTML files, they are mostly HTMLs for
 all the different subpackages.</p>
-<section id="note-1">
-<span id="id4"></span><h4>Note<a class="headerlink" href="#note-1" title="Link to this heading"><span>#</span></a></h4>
+<section id="note">
+<span id="note-1"></span><h4>Note<a class="headerlink" href="#note" title="Link to this heading"><span>#</span></a></h4>
 <p>If you generate Latex documents, the output is in <code class="docutils literal notranslate"><span class="pre">/_build/latex</span></code> with
 a similar pattern.</p>
 </section>
@@ -312,9 +292,8 @@ Reference</a></p>
 <li><a :data-current="activeSection === '#html'" class="reference internal" href="#html">HTML</a><ul>
 <li><a :data-current="activeSection === '#automatic'" class="reference internal" href="#automatic">Automatic</a></li>
 <li><a :data-current="activeSection === '#manual'" class="reference internal" href="#manual">Manual</a></li>
-<li><a :data-current="activeSection === '#note'" class="reference internal" href="#note">Note</a></li>
 <li><a :data-current="activeSection === '#where-are-the-generated-files'" class="reference internal" href="#where-are-the-generated-files">Where are the generated files?</a><ul>
-<li><a :data-current="activeSection === '#note-1'" class="reference internal" href="#note-1">Note</a></li>
+<li><a :data-current="activeSection === '#note'" class="reference internal" href="#note">Note</a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#navigating-the-html'" class="reference internal" href="#navigating-the-html">Navigating the HTML</a></li>
@@ -337,6 +316,6 @@ Reference</a></p>
 <script src="../_static/documentation_options.js?v=5929fcd5"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
 </body>
 </html>

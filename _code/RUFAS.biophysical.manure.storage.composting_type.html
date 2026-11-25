@@ -25,11 +25,11 @@
 <meta content="RUFAS.biophysical.manure.storage.composting_type module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
 <meta content="RUFAS.biophysical.manure.storage.composting_type module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
-<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="RUFAS.biophysical.manure.storage.open_lot.html" rel="next" title="RUFAS.biophysical.manure.storage.open_lot module"/>
+<link href="RUFAS.biophysical.manure.storage.daily_spread.html" rel="next" title="RUFAS.biophysical.manure.storage.daily_spread module"/>
 <link href="RUFAS.biophysical.manure.storage.composting.html" rel="prev" title="RUFAS.biophysical.manure.storage.composting module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -97,6 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tools:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
@@ -104,9 +106,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Team Culture:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Version-Update-Workflow.html">Maintainer Team Workflow and Communication during a Version Update</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Release Notes:</span></p>
 <ul>
@@ -160,7 +164,9 @@
 </dd>
 <dt>PASSIVE_WINDROW<span class="classifier">str</span></dt><dd><p>Passive windrow.</p>
 </dd>
-<dt>STATIC_PILE: str</dt><dd><p>Static pile.</p>
+<dt>STATIC_PILE<span class="classifier">str</span></dt><dd><p>Static pile.</p>
+</dd>
+<dt>IN_VESSEL<span class="classifier">str</span></dt><dd><p>In vessel.</p>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -175,6 +181,10 @@
 <dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.composting_type.CompostingType.STATIC_PILE">
 <span class="sig-name descname"><span class="pre">STATIC_PILE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'static</span> <span class="pre">pile'</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.composting_type.CompostingType.STATIC_PILE" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.composting_type.CompostingType.STATIC_PILE'"><span>#</span></a></dt>
 <dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.biophysical.manure.storage.composting_type.CompostingType.IN_VESSEL">
+<span class="sig-name descname"><span class="pre">IN_VESSEL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'in</span> <span class="pre">vessel'</span></span><a class="headerlink" href="#RUFAS.biophysical.manure.storage.composting_type.CompostingType.IN_VESSEL" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.manure.storage.composting_type.CompostingType.IN_VESSEL'"><span>#</span></a></dt>
+<dd></dd></dl>
 </section>
 </dd></dl>
 </section>
@@ -185,6 +195,7 @@
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.composting_type.CompostingType.INTENSIVE_WINDROW'" class="reference internal" href="#RUFAS.biophysical.manure.storage.composting_type.CompostingType.INTENSIVE_WINDROW"><code class="docutils literal notranslate"><span class="pre">CompostingType.INTENSIVE_WINDROW</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.composting_type.CompostingType.PASSIVE_WINDROW'" class="reference internal" href="#RUFAS.biophysical.manure.storage.composting_type.CompostingType.PASSIVE_WINDROW"><code class="docutils literal notranslate"><span class="pre">CompostingType.PASSIVE_WINDROW</span></code></a></li>
 <li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.composting_type.CompostingType.STATIC_PILE'" class="reference internal" href="#RUFAS.biophysical.manure.storage.composting_type.CompostingType.STATIC_PILE"><code class="docutils literal notranslate"><span class="pre">CompostingType.STATIC_PILE</span></code></a></li>
+<li><a :data-current="activeSection === '#RUFAS.biophysical.manure.storage.composting_type.CompostingType.IN_VESSEL'" class="reference internal" href="#RUFAS.biophysical.manure.storage.composting_type.CompostingType.IN_VESSEL"><code class="docutils literal notranslate"><span class="pre">CompostingType.IN_VESSEL</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -203,6 +214,6 @@
 <script src="../_static/documentation_options.js?v=5929fcd5"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
 </body>
 </html>

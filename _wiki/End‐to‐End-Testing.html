@@ -25,7 +25,7 @@
 <meta content="End to End Testing | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
 <meta content="End to End Testing | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
-<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul class="current">
@@ -97,6 +98,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">End to End Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Data-Collection-App.html">Data Collection App</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tools:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Github-Actions.html">Github Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Using-Mypy.html">Using Mypy</a></li>
@@ -104,9 +106,11 @@
 <li class="toctree-l1"><a class="reference internal" href="Using-Sphinx.html">Using Sphinx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Using-Flake8.html">Using Flake8</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Team Culture:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Version-Update-Workflow.html">Maintainer Team Workflow and Communication during a Version Update</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Release Notes:</span></p>
 <ul>
@@ -188,6 +192,17 @@ testing on a particular domain. This file contains:</p>
 end-to-end testing</p></li>
 </ul>
 </li>
+<li><p><strong>Must-Change Variables</strong> - Variables whose actual values are required
+to differ from their expected values for the end-to-end test to pass.
+These are typically used to verify that an intentional change to the
+model produces a change in the affected variables. See
+<a class="reference internal" href="#e2e-must-change-variables"><span class="std std-ref">Must-Change Variables</span></a>.</p></li>
+<li><p><strong>Accepted Ranges</strong> - A minimum and maximum allowable value for a
+variable. During end-to-end testing, the variable’s actual values are
+checked against this range rather than compared to the values in the
+expected results. The variable passes if all of its actual values fall
+within the accepted range, regardless of whether they match the
+expected results. See <a class="reference internal" href="#e2e-accepted-ranges"><span class="std std-ref">Accepted Ranges</span></a>.</p></li>
 </ul>
 </section>
 </section>
@@ -235,6 +250,9 @@ of inputs. Run E2E testing with the following command:</p>
 <li><p><strong>A domain’s E2E test passes if there are no differences between the
 expected and actual results.</strong></p></li>
 <li><p><strong>A domain’s E2E test fails if there are any differences.</strong></p></li>
+<li><p><strong>Variables in the must-change list or with an accepted range are
+evaluated using different passing criteria.</strong> See
+<a class="reference internal" href="#e2e-must-change-and-accepted-ranges"><span class="std std-ref">Must-Change Variables and Accepted Ranges</span></a>.</p></li>
 <li><p><strong>If an E2E test passes, the result is logged normally. If it fails,
 the result is logged as an error.</strong></p></li>
 </ul>
@@ -246,9 +264,287 @@ The file name includes the domain name and is labeled with a timestamp.</p>
 <p><code class="docutils literal notranslate"><span class="pre">end-to-end-testing_saved_variables_feed_storage_e2e_results_16-Oct-2024_Wed_17-21-06.json</span></code></p>
 <p>This output file contains:</p>
 <ul class="simple">
-<li><p>All differences between the actual and expected results.</p></li>
-<li><p>A key that points to a boolean value indicating whether the E2E test
-passed or not.</p></li>
+<li><p>Differences between actual and expected results: Details of variables
+whose actual values differ from their expected values.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">end_to_end_testing_passing</span></code>: A boolean value indicating whether the
+E2E test passed or not.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">changed_variables</span></code>: The names of variables whose actual values
+differ from their expected values. Variables designated as must-change
+or assigned an accepted range are excluded from this list because they
+are evaluated using separate passing criteria.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">must_change_satisfied</span></code>: The names of must-change variables whose
+actual values differ from their expected values, satisfying the
+requirement that they change.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">must_change_violations</span></code>: The must-change variables whose actual
+values did not change beyond the tolerance or that are missing from
+the actual results, each with the reason it failed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accepted_range_satisfied</span></code>: The variables whose actual values all
+fall within their accepted ranges, each with its range and the
+smallest and largest values found.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accepted_range_violations</span></code>: The variables with an accepted range
+that have values outside the range, have no numerical values, or are
+missing from the actual results, each with its range and the reason
+it failed.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">must_change_*</span></code> keys appear only if the domain has must-change
+variables, and the <code class="docutils literal notranslate"><span class="pre">accepted_range_*</span></code> keys only if it has variables
+with an accepted range. Each key starts with the domain name, for
+example <code class="docutils literal notranslate"><span class="pre">Animal.changed_variables</span></code>.</p>
+</section>
+</section>
+<section id="must-change-variables-and-accepted-ranges">
+<span id="e2e-must-change-and-accepted-ranges"></span><h2>Must-Change Variables and Accepted Ranges<a class="headerlink" href="#must-change-variables-and-accepted-ranges" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#must-change-variables-and-accepted-ranges'"><span>#</span></a></h2>
+<p>By default, each variable’s actual value is compared against its
+expected value to determine whether it passes the end-to-end (E2E)
+comparison. Two optional configuration files allow different passing
+criteria to be specified for individual variables:</p>
+<ul class="simple">
+<li><p><strong>Must-change variables:</strong> Identifies variables whose actual values
+must differ from their expected values to pass the E2E comparison.</p></li>
+<li><p><strong>Accepted ranges:</strong> Defines minimum and maximum allowable values for
+variables. These variables pass if their actual values fall within the
+specified ranges, rather than being compared against their expected
+values.</p></li>
+</ul>
+<p>Both configuration files are located in the corresponding input set’s
+directory under <code class="docutils literal notranslate"><span class="pre">input/data/end_to_end_testing</span></code>. For example, the
+freestall input set uses:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">input/data/end_to_end_testing/freestall/freestall_must_change_variables.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input/data/end_to_end_testing/freestall/freestall_accepted_ranges.json</span></code></p></li>
+</ul>
+<p>Each configuration file can specify variables across all domains within
+its input set. Variable names must match the keys used in the
+<code class="docutils literal notranslate"><span class="pre">expected_results</span></code> section of the corresponding E2E JSON filter files.
+For example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">AnimalModuleReporter.report_305_day_milk_yield.milk_305_day_yield_herd_mean</span></code></p>
+<p>RuFaS locates these configuration files using the
+<code class="docutils literal notranslate"><span class="pre">must_change_variables_path</span></code> and <code class="docutils literal notranslate"><span class="pre">accepted_ranges_path</span></code> keys in
+<code class="docutils literal notranslate"><span class="pre">end_to_end_testing_result_paths.json</span></code>. See
+<a class="reference internal" href="#e2e-testing-results-paths-file"><span class="std std-ref">E2E Testing Results Paths File</span></a>
+for more information.</p>
+<section id="must-change-variables">
+<span id="e2e-must-change-variables"></span><h3>Must-Change Variables<a class="headerlink" href="#must-change-variables" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#must-change-variables'"><span>#</span></a></h3>
+<p>Use the must-change variables configuration file when an intentional
+change to the model is expected to affect specific output variables.
+Variables listed in this file are required to differ from their expected
+values by more than the tolerance defined for their domain to pass the
+E2E comparison. If a listed variable’s actual value remains within the
+tolerance of its expected value, the domain fails the comparison.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">    </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Names of variables that must differ from the expected results. Empty this list after updating the expected results."</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"must_change_variables"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-4"><span class="w">        </span><span class="s2">"AnimalModuleReporter.report_enteric_methane_emission.enteric_methane_emission_for_LAC_COW_PEN_3"</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">        </span><span class="s2">"AnimalModuleReporter.report_manure_excretions.LAC_COW_PEN_3_manure_mass"</span>
+</span><span id="line-6"><span class="w">    </span><span class="p">]</span>
+</span><span id="line-7"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p>How to use it:</p>
+<ol class="arabic simple">
+<li><p>Run E2E testing. The results file of each domain lists the variables
+that differ from the expected results under <code class="docutils literal notranslate"><span class="pre">changed_variables</span></code>.</p></li>
+<li><p>Review the differences and add any variables that are expected to
+change as a result of the intentional model modifications to the
+<code class="docutils literal notranslate"><span class="pre">must_change_variables</span></code> list.</p></li>
+<li><p>Run E2E testing again. Variables in the must-change list are
+evaluated against their expected values using the must-change passing
+criteria. Variables that differ beyond the domain’s tolerance satisfy
+the requirement, while those that do not cause the domain to fail.
+These variables are no longer included in <code class="docutils literal notranslate"><span class="pre">changed_variables</span></code>.</p></li>
+<li><p>After updating the expected results to reflect the intended model
+changes, clear the <code class="docutils literal notranslate"><span class="pre">must_change_variables</span></code> list. RuFaS does not
+clear this list automatically. Leaving variables in the list causes
+the next E2E test run to fail, because their actual values now match the
+updated expected results.</p></li>
+</ol>
+<p>Interpreting the results:</p>
+<p>The E2E results file reports the outcomes of must-change comparisons
+using two fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">must_change_satisfied</span></code>: Lists variables whose actual values differ
+from their expected values beyond the domain’s tolerance, satisfying
+the must-change requirement.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">must_change_violations</span></code>: Identifies variables that failed the
+must-change requirement and provides an explanation for each failure.</p></li>
+</ul>
+<p>Example results:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">    </span><span class="nt">"Animal.must_change_satisfied"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">        </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-4"><span class="w">            </span><span class="p">[</span>
+</span><span id="line-5"><span class="w">                </span><span class="s2">"AnimalModuleReporter.report_manure_excretions.LAC_COW_PEN_3_manure_mass"</span>
+</span><span id="line-6"><span class="w">            </span><span class="p">]</span>
+</span><span id="line-7"><span class="w">        </span><span class="p">]</span>
+</span><span id="line-8"><span class="w">    </span><span class="p">},</span>
+</span><span id="line-9"><span class="w">    </span><span class="nt">"Animal.must_change_violations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-10"><span class="w">        </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-11"><span class="w">            </span><span class="p">{</span>
+</span><span id="line-12"><span class="w">                </span><span class="nt">"AnimalModuleReporter.report_305_day_milk_yield.milk_305_day_yield_l1_mean"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Flagged as must change but the value still matches the expected results within the tolerance."</span>
+</span><span id="line-13"><span class="w">            </span><span class="p">}</span>
+</span><span id="line-14"><span class="w">        </span><span class="p">]</span>
+</span><span id="line-15"><span class="w">    </span><span class="p">}</span>
+</span><span id="line-16"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+</section>
+<section id="accepted-ranges">
+<span id="e2e-accepted-ranges"></span><h3>Accepted Ranges<a class="headerlink" href="#accepted-ranges" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#accepted-ranges'"><span>#</span></a></h3>
+<p>Use the accepted ranges configuration file when a variable’s actual
+values should be evaluated against a defined range rather than compared
+to its expected values. For example, an accepted range may be based on
+scientifically established limits or values reported in the literature.</p>
+<p>A variable with an accepted range passes the E2E comparison only if all
+of its actual values fall within the specified minimum and maximum
+bounds, regardless of whether they differ from the expected results.</p>
+<p>Example configuration:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">    </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Accepted 'min' and 'max' for each variable name. All values of a listed variable must fall within them."</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"accepted_ranges"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-4"><span class="w">        </span><span class="nt">"AnimalModuleReporter.report_305_day_milk_yield.milk_305_day_yield_herd_mean"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-5"><span class="w">            </span><span class="nt">"min"</span><span class="p">:</span><span class="w"> </span><span class="mi">10000</span><span class="p">,</span>
+</span><span id="line-6"><span class="w">            </span><span class="nt">"max"</span><span class="p">:</span><span class="w"> </span><span class="mi">13000</span>
+</span><span id="line-7"><span class="w">        </span><span class="p">}</span>
+</span><span id="line-8"><span class="w">    </span><span class="p">}</span>
+</span><span id="line-9"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p>Accepted range requirements:</p>
+<ul class="simple">
+<li><p>Both <code class="docutils literal notranslate"><span class="pre">min</span></code> and <code class="docutils literal notranslate"><span class="pre">max</span></code> are required and must be numeric values, with
+<code class="docutils literal notranslate"><span class="pre">min</span></code> less than or equal to <code class="docutils literal notranslate"><span class="pre">max</span></code>.</p></li>
+<li><p>The minimum and maximum bounds are inclusive, meaning values equal to
+either bound are considered passing.</p></li>
+<li><p>Every numeric value recorded for a variable is evaluated against the
+specified range. For daily variables, this includes the value recorded
+for each day. For variables containing multiple numeric fields, the
+same range is applied to every field.</p></li>
+</ul>
+<p>Enabling or disabling accepted ranges:</p>
+<p>Accepted range validation is controlled by the <code class="docutils literal notranslate"><span class="pre">use_accepted_ranges</span></code>
+setting in <code class="docutils literal notranslate"><span class="pre">input/data/tasks/end_to_end_testing_task.json</span></code>. This
+setting is configured for each E2E task and defaults to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">use_accepted_ranges</span></code> is set to <code class="docutils literal notranslate"><span class="pre">false</span></code>, the accepted ranges
+configuration file is not read, and variables are evaluated using the
+standard E2E comparison criteria unless another configured rule applies.</p>
+<p>Interpreting the results:</p>
+<p>The E2E results file reports accepted range comparisons using two
+fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">accepted_range_satisfied</span></code>: Identifies variables for which all
+recorded values fall within their accepted ranges.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accepted_range_violations</span></code>: Identifies variables with one or more
+values outside their accepted ranges, with no numerical values, or
+missing from the actual results, and provides an explanation of each
+violation.</p></li>
+</ul>
+<p>Both fields include the configured minimum and maximum bounds (<code class="docutils literal notranslate"><span class="pre">min</span></code>
+and <code class="docutils literal notranslate"><span class="pre">max</span></code>). They also include the smallest and largest values observed
+during the simulation (<code class="docutils literal notranslate"><span class="pre">observed_min</span></code> and <code class="docutils literal notranslate"><span class="pre">observed_max</span></code>), except for
+a variable that is missing or has no numerical values.</p>
+<p>For violations, the <code class="docutils literal notranslate"><span class="pre">reason</span></code> field describes why the variable failed:
+how many recorded values fall outside the accepted range, or that the
+variable is missing or has no numerical values.</p>
+<p>Example violation:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">    </span><span class="nt">"Animal.accepted_range_violations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">        </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="line-4"><span class="w">            </span><span class="p">{</span>
+</span><span id="line-5"><span class="w">                </span><span class="nt">"AnimalModuleReporter.report_manure_excretions.LAC_COW_PEN_3_urine"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-6"><span class="w">                    </span><span class="nt">"min"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-7"><span class="w">                    </span><span class="nt">"max"</span><span class="p">:</span><span class="w"> </span><span class="mi">1500</span><span class="p">,</span>
+</span><span id="line-8"><span class="w">                    </span><span class="nt">"observed_min"</span><span class="p">:</span><span class="w"> </span><span class="mf">1244.110055144196</span><span class="p">,</span>
+</span><span id="line-9"><span class="w">                    </span><span class="nt">"observed_max"</span><span class="p">:</span><span class="w"> </span><span class="mf">1748.8818365567322</span><span class="p">,</span>
+</span><span id="line-10"><span class="w">                    </span><span class="nt">"reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"191 of 366 values fall outside the accepted range."</span>
+</span><span id="line-11"><span class="w">                </span><span class="p">}</span>
+</span><span id="line-12"><span class="w">            </span><span class="p">}</span>
+</span><span id="line-13"><span class="w">        </span><span class="p">]</span>
+</span><span id="line-14"><span class="w">    </span><span class="p">}</span>
+</span><span id="line-15"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+</section>
+<section id="how-the-checks-work-together">
+<span id="e2e-check-interactions"></span><h3>How the Checks Work Together<a class="headerlink" href="#how-the-checks-work-together" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#how-the-checks-work-together'"><span>#</span></a></h3>
+<p>A variable can be in neither file, in one of them, or in both. The table
+below shows the checks a variable gets in each case, as of
+<strong>11/22/2026</strong>.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable is in</p></th>
+<th class="head"><p>Checks it gets</p></th>
+<th class="head"><p>Passes when</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Neither file</p></td>
+<td><p>Normal comparison</p></td>
+<td><p>It matches the expected value within the
+tolerance.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Must-change file only</p></td>
+<td><p>Must-change check</p></td>
+<td><p>It differs from the expected value by more
+than the tolerance.</p></td>
+</tr>
+<tr class="row-even"><td><p>Accepted ranges file
+only</p></td>
+<td><p>Range check</p></td>
+<td><p>Every value is inside the range. A change
+from the expected value does not matter.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Both files</p></td>
+<td><p>Must-change check and range
+check</p></td>
+<td><p>It differs from the expected value by more
+than the tolerance, and every value is
+inside the range.</p></td>
+</tr>
+</tbody>
+</table>
+<p>For a variable in both files, both checks must pass:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Value changed?</p></th>
+<th class="head"><p>Inside the range?</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Pass</p></td>
+</tr>
+<tr class="row-odd"><td><p>No</p></td>
+<td><p>Yes</p></td>
+<td><p>Fail</p></td>
+</tr>
+<tr class="row-even"><td><p>Yes</p></td>
+<td><p>No</p></td>
+<td><p>Fail</p></td>
+</tr>
+<tr class="row-odd"><td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>Fail</p></td>
+</tr>
+</tbody>
+</table>
+<p>Things to keep in mind:</p>
+<ul class="simple">
+<li><p>The tolerance is the <code class="docutils literal notranslate"><span class="pre">tolerance</span></code> set for the domain in
+<code class="docutils literal notranslate"><span class="pre">end_to_end_testing_result_paths.json</span></code>.</p></li>
+<li><p>A variable in either file is left out of the normal comparison.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">use_accepted_ranges</span></code> is <code class="docutils literal notranslate"><span class="pre">false</span></code>, the ranges are ignored. A
+variable with a range then gets the normal comparison, or only the
+must-change check if it is also in the must-change file.</p></li>
+<li><p>A domain passes only if all of its variables pass.</p></li>
+<li><p>A listed variable that is missing from the actual results fails.</p></li>
+<li><p>A variable with an accepted range that has no numbers to check fails.</p></li>
+<li><p>A name that is not in the expected results of any domain of the input
+set is a configuration error. So is a file that cannot be found or
+read, and a range without a valid <code class="docutils literal notranslate"><span class="pre">min</span></code> and <code class="docutils literal notranslate"><span class="pre">max</span></code>. RuFaS logs the
+error and does not compare any domain of that input set. This is
+checked after the simulation has run.</p></li>
 </ul>
 </section>
 </section>
@@ -283,6 +579,16 @@ Keep following the steps.</p></li>
 <li><p>See <a class="reference internal" href="#e2e-comparison-filter-file"><span class="std std-ref">E2E Comparison filter file</span></a> for reference.</p></li>
 </ul>
 </li>
+<li><p><strong>Must-Change Variables and Accepted Ranges Files (optional)</strong></p>
+<ul>
+<li><p>File name formats: <code class="docutils literal notranslate"><span class="pre">{input</span> <span class="pre">set}_must_change_variables.json</span></code> and
+<code class="docutils literal notranslate"><span class="pre">{input</span> <span class="pre">set}_accepted_ranges.json</span></code>. Keep these endings. RuFaS
+uses them to tell these files apart from the filter files.</p></li>
+<li><p>Copy the two files from an existing input set. They start empty.</p></li>
+<li><p>See <a class="reference internal" href="#e2e-must-change-and-accepted-ranges"><span class="std std-ref">Must-Change Variables and Accepted Ranges</span></a>
+for reference.</p></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><p><strong>Update the ``end_to_end_testing_task.json`` file</strong> in the <code class="docutils literal notranslate"><span class="pre">input/data/tasks</span></code> directory:
@@ -295,6 +601,7 @@ Keep following the steps.</p></li>
 preferably following the patter <code class="docutils literal notranslate"><span class="pre">{custom_name}_e2e</span></code>.
 <strong>Please NOTE DOWN this output prefix name, it will be referenced later.</strong></p></li>
 <li><p>“filters_directory”: the directory path to the new directory conataining the two newly created filters.</p></li>
+<li><p>“use_accepted_ranges”: true to check variables against the accepted ranges file, false to ignore that file.</p></li>
 <li><p>“log_verbosity”: the desired verbosity, the suggested verbosity is “logs” for an E2E testing run.</p></li>
 <li><p>“exclude_info_maps”: true. Please set this flag to true to exclude the info maps in the outputs,
 so that we can decrease the output file size and speed up the comparison process.</p></li>
@@ -324,6 +631,9 @@ The key should be the output prefix specified in step 3 and 4.</p></li>
 <li><p>Specify the domains you’re testing, the path to the expected
 outputs, and the pattern used to find the actual outputs for the
 domain module.</p></li>
+<li><p>If you created the must-change variables and accepted ranges files
+in step 2, add their paths with the <code class="docutils literal notranslate"><span class="pre">must_change_variables_path</span></code>
+and <code class="docutils literal notranslate"><span class="pre">accepted_ranges_path</span></code> keys.</p></li>
 <li><p><strong>Use the existing entries as examples.</strong></p></li>
 <li><p>See <a class="reference internal" href="#e2e-testing-results-paths-file"><span class="std std-ref">E2E Testing Results Paths File</span></a> for reference.</p></li>
 <li><p><strong>Note:</strong> <em>You will not create a new results paths file. Add your
@@ -418,6 +728,10 @@ a safeguard against accidental updates to these files.</p></li>
 </ol>
 <p>It is always good practice after running this automatic update to re-run
 end-to-end testing to ensure that the results were properly updated.</p>
+<p>The update does not read or change the must-change variables and
+accepted ranges files. If the must-change list of an input set is not
+empty, empty it before you re-run end-to-end testing. See
+<a class="reference internal" href="#e2e-must-change-variables"><span class="std std-ref">Must-Change Variables</span></a>.</p>
 </section>
 <hr class="docutils"/>
 <section id="more-detailed-setup-explanation">
@@ -547,11 +861,13 @@ properly. This is accomplished in the
 </span><span id="line-5"><span class="w">                </span><span class="nt">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FeedStorage"</span><span class="p">,</span>
 </span><span id="line-6"><span class="w">                </span><span class="nt">"expected_results_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"input/data/end_to_end_testing/e2e_json_feed_storage_filter.json"</span><span class="p">,</span>
 </span><span id="line-7"><span class="w">                </span><span class="nt">"actual_results_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"end-to-end-testing_saved_variables_e2e_feed_storage_"</span><span class="p">,</span>
-</span><span id="line-8"><span class="w">                </span><span class="nt">"tolerance"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.1</span>
-</span><span id="line-9"><span class="w">            </span><span class="p">}</span>
-</span><span id="line-10"><span class="w">        </span><span class="p">]</span>
-</span><span id="line-11"><span class="w">     </span><span class="p">}</span>
-</span><span id="line-12"><span class="p">}</span>
+</span><span id="line-8"><span class="w">                </span><span class="nt">"tolerance"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span>
+</span><span id="line-9"><span class="w">                </span><span class="nt">"must_change_variables_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"input/data/end_to_end_testing/freestall/freestall_must_change_variables.json"</span><span class="p">,</span>
+</span><span id="line-10"><span class="w">                </span><span class="nt">"accepted_ranges_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"input/data/end_to_end_testing/freestall/freestall_accepted_ranges.json"</span>
+</span><span id="line-11"><span class="w">            </span><span class="p">}</span>
+</span><span id="line-12"><span class="w">        </span><span class="p">]</span>
+</span><span id="line-13"><span class="w">     </span><span class="p">}</span>
+</span><span id="line-14"><span class="p">}</span>
 </span></code></pre></div>
 </div>
 <p>The “expected_results_path” points to the filter file which contains the
@@ -560,6 +876,11 @@ pattern that will start the file produced by the filter file containing
 the expected results. The “tolerance” is the percent tolerance allowed
 between the expected and actual results. It can be set individually for
 each domain to be more or less lenient.</p>
+<p>The “must_change_variables_path” and “accepted_ranges_path” entries are
+optional. They point to the must-change variables file and the accepted
+ranges file of the input set. All the domains of an input set point to
+the same two files. See
+<a class="reference internal" href="#e2e-must-change-and-accepted-ranges"><span class="std std-ref">Must-Change Variables and Accepted Ranges</span></a>.</p>
 <p>Some important things to note in the “actual_results_path”:</p>
 <ul class="simple">
 <li><p>It starts with “end-to-end-testing”, this must match the output prefix
@@ -594,6 +915,12 @@ E2E test will not be collected properly by the comparison file.</p>
 <li><a :data-current="activeSection === '#output-file-details'" class="reference internal" href="#output-file-details">Output File Details</a></li>
 </ul>
 </li>
+<li><a :data-current="activeSection === '#must-change-variables-and-accepted-ranges'" class="reference internal" href="#must-change-variables-and-accepted-ranges">Must-Change Variables and Accepted Ranges</a><ul>
+<li><a :data-current="activeSection === '#must-change-variables'" class="reference internal" href="#must-change-variables">Must-Change Variables</a></li>
+<li><a :data-current="activeSection === '#accepted-ranges'" class="reference internal" href="#accepted-ranges">Accepted Ranges</a></li>
+<li><a :data-current="activeSection === '#how-the-checks-work-together'" class="reference internal" href="#how-the-checks-work-together">How the Checks Work Together</a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#setting-up-e2e-testing'" class="reference internal" href="#setting-up-e2e-testing">Setting up E2E Testing</a><ul>
 <li><a :data-current="activeSection === '#quick-setup'" class="reference internal" href="#quick-setup">Quick Setup</a><ul>
 <li><a :data-current="activeSection === '#new-input-set-setup'" class="reference internal" href="#new-input-set-setup">New Input Set Setup</a></li>
@@ -626,6 +953,6 @@ E2E test will not be collected properly by the comparison file.</p>
 <script src="../_static/documentation_options.js?v=5929fcd5"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
 </body>
 </html>

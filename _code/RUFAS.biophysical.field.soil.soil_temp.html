@@ -25,10 +25,12 @@
 <meta content="RUFAS.biophysical.field.soil.soil_temp module | Ruminant Farm Simulation (RuFaS)  documentation" property="og:title"/>
 <meta content="RUFAS.biophysical.field.soil.soil_temp module | Ruminant Farm Simulation (RuFaS)  documentation" name="twitter:title"/>
 <link href="../_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
-<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
 <link href="../_static/rufas.png" rel="icon"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
+<link href="RUFAS.biophysical.manure.html" rel="next" title="RUFAS.biophysical.manure package"/>
+<link href="RUFAS.biophysical.field.soil.soil_erosion.html" rel="prev" title="RUFAS.biophysical.field.soil.soil_erosion module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -72,12 +74,13 @@
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
 <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">RuFaS</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">RuFaS</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/onboarding.html"><strong>Welcome to RuFaS</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Onboarding-videos.html">Onboarding Videos</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Infrastructure for Simulation:</span></p>
 <ul>
@@ -95,6 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/End%E2%80%90to%E2%80%90End-Testing.html">End to End Testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Data-Collection-App.html">Data Collection App</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tools:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Github-Actions.html">Github Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Mypy.html">Using Mypy</a></li>
@@ -102,9 +106,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Sphinx.html">Using Sphinx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/Using-Flake8.html">Using Flake8</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Team Culture:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/RuFaS-Versioning-Policy.html">RuFaS Versioning Policy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../_wiki/SCRUM-at-RuFaS.html">RuFaS Team SCRUM Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_wiki/Version-Update-Workflow.html">Maintainer Team Workflow and Communication during a Version Update</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Release Notes:</span></p>
 <ul>
@@ -136,6 +142,11 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">RuFaS</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.html">RUFAS package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.html">RUFAS.biophysical package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.html">RUFAS.biophysical.field package</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="RUFAS.biophysical.field.soil.html">RUFAS.biophysical.field.soil package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">RUFAS.biophysical.field.soil.soil_temp module</span>
 </nav>
 <div id="content" role="main">
@@ -143,23 +154,19 @@
 <span id="rufas-biophysical-field-soil-soil-temp-module"></span><h1>RUFAS.biophysical.field.soil.soil_temp module<a class="headerlink" href="#module-RUFAS.biophysical.field.soil.soil_temp" title="Link to this heading"><span>#</span></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_temp.SoilTemp">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">SoilTemp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData" title="RUFAS.biophysical.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_temp.SoilTemp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_temp.SoilTemp'"><span>#</span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">RUFAS.biophysical.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">SoilTemp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData" title="RUFAS.biophysical.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_temp.SoilTemp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_temp.SoilTemp'"><span>#</span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Manages and simulates soil temperature based on the “Soil Temperature” section (1:1.3.3) of the Soil and Water
 Assessment Tool (SWAT) documentation.</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'"><span>#</span></a></h2>
 <dl class="simple">
-<dt>soil_data<span class="classifier">SoilData, optional</span></dt><dd><p>The SoilData object used by this module to track the temperatures within the soil profile, creates new one
-if one is not provided.</p>
-</dd>
-<dt>field_size<span class="classifier">float, optional</span></dt><dd><p>Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-not provided (ha).</p>
+<dt>soil_data<span class="classifier">SoilData</span></dt><dd><p>The SoilData object used by this module to track the temperatures within the soil profile.</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_temp.SoilTemp.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData" title="RUFAS.biophysical.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_temp.SoilTemp.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_temp.SoilTemp.__init__'"><span>#</span></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.biophysical.field.soil.soil_data.html#RUFAS.biophysical.field.soil.soil_data.SoilData" title="RUFAS.biophysical.field.soil.soil_data.SoilData"><span class="pre">SoilData</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.biophysical.field.soil.soil_temp.SoilTemp.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#RUFAS.biophysical.field.soil.soil_temp.SoilTemp.__init__'"><span>#</span></a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.biophysical.field.soil.soil_temp.SoilTemp.daily_soil_temperature_update">
@@ -170,17 +177,17 @@ not provided (ha).</p>
 <dl class="simple">
 <dt>solar_radiation<span class="classifier">float</span></dt><dd><p>Solar radiation reaching the ground on the current day (MJ per square meter per day).</p>
 </dd>
-<dt>avg_temp<span class="classifier">float</span></dt><dd><p>Average temperature of the current day (degrees C).</p>
+<dt>avg_temp<span class="classifier">float</span></dt><dd><p>Average temperature of the current day (Celsius).</p>
 </dd>
-<dt>min_temp<span class="classifier">float</span></dt><dd><p>Minimum temperature of the current day (degrees C).</p>
+<dt>min_temp<span class="classifier">float</span></dt><dd><p>Minimum temperature of the current day (Celsius).</p>
 </dd>
-<dt>max_temp<span class="classifier">float</span></dt><dd><p>Maximum temperature of the current day (degrees C).</p>
+<dt>max_temp<span class="classifier">float</span></dt><dd><p>Maximum temperature of the current day (Celsius).</p>
 </dd>
-<dt>plant_cover<span class="classifier">float</span></dt><dd><p>Total aboveground plant biomass and residue on the current day (kg per hectare).</p>
+<dt>plant_cover<span class="classifier">float</span></dt><dd><p>Total above ground plant biomass and residue on the current day (kg per hectare).</p>
 </dd>
 <dt>snow_cover<span class="classifier">float</span></dt><dd><p>Water content of the snow cover on the current day (mm).</p>
 </dd>
-<dt>avg_annual_air_temp<span class="classifier">float</span></dt><dd><p>Average annual air temperature (degrees C).</p>
+<dt>avg_annual_air_temp<span class="classifier">float</span></dt><dd><p>Average annual air temperature (Celsius).</p>
 </dd>
 </dl>
 </section>
@@ -385,16 +392,16 @@ that can occur throughout the year.</p>
 <dl class="simple">
 <dt>cover_weighting_factor<span class="classifier">float</span></dt><dd><p>Weighting factor for soil cover impacts (unitless).</p>
 </dd>
-<dt>previous_top_soil_layer_temp<span class="classifier">float</span></dt><dd><p>Temperature of the first layer of soil on the previous day (degrees C).</p>
+<dt>previous_top_soil_layer_temp<span class="classifier">float</span></dt><dd><p>Temperature of the first layer of soil on the previous day (Celsius).</p>
 </dd>
-<dt>bare_soil_surface_temp<span class="classifier">float</span></dt><dd><p>Temperature of the bare soil surface (degrees C).</p>
+<dt>bare_soil_surface_temp<span class="classifier">float</span></dt><dd><p>Temperature of the bare soil surface (Celsius).</p>
 </dd>
 </dl>
 </section>
 <section id="id23">
 <h3>Returns<a class="headerlink" href="#id23" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>Soil surface temperature for the current day (degrees C).</p>
+<dt>float</dt><dd><p>Soil surface temperature for the current day (Celsius).</p>
 </dd>
 </dl>
 </section>
@@ -413,20 +420,20 @@ that can occur throughout the year.</p>
 <dt>prev_temperature_effect<span class="classifier">float</span></dt><dd><p>Coefficient that controls the influence of the previous day’s temperature on the current day’s temperature
 (unitless).</p>
 </dd>
-<dt>previous_day_soil_temp<span class="classifier">float</span></dt><dd><p>Soil temperature in the layer from the previous day (degrees C).</p>
+<dt>previous_day_soil_temp<span class="classifier">float</span></dt><dd><p>Soil temperature in the layer from the previous day (Celsius).</p>
 </dd>
 <dt>depth_factor<span class="classifier">float</span></dt><dd><p>Factor that quantifies the influence of depth below the surface on soil temperature (unitless).</p>
 </dd>
-<dt>avg_annual_air_temp<span class="classifier">float</span></dt><dd><p>Average annual air temperature (degrees C).</p>
+<dt>avg_annual_air_temp<span class="classifier">float</span></dt><dd><p>Average annual air temperature (Celsius).</p>
 </dd>
-<dt>soil_surface_temp<span class="classifier">float</span></dt><dd><p>Soil surface temperature on the current day (degrees C).</p>
+<dt>soil_surface_temp<span class="classifier">float</span></dt><dd><p>Soil surface temperature on the current day (Celsius).</p>
 </dd>
 </dl>
 </section>
 <section id="id26">
 <h3>Returns<a class="headerlink" href="#id26" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'"><span>#</span></a></h3>
 <dl class="simple">
-<dt>float</dt><dd><p>Soil temperature at the given depth on the current day (degrees C).</p>
+<dt>float</dt><dd><p>Soil temperature at the given depth on the current day (Celsius).</p>
 </dd>
 </dl>
 </section>
@@ -471,6 +478,6 @@ that can occur throughout the year.</p>
 <script src="../_static/documentation_options.js?v=5929fcd5"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
 </body>
 </html>

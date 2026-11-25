@@ -7,7 +7,9 @@ Subpackages
 .. toctree::
    :maxdepth: 1
 
+   RUFAS.EEE
    RUFAS.biophysical
+   RUFAS.data_structures
 
 Submodules
 ----------
@@ -22,12 +24,14 @@ Submodules
    RUFAS.general_constants
    RUFAS.graph_generator
    RUFAS.input_manager
+   RUFAS.main
    RUFAS.output_manager
    RUFAS.report_generator
    RUFAS.rufas_time
    RUFAS.simulation_engine
    RUFAS.task_manager
    RUFAS.units
+   RUFAS.user_constants
    RUFAS.util
    RUFAS.weather
 

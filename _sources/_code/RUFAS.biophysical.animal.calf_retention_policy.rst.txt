@@ -1,0 +1,7 @@
+RUFAS.biophysical.animal.calf\_retention\_policy module
+=======================================================
+
+.. automodule:: RUFAS.biophysical.animal.calf_retention_policy
+   :members:
+   :show-inheritance:
+   :undoc-members:
