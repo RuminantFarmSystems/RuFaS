@@ -218,7 +218,7 @@ def test_report_milk(mocker: MockerFixture) -> None:
 
     expected_add_variable_calls.extend(
         [
-            call("fresh_cow_num", 2, {**cow_stat_info_map, "units": MeasurementUnits.ANIMALS}),
+            call("fresh_cow_num", 1, {**cow_stat_info_map, "units": MeasurementUnits.ANIMALS}),
             call("cows_at_or_above_50_dim", 1, {**cow_stat_info_map, "units": MeasurementUnits.ANIMALS}),
             call(
                 "average_estimated_daily_milk_produced_parity_1",
