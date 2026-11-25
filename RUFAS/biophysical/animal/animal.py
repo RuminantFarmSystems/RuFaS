@@ -423,6 +423,20 @@ class Animal:
         return self.days_in_milk > 0
 
     @property
+    def is_fresh(self) -> bool:
+        """
+        Check if the animal is a fresh cow.
+
+        Returns
+        -------
+        bool
+            True if the animal is a lactating cow below the fresh-cow days-in-milk threshold, False
+            otherwise. Dry cows are never fresh.
+
+        """
+        return self.is_milking and self.days_in_milk < animal_constants.FRESH_COW_DAYS_IN_MILK_THRESHOLD
+
+    @property
     def future_cull_date(self) -> int:
         """
         Returns the cull death date of the animal.
@@ -2516,7 +2530,7 @@ class Animal:
         daily_risk_other = average_daily_risk / (2.55 * percent_fresh + percent_other)
         daily_risk_fresh = 2.55 * daily_risk_other
 
-        daily_risk = daily_risk_fresh if self.days_in_milk < 50 else daily_risk_other
+        daily_risk = daily_risk_fresh if self.is_fresh else daily_risk_other
         return random() <= daily_risk
 
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:

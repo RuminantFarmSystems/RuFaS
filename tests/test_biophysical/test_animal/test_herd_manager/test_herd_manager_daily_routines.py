@@ -1392,10 +1392,14 @@ def test_calculate_annual_risk_by_parity(
 
 
 def test_process_daily_removals(herd_manager: HerdManager, mocker: MockerFixture) -> None:
-    """Cows are assessed with the herd fresh fraction and parity-group risks; removed cows are collected."""
+    """
+    Cows are assessed with the herd fresh fraction and parity-group risks; removed cows are collected.
+
+    The dry cow has zero days in milk and must not count toward the fresh fraction.
+    """
     fresh_first_parity_cow = mock_animal(AnimalType.LAC_COW, days_in_milk=10, calves=1)
     sold_cow = mock_animal(AnimalType.LAC_COW, days_in_milk=100, calves=2)
-    dead_cow = mock_animal(AnimalType.DRY_COW, days_in_milk=300, calves=5)
+    dead_cow = mock_animal(AnimalType.DRY_COW, days_in_milk=0, calves=5)
     heifer = mock_animal(AnimalType.HEIFER_III)
     for cow in [fresh_first_parity_cow, sold_cow, dead_cow]:
         cow.sold = False
