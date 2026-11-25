@@ -565,6 +565,7 @@ def mock_animal(
     if animal_type.is_cow:
         animal.is_milking = True if animal_type == AnimalType.LAC_COW else False
         animal.days_in_milk = days_in_milk
+        animal.is_fresh = animal.is_milking and days_in_milk < 50
     animal.is_pregnant = True if days_in_pregnancy > 0 else False
     animal.days_in_pregnancy = days_in_pregnancy
     animal.body_weight = body_weight

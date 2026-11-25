@@ -3053,6 +3053,32 @@ def test_is_selected_for_removal_fresh_scaling(
     assert mock_lactating_cow.is_selected_for_removal(annual_risk=0.365, percent_fresh=0.2) is expected
 
 
+def test_is_selected_for_removal_dry_cow_uses_other_risk(mock_lactating_cow: Animal, mocker: MockerFixture) -> None:
+    """A dry cow (zero days in milk) carries the non-fresh daily risk, not the fresh risk."""
+    mock_lactating_cow.days_in_milk = 0
+    mocker.patch("RUFAS.biophysical.animal.animal.random", return_value=0.0008)
+    assert mock_lactating_cow.is_selected_for_removal(annual_risk=0.365, percent_fresh=0.2) is False
+
+
+@pytest.mark.parametrize(
+    "is_cow, days_in_milk, expected",
+    [
+        (False, 10, False),
+        (True, 0, False),
+        (True, 1, True),
+        (True, 49, True),
+        (True, 50, False),
+    ],
+)
+def test_is_fresh(
+    is_cow: bool, days_in_milk: int, expected: bool, mock_lactating_cow: Animal, mocker: MockerFixture
+) -> None:
+    """Only lactating cows below the fresh-cow days-in-milk threshold are fresh; dry cows are not."""
+    mock_lactating_cow._days_in_milk = days_in_milk
+    mocker.patch.object(AnimalType, "is_cow", new_callable=PropertyMock, return_value=is_cow)
+    assert mock_lactating_cow.is_fresh is expected
+
+
 @pytest.mark.parametrize(
     "calves,expected",
     [
