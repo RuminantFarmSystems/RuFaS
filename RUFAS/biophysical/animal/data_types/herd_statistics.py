@@ -157,8 +157,16 @@ class HerdStatistics:
     average_age_at_heiferIII_graduation : float | None
         Average age of heifers transitioning from Heifer II to Heifer III on a particular day, (simulation days).
         None if no heifers transitioned to Heifer III.
+    dcc_at_removal_sum : int
+        Total days in pregnancy accumulated across all cows sold or that died
+        during the current simulation day, including nonpregnant cows with
+        zero days in pregnancy (days).
+    dcc_at_removal_count : int
+        Total number of cows sold or that died during the current simulation
+        day, used to calculate the average days in pregnancy at removal.
     average_dcc_at_removal : float | None
-        Average days carried calf (DCC) among cows sold or deceased on a particular day, (simulation days).
+        Average days in pregnancy across all cows sold or that died during
+        the current simulation day, including nonpregnant cows (days).
         None if no cows were removed.
     parity_culling_stats_range : dict[str, int]
         Count of culled animals categorized by their parity classes ("1", "2", "3",
@@ -385,6 +393,8 @@ class HerdStatistics:
     herd_milk_protein_percent = 0.0
     milk_production_at_removal_sum = 0.0
     milk_production_at_removal_count = 0
+    dcc_at_removal_sum = 0
+    dcc_at_removal_count = 0
     milk_production_at_low_production_sale_avg: float | None = None
     days_in_milk_at_low_production_sale_avg: float | None = None
     parity_at_low_production_sale_avg: float | None = None
@@ -532,6 +542,8 @@ class HerdStatistics:
         self.average_age_at_heiferII_graduation = None
         self.average_age_at_heiferIII_graduation = None
         self.average_dcc_at_removal = None
+        self.dcc_at_removal_count = 0
+        self.dcc_at_removal_sum = 0
 
         self.acute_sale_cows_parity_1 = 0
         self.acute_sale_cows_parity_2 = 0

@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import date, timedelta
+import inspect
 import math
 from typing import Any
 
@@ -2537,9 +2538,15 @@ class HerdManager:
             self.herd_statistics.milk_production_at_removal_sum += cow.milk_production.daily_milk_produced
             self.herd_statistics.milk_production_at_removal_count += 1
         if sold_and_died_cows:
-            self.herd_statistics.average_dcc_at_removal = sum(
+            self.herd_statistics.dcc_at_removal_sum += sum(
                 cow.days_in_pregnancy for cow in sold_and_died_cows
-            ) / len(sold_and_died_cows)
+            )
+            self.herd_statistics.dcc_at_removal_count += len(sold_and_died_cows)
+
+            self.herd_statistics.average_dcc_at_removal = (
+                self.herd_statistics.dcc_at_removal_sum
+                / self.herd_statistics.dcc_at_removal_count
+            )
 
         for parity in self.herd_statistics.parity_culling_stats_range.keys():
             if parity == "greater_than_5":
