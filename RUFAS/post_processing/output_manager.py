@@ -54,7 +54,9 @@ class OutputManager:
                 "comparison": "e2e_comparison_",
             }
             self.time: RufasTime | None = None
-            self.file_manager = FileManager(self.__metadata_prefix, self._filter_prefixes)
+            self.file_manager = FileManager(
+                metadata_prefix_getter=lambda: self.__metadata_prefix, supported_prefixes=self._filter_prefixes
+            )
             self.pool_manager = PoolManager(self.file_manager)
             self.output_config_validator = OutputConfigValidator()
 

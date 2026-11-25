@@ -17,8 +17,11 @@ MODULE = "RUFAS.post_processing.file_manager"
 
 @pytest.fixture
 def file_manager() -> FileManager:
-    """Create a FileManager with test metadata and supported prefixes."""
-    return FileManager("test_run", {"report": "report_"})
+    """Creates a FileManager instance for testing."""
+    return FileManager(
+        metadata_prefix_getter=lambda: "test",
+        supported_prefixes={"report": "report_"},
+    )
 
 
 @pytest.fixture
@@ -29,8 +32,41 @@ def mock_logger(mocker: MockerFixture) -> MagicMock:
 
 def test_init(file_manager: FileManager) -> None:
     """Test initialization of metadata and supported filter prefixes."""
-    assert file_manager.metadata_prefix == "test_run"
+    assert file_manager.metadata_prefix == "test"
     assert file_manager.supported_filter_types_prefixes == {"report": "report_"}
+
+
+def test_metadata_prefix_getter(mocker: MockerFixture) -> None:
+    """Test that the metadata prefix reflects changes to its source."""
+    getter = mocker.Mock(return_value="initial_prefix")
+    file_manager = FileManager(getter, {})
+
+    assert file_manager.metadata_prefix == "initial_prefix"
+
+    getter.return_value = "updated_prefix"
+
+    assert file_manager.metadata_prefix == "updated_prefix"
+    assert getter.call_count == 2
+
+
+def test_generate_file_name_with_updated_metadata_prefix(
+    mocker: MockerFixture,
+) -> None:
+    """Test that file names use the current metadata prefix."""
+    getter = mocker.Mock(return_value="simulation")
+    file_manager = FileManager(getter, {})
+
+    mocker.patch.object(Utility, "get_timestamp", return_value="timestamp")
+
+    assert file_manager.generate_file_name("report", "json") == (
+        "simulation_report_timestamp.json"
+    )
+
+    getter.return_value = "freestall_e2e"
+
+    assert file_manager.generate_file_name("report", "json") == (
+        "freestall_e2e_report_timestamp.json"
+    )
 
 
 @pytest.mark.parametrize("minify", [False, True])
@@ -303,7 +339,7 @@ def test_list_to_file_txt(file_manager: FileManager, tmp_path: Path, lines: list
 def test_generate_file_name(file_manager: FileManager, mocker: MockerFixture, include_millis: bool) -> None:
     """Test timestamped file naming and millisecond option forwarding."""
     timestamp = mocker.patch.object(Utility, "get_timestamp", return_value="timestamp")
-    assert file_manager.generate_file_name("report", "json", include_millis) == "test_run_report_timestamp.json"
+    assert file_manager.generate_file_name("report", "json", include_millis) == "test_report_timestamp.json"
     timestamp.assert_called_once_with(include_millis=include_millis)
 
 

@@ -5,7 +5,7 @@ from pathlib import Path
 from RUFAS.post_processing.rufas_logger import get_logger
 from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
 from RUFAS.util import Utility
-from typing import Any, TextIO, Union
+from typing import Any, Callable, TextIO, Union
 
 import pandas as pd
 
@@ -42,11 +42,14 @@ class FileManager:
 
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
 
-    def __init__(self, metadata_prefix: str, supported_prefixes: dict[str, str]) -> None:
-        self.metadata_prefix = metadata_prefix
-        # TODO Since this can be 1 of 2 things based on whether it's an e2e run or regular simulation, maybe this should
-        # not be passed in as an arg and instead be done via a setter function depending on the use case?
+    def __init__(self, metadata_prefix_getter: Callable[[], str], supported_prefixes: dict[str, str]) -> None:
+        self._metadata_prefix_getter = metadata_prefix_getter
         self.supported_filter_types_prefixes = supported_prefixes
+
+    @property
+    def metadata_prefix(self) -> str:
+        """Returns the current metadata prefix."""
+        return self._metadata_prefix_getter()
 
     def dict_to_file_json(
         self,

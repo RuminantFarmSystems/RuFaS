@@ -346,8 +346,7 @@ class PoolManager:
         file_path : Path
             The path to the file to be loaded to the ``variables_pool``.
         """
-        info_map = {"class": self.__class__.__name__, "function": self.load_variables_pool_from_file.__name__}
-        self._set_variables_pool(self.file_manager.read_variables_pool_file(file_path, info_map))
+        self._set_variables_pool(self.file_manager.read_variables_pool_file(file_path))
 
     def load_multiple_variables_pools_from_files(
         self, pools: Sequence[tuple[str | None, Path] | dict[str, Any]]
