@@ -58,15 +58,11 @@ def test_generate_file_name_with_updated_metadata_prefix(
 
     mocker.patch.object(Utility, "get_timestamp", return_value="timestamp")
 
-    assert file_manager.generate_file_name("report", "json") == (
-        "simulation_report_timestamp.json"
-    )
+    assert file_manager.generate_file_name("report", "json") == ("simulation_report_timestamp.json")
 
     getter.return_value = "freestall_e2e"
 
-    assert file_manager.generate_file_name("report", "json") == (
-        "freestall_e2e_report_timestamp.json"
-    )
+    assert file_manager.generate_file_name("report", "json") == ("freestall_e2e_report_timestamp.json")
 
 
 @pytest.mark.parametrize("minify", [False, True])
