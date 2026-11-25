@@ -318,14 +318,14 @@ class AnimalConfig:
     average_phenotype: dict[str, dict[int, float]] = {}
     top_listing_semen: dict[str, dict[str, float]] = {}
     simulate_genetics: bool = False
-    tbv_fat_variance: float = 25.8
-    tbv_protein_variance: float = 13.4
+    tbv_fat_variance: float = 575.8
+    tbv_protein_variance: float = 281.4
     tbv_correlation: float = 0.59
-    permanent_environment_fat_variance: float = 38.8
-    permanent_environment_protein_variance: float = 20.1
+    permanent_environment_fat_variance: float = 863.6
+    permanent_environment_protein_variance: float = 422.0
     permanent_environment_correlation: float = 0.95
-    temporary_environment_fat_variance: float = 64.5
-    temporary_environment_protein_variance: float = 33.4
+    temporary_environment_fat_variance: float = 1439.4
+    temporary_environment_protein_variance: float = 703.4
     temporary_environment_correlation: float = 0.78
 
     @classmethod
