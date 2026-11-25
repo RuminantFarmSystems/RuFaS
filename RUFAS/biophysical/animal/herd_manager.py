@@ -662,7 +662,7 @@ class HerdManager:
         if num_cows == 0:
             return sold_cows, dead_cows
 
-        fresh_cow_count = sum(cow.days_in_milk < 50 for cow in all_cows)
+        fresh_cow_count = sum(cow.is_fresh for cow in all_cows)
         fresh_cow_fraction = fresh_cow_count / num_cows
 
         parity_group_counts = {
