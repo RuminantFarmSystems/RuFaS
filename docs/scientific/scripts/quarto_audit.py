@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Iterable
 
 from openpyxl import Workbook
-from openpyxl.styles import Font
+from openpyxl.styles import Alignment, Font
 from openpyxl.utils import get_column_letter
 
 # ------------------------------------------------------------
@@ -276,6 +276,132 @@ SHEET_SPECS = [
         None,
     ),
 ]
+
+# Plain-language explanation of each summary metric, written to the
+# "description" column of the summary sheet. "Rows" metrics count every
+# occurrence; "groups" metrics count each distinct label/key/ID once.
+METRIC_DESCRIPTIONS = {
+    "project_root": (
+        "Folder that was scanned (the folder above the one this script sits in)."
+    ),
+    "qmd_files_scanned": (
+        "Number of .qmd / .md / .Rmd files read. Build and cache folders "
+        "(.quarto, _site, _book, _freeze, .git, venv, etc.) are skipped."
+    ),
+    "bib_files_scanned": "Number of .bib bibliography files read.",
+    "labels_found": (
+        "Number of label definitions found: any {#id} attribute (e.g. "
+        ":::{#eq-an-cul-1}, ![..](..){#fig-x}, ## Heading {#sec-x}) plus "
+        "code-chunk labels (#| label: tbl-x). See sheet: all_labels."
+    ),
+    "label_references_found": (
+        "Number of places the text points to a label, either Quarto style "
+        "(@eq-x, @fig-x, @tbl-x, @sec-x) or link style ([AN.CUL.1](#eq-an-cul-1)). "
+        "Bibliography citations are not counted here. See sheet: all_label_refs."
+    ),
+    "duplicate_label_rows": (
+        "Number of label definitions that share an ID with another definition "
+        "(every copy is counted, so 2 copies of one label = 2). "
+        "See sheet: duplicate_labels."
+    ),
+    "duplicate_label_groups": (
+        "ACTION NEEDED if > 0. Number of distinct labels defined more than once. "
+        "Quarto keeps only one, so numbering and links can point to the wrong "
+        "item. Fix by renumbering one copy. See sheet: duplicate_label_groups."
+    ),
+    "missing_label_reference_rows": (
+        "ACTION NEEDED if > 0. Number of references (each occurrence) that point "
+        "to a label that does not exist anywhere. These render as broken links or "
+        "'?@eq-x' in the built docs. Usually a typo in the reference (missing "
+        "'eq-' prefix, wrong module code, wrong case). See sheet: missing_label_refs."
+    ),
+    "unused_label_rows": (
+        "Labels that are defined but never referenced. Informational only: most "
+        "equations are labelled for numbering and never linked to, so this is "
+        "normally large. See sheet: unused_labels."
+    ),
+    "bib_entries_found": (
+        "Number of entries (@article{key, ...}, @book{key, ...}, etc.) found in "
+        "the .bib file(s). See sheet: bib_entries."
+    ),
+    "bib_citations_found": (
+        "Number of @key citations in the text that are not cross-references "
+        "(e.g. @Sommer2004, [@Hanson2024]). See sheet: bib_citations."
+    ),
+    "duplicate_bib_key_rows": (
+        "Number of .bib entries whose key is also used by another entry "
+        "(every copy counted). See sheet: duplicate_bib_keys."
+    ),
+    "duplicate_bib_key_groups": (
+        "ACTION NEEDED if > 0. Number of distinct citation keys defined more than "
+        "once in the .bib file(s); citations may show the wrong reference. "
+        "See sheet: duplicate_bib_groups."
+    ),
+    "missing_bib_citation_rows": (
+        "ACTION NEEDED if > 0. Number of citations (each occurrence) whose key is "
+        "not in any .bib file. These render as '?key' with no bibliography entry. "
+        "Check for typos or add the entry to the .bib. Template examples and "
+        "punctuation directly after a key (e.g. '@key:') can show up here as "
+        "false positives. See sheet: missing_bib_cites."
+    ),
+    "missing_declared_bib_files": (
+        "ACTION NEEDED if > 0. 'bibliography:' paths in .qmd/.md front matter that "
+        "do not exist on disk (_quarto.yml is not checked). "
+        "See sheet: missing_bib_files."
+    ),
+    "hyperlinks_found": (
+        "Total markdown links [text](target), including images, plus <https://...> "
+        "autolinks. Split into the four link types below. See sheet: hyperlinks."
+    ),
+    "external_links": (
+        "Links to web addresses (http, https, mailto). The script does not check "
+        "whether these sites are still live. See sheet: external_links."
+    ),
+    "internal_links": (
+        "Links to local files (.qmd, .md, .html, .pdf, .png, .csv, etc.), "
+        "including images. See sheet: internal_links."
+    ),
+    "anchor_links": (
+        "Links to a location inside the docs, written as [text](#id). Ones whose "
+        "#id does not exist also appear in missing_label_refs. "
+        "See sheet: anchor_links."
+    ),
+    "other_links": (
+        "REVIEW if > 0. Links whose target is not a web address, a #anchor or a "
+        "known file type. These are usually malformed, e.g. a missing '#' "
+        "([SC.CRP.47](eq-sc-crp-47)) or '@' inside the parentheses. "
+        "See sheet: other_links."
+    ),
+    "broken_internal_links": (
+        "ACTION NEEDED if > 0. Local file links (including images) whose target "
+        "file does not exist on disk. See sheet: broken_internal_links."
+    ),
+    "output_file": "Where this workbook was saved.",
+    "equations_found": (
+        "Number of display equations written as a ::: {#eq-...} block containing "
+        "$$ ... $$. See sheet: equations."
+    ),
+    "missing_equation_custom_ids": (
+        "ACTION NEEDED if > 0. Equations with no visible equation number, i.e. no "
+        "[[**XX.YYY.n**]]{.aside} tag (or \\tag{} / \\text{(...)} in the equation). "
+        "Readers will not see a number for these. See sheet: missing_eq_custom_ids."
+    ),
+    "equation_id_mismatches": (
+        "ACTION NEEDED if > 0. Equations whose displayed number does not match "
+        "their label. The expected number is the label without 'eq-', with "
+        "hyphens turned into dots, in capitals (eq-an-met-4 -> AN.MET.4). "
+        "See sheet: equation_id_mismatches."
+    ),
+    "duplicate_equation_custom_rows": (
+        "Number of equations whose displayed number is also used by another "
+        "equation (every copy counted). See sheet: dup_eq_custom_ids."
+    ),
+    "duplicate_equation_custom_groups": (
+        "ACTION NEEDED if > 0. Number of distinct displayed equation numbers "
+        "(e.g. AN.MET.1) used by more than one equation. "
+        "See sheet: dup_eq_custom_groups."
+    ),
+}
 
 PRINT_METRICS = [
     ("Project root", "project_root"),
@@ -973,6 +1099,16 @@ def add_sheet(wb: Workbook, title: str, headers: list[str], rows: list[dict]) ->
     autofit_worksheet(ws)
 
 
+def format_summary_sheet(ws) -> None:
+    """Wrap the description column so long explanations stay readable."""
+    ws.column_dimensions["C"].width = 90
+    for (cell,) in ws.iter_rows(min_row=2, min_col=3, max_col=3):
+        cell.alignment = Alignment(wrap_text=True, vertical="top")
+    for row in ws.iter_rows(min_row=2, max_col=2):
+        for cell in row:
+            cell.alignment = Alignment(vertical="top")
+
+
 def sort_rows(rows: list[dict], sort_key) -> list[dict]:
     return sorted(rows, key=sort_key) if sort_key else rows
 
@@ -1017,7 +1153,14 @@ def build_summary_rows(
             analysis["duplicate_equation_custom_groups"]
         ),
     }
-    return [{"metric": key, "value": value} for key, value in metrics.items()]
+    return [
+        {
+            "metric": key,
+            "value": value,
+            "description": METRIC_DESCRIPTIONS.get(key, ""),
+        }
+        for key, value in metrics.items()
+    ]
 
 
 def write_workbook(
@@ -1034,7 +1177,8 @@ def write_workbook(
 
     wb = Workbook()
     wb.remove(wb.active)
-    add_sheet(wb, "summary", ["metric", "value"], summary_rows)
+    add_sheet(wb, "summary", ["metric", "value", "description"], summary_rows)
+    format_summary_sheet(wb["summary"])
 
     for title, headers, data_key, sort_key in SHEET_SPECS:
         add_sheet(wb, title, headers, sort_rows(workbook_data[data_key], sort_key))
