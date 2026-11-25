@@ -9,6 +9,10 @@ from math import radians, sin, cos, sqrt, atan2
 # Datasets to modify
 EEEnames = ["feed_emissions_total_11112026", "feed_emissions_luc_11112026"]
 
+total_df = pd.read_csv(rf"input\data\EEE\{EEEnames[0]}.csv")
+
+luc_df = pd.read_csv(rf"input\data\EEE\{EEEnames[1]}.csv")
+
 # start distance for neighbor search.
 km_radius_start = 50
 # User should select if they want to run this algorithm on specific subsets of feed data.
@@ -116,6 +120,89 @@ def get_neighbors(fips_code: int, fips_code_list: list[int]) -> list[int]:
     return [fips_code]
 
 
+#######################################
+## Create regional averages for wheat #
+#######################################
+
+# old logic commented out temporarily before removal
+# if use_wheat_regional_average:
+#     target_cols = [c for c in ["193"] if c in emissions_doc.columns]
+#     print(target_cols)
+#     merged = emissions_doc.merge(
+#         fips_to_region[["FIPS", "Region"]], left_on="county_code", right_on="FIPS", how="left"
+#     )
+#     # print(merged)
+    
+#     merged[target_cols] = merged[target_cols].apply(pd.to_numeric, errors="coerce")
+
+#     print("Target cols:", target_cols)
+#     print("Non-null count per col:")
+#     print(merged[target_cols].notna().sum())
+#     print("Dtypes:")
+#     print(merged[target_cols].dtypes)
+
+#     region_means = merged.groupby("Region")[target_cols].mean()
+#     print(region_means)
+#     region_means.to_csv(f"helpful_scripts\emissions_interpolation\{EEEname}_wheat_regional_averages.csv")
+
+
+target_cols = ["193"]
+# Add region information
+total_reg = total_df.merge(
+    fips_to_region[["FIPS", "Region"]],
+    left_on="county_code",
+    right_on="FIPS",
+    how="left",
+)
+
+luc_reg = luc_df.merge(
+    fips_to_region[["FIPS", "Region"]],
+    left_on="county_code",
+    right_on="FIPS",
+    how="left",
+)
+
+# Calculate non-LUC
+non_luc_reg = total_reg.copy()
+
+for col in target_cols:
+    non_luc_reg[col] = total_reg[col] - luc_reg[col]
+
+    # Exclude only non-LUC zeros
+    non_luc_reg.loc[non_luc_reg[col] == 0, col] = np.nan
+
+# Regional averages
+luc_region_means = (
+    luc_reg.groupby("Region")[target_cols]
+    .mean()
+    .reset_index()
+)
+
+non_luc_region_means = (
+    non_luc_reg.groupby("Region")[target_cols]
+    .mean()
+    .reset_index()
+)
+
+# Rebuild total averages
+total_region_means = luc_region_means.copy()
+
+for col in target_cols:
+    total_region_means[col] = (
+        luc_region_means[col]
+        + non_luc_region_means[col]
+    )
+
+# Save files
+total_region_means.to_csv(
+    rf"helpful_scripts\emissions_interpolation\{EEEnames[0]}_wheat_regional_averages_v2.csv",
+    index=False,
+)
+luc_region_means.to_csv(
+    rf"helpful_scripts\emissions_interpolation\{EEEnames[1]}_wheat_regional_averages_v2.csv",
+    index=False,
+)
+
 #######################
 # Load the datasets ###
 #######################
@@ -135,31 +222,7 @@ for EEEname in EEEnames:
 
     county_codes = list(emissions_doc["county_code"])
 
-    #######################################
-    ## Create regional averages for wheat #
-    #######################################
-
-    if use_wheat_regional_average:
-        target_cols = [c for c in ["193"] if c in emissions_doc.columns]
-        print(target_cols)
-        merged = emissions_doc.merge(
-            fips_to_region[["FIPS", "Region"]], left_on="county_code", right_on="FIPS", how="left"
-        )
-        print(merged)
-
-        merged[target_cols] = merged[target_cols].apply(pd.to_numeric, errors="coerce")
-
-        print("Target cols:", target_cols)
-        print("Non-null count per col:")
-        print(merged[target_cols].notna().sum())
-        print("Dtypes:")
-        print(merged[target_cols].dtypes)
-
-        region_means = merged.groupby("Region")[target_cols].mean()
-        print(region_means)
-        region_means.to_csv(f"helpful_scripts\emissions_interpolation\{EEEname}_wheat_regional_averages.csv")
-
-    regional_sheet = pd.read_csv(f"helpful_scripts\emissions_interpolation\{EEEname}_wheat_regional_averages.csv")
+    regional_sheet = pd.read_csv(rf"helpful_scripts\emissions_interpolation\{EEEname}_wheat_regional_averages_v2.csv")
 
     #####################
     # GPS for each FIPS #
