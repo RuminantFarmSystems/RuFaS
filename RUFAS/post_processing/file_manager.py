@@ -1,9 +1,16 @@
 from enum import Enum
+import json
+import os
 from pathlib import Path
+from RUFAS.post_processing.rufas_logger import get_logger
 from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
-from typing import Any, Union
+from RUFAS.util import Utility
+from typing import Any, Callable, TextIO, Union
 
 import pandas as pd
+
+logger = get_logger(__name__)
+DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
 
 class OriginLabel(Enum):
@@ -35,11 +42,14 @@ class FileManager:
 
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
 
-    def __init__(self, metadata_prefix: str, supported_prefixes: dict[str, str]) -> None:
-        self.metadata_prefix = metadata_prefix
-        # TODO Since this can be 1 of 2 things based on whether it's an e2e run or regular simulation, maybe this should
-        # not be passed in as an arg and instead be done via a setter function depending on the use case?
+    def __init__(self, metadata_prefix_getter: Callable[[], str], supported_prefixes: dict[str, str]) -> None:
+        self._metadata_prefix_getter = metadata_prefix_getter
         self.supported_filter_types_prefixes = supported_prefixes
+
+    @property
+    def metadata_prefix(self) -> str:
+        """Returns the current metadata prefix."""
+        return self._metadata_prefix_getter()
 
     def dict_to_file_json(
         self,
@@ -81,7 +91,34 @@ class FileManager:
         serialized dictionary using the ``max_depth`` parameter. You can also set the
         ``minify_output_file`` flag to ``True`` to minimize the output JSON file size.
         """
-        pass
+        logger.info(
+            f"Attempting to save to {path}.",
+            extra={"rufas_log_name": "Save Dict To JSON Try"},
+        )
+        data_dict = {**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data_dict}
+        try:
+            with open(path, "w", encoding="utf-8") as json_file:
+                data_dict = self._add_detailed_values(data_dict, origin_label)
+                if minify_output_file:
+                    json.dump(
+                        Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
+                        json_file,
+                        separators=(",", ":"),
+                        ensure_ascii=False,
+                    )
+                else:
+                    json.dump(
+                        Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
+                        json_file,
+                        indent=2,
+                        ensure_ascii=False,
+                    )
+                logger.info(
+                    f"Successfully saved to {path}.",
+                    extra={"rufas_log_name": "Save Dict To Json Success"},
+                )
+        except Exception as e:
+            raise type(e)(f"An error occurred while saving to {path}: {str(e)}") from e
 
     def _add_detailed_values(self, data_dict: dict[str, Any], origin_label: OriginLabel) -> dict[str, Any]:
         """
@@ -171,7 +208,42 @@ class FileManager:
             ]
 
         """
-        pass
+        if origin_label is OriginLabel.NONE:
+            return data_dict
+
+        for key, sub_data_dict in data_dict.items():
+            if not self._can_add_detailed_values(sub_data_dict):
+                continue
+
+            data_origins: list[list[tuple[str, str]]] = []
+            units: list[str | dict[str, str]] = []
+            for info_map in sub_data_dict["info_maps"]:
+                if "data_origin" not in info_map:
+                    break
+                if "units" not in info_map:
+                    break
+                data_origins.append(info_map["data_origin"])
+                units.append(info_map["units"])
+
+            if len(data_origins) != len(sub_data_dict["values"]) or len(units) != len(sub_data_dict["values"]):
+                continue
+
+            detailed_values: list[str] = []
+            for index, value in enumerate(sub_data_dict["values"]):
+                for origin in data_origins[index]:
+                    detailed_origin_data = {
+                        "true_origin_class": origin[0],
+                        "true_origin_function": origin[1],
+                        "report_origin": key,
+                        "value": value,
+                        "units": units[index],
+                    }
+                    detailed_value = self._format_detailed_value_str(origin_label, detailed_origin_data)
+                    detailed_values.append(detailed_value)
+
+            sub_data_dict["detailed_values"] = detailed_values
+
+        return data_dict
 
     def _format_detailed_value_str(self, origin_label: OriginLabel, data: dict[str, Any]) -> str:
         """
@@ -217,7 +289,29 @@ class FileManager:
         - If ``origin_label`` is ``OriginLabel.NONE``, there will be no detailed_values information so no formatting
         will occur.
         """
-        pass
+        true_origin_class = data["true_origin_class"]
+        true_origin_function = data["true_origin_function"]
+        report_origin = data["report_origin"]
+        value = data["value"]
+        units = data["units"]
+
+        origin_label_str = ""
+        if origin_label is OriginLabel.TRUE_AND_REPORT_ORIGINS:
+            origin_label_str = f"[{true_origin_class}.{true_origin_function}]->[{report_origin}]"
+        elif origin_label is OriginLabel.TRUE_ORIGIN:
+            origin_label_str = f"[{true_origin_class}.{true_origin_function}]"
+        elif origin_label is OriginLabel.REPORT_ORIGIN:
+            origin_label_str = f"[{report_origin}]"
+
+        if isinstance(value, dict) and isinstance(units, dict):
+            formatted_values = [f"{subkey} = {value[subkey]} ({units[subkey]})" for subkey in value.keys()]
+            return (
+                f"{origin_label_str}: {', '.join(formatted_values)}"
+                if origin_label_str
+                else f"{', '.join(formatted_values)}"
+            )
+
+        return f"{origin_label_str}: {value} ({units})" if origin_label_str else f"{value} ({units})"
 
     def _can_add_detailed_values(self, sub_data_dict: dict[str, Any]) -> bool:
         """
@@ -240,7 +334,15 @@ class FileManager:
         - It must contain the keys ``info_maps`` and ``values``.
         - The length of the ``info_maps`` list and the ``values`` list must be equal.
         """
-        pass
+        if not isinstance(sub_data_dict, dict):
+            return False
+        if "info_maps" not in sub_data_dict or "values" not in sub_data_dict:
+            return False
+        if not sub_data_dict["info_maps"] or not sub_data_dict["values"]:
+            return False
+        if len(sub_data_dict["info_maps"]) != len(sub_data_dict["values"]):
+            return False
+        return True
 
     def _dict_to_csv_column_list(self, variable_name: str, data_dict: dict[str, list[Any]]) -> list[pd.Series]:
         """
@@ -258,7 +360,23 @@ class FileManager:
         list[pd.Series]
             A list of ``(column_name, column_data)`` named series.
         """
-        pass
+        column_list = []
+        units = data_dict["info_maps"][0]["units"] if data_dict.get("info_maps", []) else None
+        data_list = data_dict["values"]
+        if data_list and isinstance(data_list[0], dict):
+            csv_column_lists: dict[str, list[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
+            for nested_dictionary in data_list:
+                for subkey, value in nested_dictionary.items():
+                    csv_column_lists[subkey].append(value)
+
+            for subkey in csv_column_lists.keys():
+                column_title = f"{variable_name}.{subkey}{self._get_units_substr(variable_name, units, subkey)}"
+                column_list.append(pd.Series(csv_column_lists[subkey], dtype=object, name=column_title))
+        else:
+            column_title = f"{variable_name}{self._get_units_substr(variable_name, units)}"
+            column_list.append(pd.Series(data_list, dtype=object, name=column_title))
+
+        return column_list
 
     def _get_units_substr(
         self, variable_name: str, units: str | dict[str, str] | None, subkey: str | None = None
@@ -305,7 +423,29 @@ class FileManager:
             self._get_units_substr("coordinates", {"x": "m", "y": "m"})
 
         """
-        pass
+        if not isinstance(units, dict):
+            return f" ({units})" if units else ""
+
+        if variable_name in units:
+            return f" ({units[variable_name]})"
+
+        if subkey is None:
+            logger.error(
+                f"Variable {variable_name} has a dictionary for its 'units' property, "
+                f"but the 'values' associated with this variable are not dictionaries themselves.",
+                extra={"rufas_log_name": "Units Subkey Missing"},
+            )
+            return ""
+
+        if subkey in units:
+            return f" ({units[subkey]})"
+
+        logger.error(
+            f"Key '{subkey}' not found in the units dictionary for variable '{variable_name}'.",
+            extra={"rufas_log_name": "Units Key Error"},
+        )
+
+        return ""
 
     def dict_to_file_csv(self, data_dict: dict[str, Any], path: Path, direction: str | None = "portrait") -> None:
         """
@@ -321,7 +461,44 @@ class FileManager:
             The direction of the csv file, either portrait or landscape, default is portrait.
             If ``None`` is provided, the file will be saved in default portrait orientation.
         """
-        pass
+        logger.info(
+            f"Attempting to save to {path}.",
+            extra={"rufas_log_name": "Save Dict To CSV Try"},
+        )
+
+        if len(data_dict) == 0:
+            logger.warning(
+                f"Nothing to save to {path}. Data dictionary is empty.",
+                extra={"rufas_log_name": "Dict To CSV Save Failure"},
+            )
+            return
+
+        csv_columns = []
+        for variable_name, variable_data in data_dict.items():
+            csv_column_data = self._dict_to_csv_column_list(variable_name, variable_data)
+            csv_columns.extend(csv_column_data)
+
+        df = pd.concat(csv_columns, axis=1)
+        disclaimer_column = [DISCLAIMER_MESSAGE] + [""] * (len(df) - 1)
+        disclaimer_df = pd.DataFrame({"DISCLAIMER": disclaimer_column})
+        df = pd.concat([disclaimer_df, df], axis=1)
+
+        if direction == "portrait" or direction is None:
+            df.to_csv(path, index=False, encoding="utf-8")
+        elif direction == "landscape":
+            df.T.to_csv(path, encoding="utf-8")
+        else:
+            logger.error(
+                f"The provided direction '{direction}' is not recognized. "
+                f"Saving the output in portrait direction as default.",
+                extra={"rufas_log_name": "Unknown Direction for CSV Output"},
+            )
+            df.to_csv(path, index=False, encoding="utf-8")
+
+        logger.info(
+            f"Successfully saved to {path}.",
+            extra={"rufas_log_name": "Save Dict To CSV Success"},
+        )
 
     def _list_to_file_txt(self, data_list: list[str], path: Path) -> None:
         """
@@ -339,7 +516,44 @@ class FileManager:
         Exception
             If an error occurs while saving to the file.
         """
-        pass
+        logger.info(
+            f"Attempting to save to {path}.",
+            extra={"rufas_log_name": "Save Text File Try"},
+        )
+
+        try:
+            with open(path, "w") as var_names_file:
+                self._write_disclaimer(var_names_file)
+                var_names_file.writelines(data_list)
+                logger.info(
+                    f"Successfully saved to {path}.",
+                    extra={"rufas_log_name": "Save Text File Success"},
+                )
+        except Exception as e:
+            raise type(e)(f"An error occurred while saving to {path}: {str(e)}") from e
+
+    def _write_disclaimer(self, file_pointer: TextIO) -> None:
+        """
+        Writes the predefined disclaimer message to a given file.
+
+        Parameters
+        ----------
+        file_pointer: TextIO
+            A file-like object (supporting the ``.write()`` method) that points to the file where the disclaimer should
+            be written.
+
+        Example
+        -------
+        .. code-block:: python
+
+            output_manager = OutputManager()
+            import io
+            file_like_string = io.StringIO()
+            output_manager._write_disclaimer(file_like_string)
+            assert file_like_string.getvalue() == DISCLAIMER_MESSAGE + "\\n"
+
+        """
+        file_pointer.write(DISCLAIMER_MESSAGE + "\n")
 
     def generate_file_name(self, base_name: str, extension: str, include_millis: bool = False) -> str:
         """
@@ -359,7 +573,8 @@ class FileManager:
         str
             File name in the form ``{metadata_prefix}_{base_name}_{timestamp}.{extension}``.
         """
-        pass
+        timestamp: str = Utility.get_timestamp(include_millis=include_millis)
+        return f"{self.metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
     def load_filter_file_content(self, path: Path) -> tuple[list[dict[str, Any]], str | None]:
         """
@@ -403,7 +618,57 @@ class FileManager:
         This method is used to handle loading filter content from external files, which are
         used to define filtering criteria for the ``variables_pool``.
         """
-        pass
+        logger.info(
+            f"Attempting to open {path}.",
+            extra={"rufas_log_name": "Opening Filter File Attempt"},
+        )
+        try:
+            with open(path) as filter_file:
+                direction: str | None = None
+                if path.suffix == ".json":
+                    json_content = json.load(filter_file)
+                    direction = json_content.get("direction", None)
+                    if "multiple" in json_content.keys():
+                        result = json_content["multiple"]
+                    else:
+                        result = [json_content]
+                elif path.suffix == ".txt":
+                    list_of_elements = [element for element in filter_file.read().splitlines() if element]
+                    filter_by_exclusion = list_of_elements[0] == "exclude"
+                    if filter_by_exclusion:
+                        list_of_elements.pop(0)
+                    result = [{"filters": list_of_elements, "filter_by_exclusion": filter_by_exclusion}]
+                else:
+                    raise Exception(f"Unsupported file format {path.suffix}; only json and txt are supported.")
+            logger.info(
+                f"Successfully opened {path}.",
+                extra={"rufas_log_name": "Filter File Opening Successful"},
+            )
+            return result, direction
+        except FileNotFoundError:
+            logger.error(
+                f"The file '{path}' does not exist.",
+                extra={"rufas_log_name": "Filter File Not Found Error"},
+            )
+            raise
+        except json.JSONDecodeError as e:
+            logger.error(
+                str(e),
+                extra={"rufas_log_name": "Filter File JSON Parsing Error"},
+            )
+            raise
+        except UnicodeDecodeError as e:
+            logger.error(
+                str(e),
+                extra={"rufas_log_name": "Filter File Text Decoding Error"},
+            )
+            raise
+        except Exception as e:
+            logger.error(
+                str(e),
+                extra={"rufas_log_name": "Filter File Unexpected Error"},
+            )
+            raise
 
     def save_to_json(
         self,
@@ -426,15 +691,44 @@ class FileManager:
         filter_content : dict[str, Union[str, int]]
             Additional content from the filter that might influence the file naming.
         """
-        pass
+        if "e2e_comparison" in filter_file:
+            base_name = f"comparison_{filter_content['name']}"
+        elif "name" in filter_content:
+            base_name = f"saved_variables_{filter_content['name']}"
+        else:
+            base_name = f"saved_variables_{filter_file}"
+
+        origin_label = self._get_origin_label(filter_content)
+        file_name = self.generate_file_name(base_name, "json")
+        file_path = save_path / file_name
+        self.dict_to_file_json(filtered_pool, file_path, origin_label=origin_label)
 
     def read_variables_pool_file(
         self,
         file_path: Path,
-        info_map: dict[str, Any],
-    ) -> dict[str, POOL_ELEMENT_TYPE]:
+    ) -> dict[str, list[Any]]:
         """Reads a ``variables_pool`` JSON file and returns its contents."""
-        pass
+        logger.info(
+            f"Attempting to open {str(file_path)}.",
+            extra={"rufas_log_name": "Reading JSON File Attempt"},
+        )
+        try:
+            with open(file_path) as file:
+                loaded_pool: dict[str, list[Any]] = json.load(file)
+                loaded_pool.pop("DISCLAIMER", None)
+                logger.info(
+                    f"Successfully loaded pool data from {str(file_path)}.",
+                    extra={"rufas_log_name": "Pool Load Successful"},
+                )
+                return loaded_pool
+        except FileNotFoundError:
+            logger.error(
+                f"The file '{str(file_path)}' does not exist.", extra={"rufas_log_name": "Pool File Not Found Error"}
+            )
+            raise
+        except json.JSONDecodeError as e:
+            logger.error(str(e), extra={"rufas_log_name": "JSON Pool File Parsing Error"})
+            raise
 
     def clear_output_dir(self, vars_file_path: Path, output_dir: Path) -> None:
         """
@@ -447,9 +741,20 @@ class FileManager:
         output_dir : Path
             The directory for saving output.
         """
-        pass
+        is_file_found_in_dir = self.is_file_in_dir(output_dir, vars_file_path)
+        if is_file_found_in_dir:
+            logger.error(
+                f"{vars_file_path} in output directory.", extra={"rufas_log_name": "Can't clear output directory"}
+            )
+        else:
+            keep_list = [".keep", "output_filters"]
+            Utility.empty_dir(output_dir, keep=keep_list)
+            logger.info(
+                "Provided variables-file path was not in output directory.",
+                extra={"rufas_log_name": "Output directory successfully cleared"},
+            )
 
-    def is_file_in_dir(self, dir_path: Path, file_path: Path) -> bool:
+    def is_file_in_dir(self, dir_path: Path, file_path: Path | None) -> bool:
         """
         Checks if a file path is in the provided directory.
 
@@ -457,15 +762,20 @@ class FileManager:
         ----------
         dir_path : Path
             Path to the directory to be checked.
-        file_path : Path
-            Path to file to be checked.
+        file_path : Path | None
+            Path to the file to be checked. If None, returns False.
 
         Returns
         -------
         bool
             Whether the file is in the provided directory.
         """
-        pass
+        if file_path is None:
+            return False
+        file_path = file_path.resolve()
+        directory_path = dir_path.resolve()
+
+        return directory_path == file_path or directory_path in file_path.parents
 
     def create_directory(self, path: Path) -> None:
         """
@@ -476,7 +786,26 @@ class FileManager:
         path : Path
             The path where the directory will be created if it does not already exist.
         """
-        pass
+        logger.info(
+            f"Attempting to create a new directory at {path}.",
+            extra={"rufas_log_name": "Attempting to create a new directory"},
+        )
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+            logger.info(
+                f"Created a new directory at {path}.",
+                extra={"rufas_log_name": "Directory successfully created."},
+            )
+        except PermissionError as e:
+            logger.error(
+                f"{path=}; Exception: {str(e)}",
+                extra={"rufas_log_name": "Directory Creation Permissions Error"},
+            )
+        except Exception as e:
+            logger.error(
+                f"{path=}; Exception: {str(e)}",
+                extra={"rufas_log_name": "Directory Creation mkdir Error"},
+            )
 
     def _get_origin_label(self, filter_content: dict[str, str | int]) -> OriginLabel:
         """
@@ -498,11 +827,112 @@ class FileManager:
         This method checks the value of the ``origin_label`` key in the provided ``filter_content`` dictionary.
         If the value is a valid string matching one of the supported options defined in the ``OriginLabel`` enum,
         the corresponding ``OriginLabel`` member is returned. If the value is invalid or the key is not present,
-        ``OriginLabel.NONE`` is returned, and an error is added to the Output Manager's errors pool.
+        ``OriginLabel.NONE`` is returned, and an error is logged.
         """
-        pass
+        if "origin_label" not in filter_content:
+            return OriginLabel.NONE
+
+        origin_label_value = filter_content["origin_label"]
+        supported_options = [label.value for label in OriginLabel]
+
+        if not isinstance(origin_label_value, str):
+            logger.error(
+                f"Origin label must be a string. Received '{origin_label_value}' of type {type(origin_label_value)}.",
+                extra={"rufas_log_name": "Origin Label Error"},
+            )
+            return OriginLabel.NONE
+
+        if origin_label_value not in supported_options:
+            logger.error(
+                f"Origin label must be one of {supported_options}. Received '{origin_label_value}'.",
+                extra={"rufas_log_name": "Origin Label Error"},
+            )
+            return OriginLabel.NONE
+
+        return OriginLabel(origin_label_value)
 
     @staticmethod
     def normalize_module_header(json_key: str) -> str:
         """Normalizes the module header from a JSON key."""
-        pass
+        module = json_key.split(".", 1)[0].lower()
+        if module == "animal":
+            return "Animal"
+        if module == "crop_and_soil":
+            return "CropAndSoil"
+        if module == "manure":
+            return "Manure"
+        return json_key.split(".", 1)[0]
+
+    def read_e2e_comparison_files(
+        self,
+        json_output_directory: Path,
+        output_prefixes: list[str],
+        failed_e2e_groups: list[str] | None = None,
+    ) -> dict[str, list[dict[str, Any]]]:
+        """
+        Reads end-to-end test comparison files and groups their contents by output prefix.
+
+        Parameters
+        ----------
+        json_output_directory : Path
+            The directory containing the JSON comparison files.
+        output_prefixes : list[str]
+            The output prefixes used to identify relevant comparison files.
+        failed_e2e_groups : list[str] | None, default None
+            The output prefixes of failed tasks whose comparison files should
+            be ignored because they may have been left by an earlier run.
+
+        Returns
+        -------
+        dict[str, list[dict[str, Any]]]
+            The contents of the comparison files grouped by output prefix.
+
+        """
+        failed_e2e_groups = failed_e2e_groups or []
+        comparison_results: dict[str, list[dict[str, Any]]] = {}
+
+        logger.info(
+            f"Attempting to read E2E comparison files from {json_output_directory}.",
+            extra={"rufas_log_name": "Reading E2E Comparison Files Attempt"},
+        )
+
+        for filename in os.listdir(json_output_directory):
+            if "comparison" not in filename.lower() or not filename.endswith(".json"):
+                continue
+
+            matched_prefix = next(
+                (prefix for prefix in output_prefixes if prefix.lower() in filename.lower()),
+                None,
+            )
+
+            if matched_prefix is None:
+                logger.error(
+                    f"No matching output prefix found in filename: {filename}",
+                    extra={"rufas_log_name": "Invalid E2E Output Prefix"},
+                )
+                continue
+
+            if matched_prefix in failed_e2e_groups:
+                continue
+
+            file_path = json_output_directory / filename
+
+            try:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    data: dict[str, Any] = json.load(file)
+            except (OSError, ValueError) as exc:
+                logger.error(
+                    f"Failed to read {file_path}: {exc}",
+                    extra={"rufas_log_name": "E2E Comparison File Reading Error"},
+                )
+                continue
+
+            comparison_results.setdefault(matched_prefix, []).append(data)
+
+        logger.info(
+            f"Finished reading E2E comparison files from {json_output_directory}. "
+            f"Successfully read {sum(len(files) for files in comparison_results.values())} files.",
+            extra={"rufas_log_name": "E2E Comparison File Reading Complete"},
+        )
+
+        return comparison_results

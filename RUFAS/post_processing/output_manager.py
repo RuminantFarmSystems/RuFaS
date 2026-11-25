@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 import os
 import sys
@@ -20,6 +19,7 @@ from RUFAS.rufas_time import RufasTime
 from RUFAS.util import Utility
 
 NON_FILTER_FILE_SUFFIXES = ("must_change_variables.json", "accepted_ranges.json")
+logger = get_logger(__name__)
 
 
 class OutputManager:
@@ -54,10 +54,11 @@ class OutputManager:
                 "comparison": "e2e_comparison_",
             }
             self.time: RufasTime | None = None
-            self.file_manager = FileManager(self.__metadata_prefix, self._filter_prefixes)
+            self.file_manager = FileManager(
+                metadata_prefix_getter=lambda: self.__metadata_prefix, supported_prefixes=self._filter_prefixes
+            )
             self.pool_manager = PoolManager(self.file_manager)
             self.output_config_validator = OutputConfigValidator()
-            self._logger = get_logger(self.__class__.__name__)
 
     @property
     def _filter_prefixes(self) -> dict[str, str]:
@@ -610,49 +611,31 @@ class OutputManager:
             The output prefixes of the tasks that failed. They are summarized as not run, and any results files found
             for them are ignored because they were left by an earlier run.
         """
-        info_map = self._info_map(self.summarize_e2e_test_results.__name__)
         failed_e2e_groups = failed_e2e_groups or []
-        self.add_log(
-            "Attempting to open e2e test results directory",
-            "Opening e2e test results directory to read results files",
-            info_map,
-        )
         module_headers: list[str] = ["Animal", "CropAndSoil", "Manure", "Feed"]
+
         e2e_results_summary: dict[str, dict[str, bool | str]] = {
             prefix: {
                 header: "not run (task failed)" if prefix in failed_e2e_groups else "n/a" for header in module_headers
             }
             for prefix in output_prefixes
         }
-        for filename in os.listdir(json_output_directory):
-            if "comparison" not in filename.lower() or not filename.endswith(".json"):
-                continue
-            file_path = json_output_directory / filename
-            try:
-                with open(file_path, "r") as file:
-                    data: dict[str, Any] = json.load(file)
-            except Exception as exc:
-                self.add_error("File path invalid.", f"Failed to read {file_path}: {exc}", info_map)
-                continue
 
-            matched_prefix = next((prefix for prefix in output_prefixes if prefix.lower() in filename.lower()), None)
-            if matched_prefix is None:
-                self.add_error(
-                    "Invalid e2e output prefix", f"No matching output_prefix found in filename: {filename}", info_map
-                )
-                continue
-            if matched_prefix in failed_e2e_groups:
-                continue
-
-            for key, value in data.items():
-                if key == "DISCLAIMER":
-                    continue
-                module = self.file_manager.normalize_module_header(key)
-                e2e_results_summary[matched_prefix][module] = value["values"][0]
-
-        self.add_log(
-            "Successfully opened e2e test results directory", "Directory opened and files successfully read", info_map
+        comparison_results = self.file_manager.read_e2e_comparison_files(
+            json_output_directory,
+            output_prefixes,
+            failed_e2e_groups,
         )
+
+        for prefix, comparison_files in comparison_results.items():
+            for data in comparison_files:
+                for key, value in data.items():
+                    if key == "DISCLAIMER":
+                        continue
+
+                    module = self.file_manager.normalize_module_header(key)
+                    e2e_results_summary[prefix][module] = value["values"][0]
+
         self._print_e2e_results_summary(e2e_results_summary, e2e_random_seeds)
 
     def _print_e2e_results_summary(
@@ -981,7 +964,7 @@ class OutputManager:
         info_map : dict[str, Any] | None
             Additional context associated with the message.
         """
-        self._logger.log(
+        logger.log(
             level,
             message,
             extra={
