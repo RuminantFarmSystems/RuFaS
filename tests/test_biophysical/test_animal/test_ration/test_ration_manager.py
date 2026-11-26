@@ -406,27 +406,23 @@ def test_get_intake_option_defaults_to_predict_when_unset() -> None:
 
 
 @pytest.mark.parametrize(
-    "option, expected_fraction, expected_boost, expected_retry",
+    "option, expected_fraction, expected_retry",
     [
         (
             IntakeOption.PREDICT_DMI,
             AnimalModuleConstants.DMI_CONSTRAINT_FRACTION,
-            AnimalModuleConstants.DMI_REQUIREMENT_BOOST,
             AnimalModuleConstants.DMI_RETRY_INCREASE_FACTOR,
         ),
-        (IntakeOption.SET_DMI, 0.0, 1.0, 1.0),
-        (IntakeOption.SET_DMI_PER_X, 0.0, 1.0, 1.0),
+        (IntakeOption.SET_DMI, 0.0, 1.0),
+        (IntakeOption.SET_DMI_PER_X, 0.0, 1.0),
     ],
 )
-def test_effective_dmi_constants(
-    option: IntakeOption, expected_fraction: float, expected_boost: float, expected_retry: float
-) -> None:
+def test_effective_dmi_constants(option: IntakeOption, expected_fraction: float, expected_retry: float) -> None:
     """DMI input options neutralize the internal DMI adjustment constants."""
     RationManager.intake_options = {AnimalCombination.LAC_COW: option}
     RationManager.intake_values = {AnimalCombination.LAC_COW: 24.0}
 
     assert RationManager.effective_dmi_constraint_fraction(AnimalCombination.LAC_COW) == expected_fraction
-    assert RationManager.effective_dmi_requirement_boost(AnimalCombination.LAC_COW) == expected_boost
     assert RationManager.effective_dmi_retry_increase_factor(AnimalCombination.LAC_COW) == expected_retry
 
 

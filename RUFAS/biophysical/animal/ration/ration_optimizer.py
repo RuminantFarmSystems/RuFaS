@@ -60,10 +60,6 @@ class RationConfig:
     dmi_constraint_fraction : float
         The +/- fraction of the dry matter requirement allowed in the DMI constraint methods. 0.0
         when the animal combination uses a DMI input option.
-    dmi_requirement_boost : float
-        The fraction of the dry matter intake requirement used as the basis for the inclusion rate
-        bounds in the user defined ration formulation method. 1.0 when the animal combination uses
-        a DMI input option.
     feeds_used : list[Feed]
         List of Feeds used in ration formulation.
     price_list : list[float]
@@ -108,7 +104,6 @@ class RationConfig:
         self.initial_protein_requirement: float = initial_protein_requirement
         self.animal_combination = animal_combination
         self.dmi_constraint_fraction: float = RationManager.effective_dmi_constraint_fraction(animal_combination)
-        self.dmi_requirement_boost: float = RationManager.effective_dmi_requirement_boost(animal_combination)
 
         self.feeds_used = pen_available_feeds
 
@@ -985,13 +980,13 @@ class RationOptimizer:
                 user_defined_ration_dictionary[key]
                 / 100
                 * (1 - udr_tolerance)
-                * (ration_config.initial_dry_matter_requirement * ration_config.dmi_requirement_boost)
+                * (ration_config.initial_dry_matter_requirement)
             )
             target_upper = (
                 user_defined_ration_dictionary[key]
                 / 100
                 * (1 + udr_tolerance)
-                * (ration_config.initial_dry_matter_requirement * ration_config.dmi_requirement_boost)
+                * (ration_config.initial_dry_matter_requirement)
             )
             targetbounds = (max(0.0, target_lower), target_upper)
             user_defined_boundlist.append(targetbounds)
