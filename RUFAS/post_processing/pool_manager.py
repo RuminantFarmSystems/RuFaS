@@ -1,18 +1,68 @@
 import collections
+import os
+import sys
+from copy import deepcopy
+from math import inf
 from pathlib import Path
-
-from numpy import inf
-from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
 from typing import Any, Counter, Sequence, Union
 
+import psutil
+
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.post_processing.file_manager import FileManager
 from RUFAS.post_processing.rufas_logger import get_logger
+from RUFAS.post_processing.shared_data_types import POOL_ELEMENT_TYPE
+from RUFAS.rufas_time import RufasTime
 from RUFAS.units import MeasurementUnits
+from RUFAS.util import Utility
+
+logger = get_logger(__name__)
 
 
 class PoolManager:
     """
     Class overseeing the management of the variables pool including chunkification.
+
+    Parameters
+    ----------
+    file_manager : FileManager
+        The ``FileManager`` used to create the directory for saved pool chunks and to save and load pools.
+
+    Attributes
+    ----------
+    variables_pool : dict[str, POOL_ELEMENT_TYPE]
+        Contains variables reported during the simulation.
+    chunkification : bool
+        Set to ``True`` to enable chunkification of the output ``variables_pool``.
+    saved_pool_chunks_num : int
+        The number of saved pool chunks.
+    saved_pool_chunks_path : Path | None
+        The path to the directory where saved pool chunks are stored.
+    available_memory : int
+        The available memory on the system, bytes.
+    average_add_variable_call_addition : int, default 118
+        The average memory usage increases per call to ``add_variable()``.
+    add_variable_call : int
+        The number of calls to ``add_variable()``.
+    save_chunk_threshold_call_count : int
+        The threshold ``add_variable_call`` count for saving pool chunk.
+    current_pool_size : int
+        The current size of the variable pool, bytes.
+    maximum_pool_size : float
+        The maximum allowed variable pool size, bytes.
+    _variables_usage_counter : Counter[str]
+        A ``Counter``-like registry of filtered variable keys. Dictionary-valued variables pre-seed subkeys at 0, and
+        counts increase when post-processing filters select matching variables or subkeys. The pre-seeding exists
+        because dictionary-valued variables can later be filtered by subkey (for example ``variable.min``), even though
+        those subkeys are not stored as standalone top-level variables in the pool. Non-dictionary variables are not
+        pre-seeded; they only appear here once a filter actually selects them.
+    file_manager : FileManager
+        The ``FileManager`` used to create the directory for saved pool chunks and to save and load pools.
+    time : RufasTime | None
+        A ``RufasTime`` object used to track the simulation time. Set by ``OutputManager``.
+    exclude_info_maps : bool
+        Set to ``True`` to exclude ``info_maps`` when adding variables to the ``variables_pool``. Set by
+        ``OutputManager``.
     """
 
     _VARIABLE_DUMP_KEYS_TO_IGNORE = frozenset(
@@ -32,6 +82,8 @@ class PoolManager:
         self.maximum_pool_size: float = inf
         self._variables_usage_counter: Counter[str] = collections.Counter()
         self.file_manager = file_manager
+        self.time: RufasTime | None = None
+        self.exclude_info_maps: bool = False
         self._logger = get_logger(self.__class__.__name__)
 
     def setup_pool_overflow_control(
@@ -55,11 +107,44 @@ class PoolManager:
         save_chunk_threshold_call_count : int | None, optional
             The setting for the threshold ``add_variable_call`` count for saving pool chunk.
         """
-        pass
+        self.chunkification = True
+
+        self.available_memory = psutil.virtual_memory().available
+        available_memory_gb = self.available_memory / GeneralConstants.BYTES_PER_GB
+
+        self.saved_pool_chunks_path = Path.joinpath(
+            output_dir,
+            f"saved_pool/{self.file_manager.metadata_prefix}_{Utility.get_timestamp(include_millis=True)}",
+        )
+        self.file_manager.create_directory(self.saved_pool_chunks_path)
+
+        log_message = (
+            f"Created {self.saved_pool_chunks_path} for saved pools during simulation.\n"
+            f"Current system available memory: {available_memory_gb:.2f} GB = "
+            f"{self.available_memory} Bytes.\n"
+        )
+
+        if save_chunk_threshold_call_count is not None and save_chunk_threshold_call_count > 0:
+            self.save_chunk_threshold_call_count = save_chunk_threshold_call_count
+            log_message += (
+                "The threshold add_variable_call count for saving pool chunk is set to "
+                f"{self.save_chunk_threshold_call_count}"
+            )
+        elif max_memory_usage:
+            self.maximum_pool_size = max_memory_usage
+            log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
+        else:
+            self.maximum_pool_size = (
+                max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION
+            ) * self.available_memory
+            log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
+        logger.info(log_message, extra={"rufas_log_name": "Pool Overflow Control Setup"})
 
     def _pool_element_factory(self) -> POOL_ELEMENT_TYPE:
         """Factory for elements added to pools"""
-        pass
+        info_maps: list[dict[str, Any]] = []
+        values: list[Any] = []
+        return {"info_maps": info_maps, "values": values}
 
     def _add_to_pool(
         self,
@@ -92,7 +177,27 @@ class PoolManager:
         and storing a reference would allow external modifications to corrupt the data
         held in the pool.
         """
-        pass
+        discard_info_map = first_info_map_only
+
+        key_not_exists_in_pool = pool.get(key) is None
+        if key_not_exists_in_pool:
+            pool[key] = self._pool_element_factory()
+            discard_info_map = False
+
+        new_daily_flag = info_map.get("is_daily_variable", False)
+        new_daily_flag = new_daily_flag if isinstance(new_daily_flag, bool) else False
+        pool[key]["is_daily_variable"] = bool(pool[key].get("is_daily_variable", False)) or new_daily_flag
+
+        if not self.exclude_info_maps and not discard_info_map:
+            reduced_info_map = {
+                k: v for k, v in info_map.items() if k not in ["class", "function", "is_daily_variable"]
+            }
+            pool[key]["info_maps"].append(reduced_info_map)
+
+        if isinstance(value, (int, bool, float, str)):
+            pool[key]["values"].append(value)
+        else:
+            pool[key]["values"].append(deepcopy(value))
 
     def _add_simulation_day_to_info_map(
         self,
@@ -124,8 +229,33 @@ class PoolManager:
         -----
         A warning is triggered if the resulting ``info_map`` has no ``simulation_day`` value (or a value of None)
         """
-        # TODO Determine if this should be here or in new OutputManager - needs time.
-        pass
+        info_map_copy = dict(info_map)
+
+        time_day = self.time.simulation_day if hasattr(self.time, "simulation_day") else None
+
+        map_has_valid_day = info_map_copy.get("simulation_day") is not None
+
+        day_to_use = simulation_day if simulation_day is not None else time_day
+
+        # Don't overwrite a valid simulation_day with None
+        if day_to_use is None and map_has_valid_day:
+            return info_map_copy
+
+        should_add_sim_day = overwrite or "simulation_day" not in info_map_copy
+
+        if day_to_use is not None and should_add_sim_day:
+            info_map_copy["simulation_day"] = day_to_use
+
+        if day_to_use is None and not map_has_valid_day:
+            logger.warning(
+                "no simulation day was available to add to the info_map for variable %s (from %s.%s)",
+                name,
+                info_map_copy.get("class"),
+                info_map_copy.get("function"),
+                extra={"rufas_log_name": "no simulation_day available"},
+            )
+
+        return info_map_copy
 
     def add_variable(
         self,
@@ -187,7 +317,36 @@ class PoolManager:
             If present, marks whether the variable should be treated as daily for reporting diagnostics. Defaults to
             ``False``, and is persisted on the stored variable entry before ``info_maps`` may be excluded.
         """
-        pass
+        self.add_variable_call += 1
+        units = info_map.get("units")
+        if units is None:
+            raise KeyError(f"'units' was not found in info_map for call to 'add_variable()' for {name}.")
+        if isinstance(units, dict) and len(info_map["units"]) != len(value) and value != {}:
+            raise KeyError(f"'units' missing in units dict for a variable in {name}.")
+        units = self._stringify_units(units)
+
+        updated_info_map = self._add_simulation_day_to_info_map(
+            info_map, overwrite_simulation_day, simulation_day, name
+        )
+
+        key = self._generate_key(name, updated_info_map)
+        self._add_to_pool(self.variables_pool, key, value, {**updated_info_map, "units": units}, first_info_map_only)
+
+        if isinstance(value, dict):
+            for k, v in value.items():
+                self._variables_usage_counter[f"{key}.{k}"] = 0
+
+        if self.chunkification:
+            self.current_pool_size += self.average_add_variable_call_addition
+            is_save_chunk_threshold_reached = (
+                self.save_chunk_threshold_call_count > 0
+                and self.add_variable_call % self.save_chunk_threshold_call_count == 0
+            )
+            is_pool_size_at_maximum_capacity = (
+                self.save_chunk_threshold_call_count == 0 and self.current_pool_size >= self.maximum_pool_size
+            )
+            if is_save_chunk_threshold_reached or is_pool_size_at_maximum_capacity:
+                self.save_current_variable_pool()
 
     def add_variable_bulk(
         self,
@@ -210,7 +369,9 @@ class PoolManager:
             overwritten.
 
         """
-        pass
+        for variable, info_map in variables:
+            name, value = list(variable.items())[0]
+            self.add_variable(name, value, info_map, first_info_map_only, overwrite_simulation_day)
 
     def save_current_variable_pool(self) -> None:
         """
@@ -279,7 +440,22 @@ class PoolManager:
         TypeError
             If any unit or nested unit does not have the type ``MeasurementUnits``.
         """
-        pass
+        if isinstance(units, dict):
+            return {key: self._stringify_units(unit) for key, unit in units.items()}
+
+        if type(units) is not MeasurementUnits:
+            logger.error(
+                "The following unit does not have the type MeasurementUnits: %s (type %s).",
+                units,
+                type(units),
+                extra={"rufas_log_name": "invalid_units_type"},
+            )
+
+            raise TypeError(
+                f"The following unit does not have the type MeasurementUnits: {units} (type {type(units)})."
+            )
+
+        return str(units)
 
     def _generate_key(self, name: str, info_map: dict[str, Union[str, bool]]) -> str:
         """
@@ -303,7 +479,24 @@ class PoolManager:
         KeyError
             If ``info_map["class"]`` or ``info_map["function"]`` are not present.
         """
-        pass
+        if info_map.get("class") is None:
+            raise KeyError("'class' was not found in info_map")
+        if info_map.get("function") is None:
+            raise KeyError("'function' was not found in info_map")
+
+        prefix = ""
+        prefix_value = info_map.get("prefix")
+        if isinstance(prefix_value, str):
+            prefix = prefix_value + "."
+        elif not info_map.get("suppress_prefix", False):
+            class_value = info_map.get("class")
+            function_value = info_map.get("function")
+            if isinstance(class_value, str) and isinstance(function_value, str):
+                prefix = self._get_prefix(class_value, function_value) + "."
+
+        suffix = f'.{info_map.get("suffix")}' if info_map.get("suffix") is not None else ""
+
+        return f"{prefix}{name}{suffix}"
 
     def _get_prefix(self, caller_class: str, caller_function: str) -> str:
         """
@@ -321,21 +514,38 @@ class PoolManager:
         str
             ``{caller_class}.{caller_function}``
         """
-        pass
+        return f"{caller_class}.{caller_function}"
 
     def _sort_saved_chunk_files(self) -> list[Path]:
         """
         Get a list of all saved chunks of the output variable pool by retrieving all JSON files under
         the ``saved_pool_chunks_path``. Then sort the files according to their file name to preserve the order.
         """
-        pass
+        list_of_dumped_files: list[Path] = [
+            file for file in self.saved_pool_chunks_path.iterdir() if file.is_file() and file.name.endswith(".json")
+        ]
+        list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
+        return list_of_dumped_files
 
     def load_saved_pools(self) -> None:
         """
         Loads saved pools of data from JSON files in the ``saved_pool_chunks_path`` directory and merges them into
         a single variables pool.
         """
-        pass
+        merged_pool: dict[str, POOL_ELEMENT_TYPE] = {}
+        list_of_dumped_files = self._sort_saved_chunk_files()
+        for file in list_of_dumped_files:
+            self.load_variables_pool_from_file(file)
+            for key, value in self.variables_pool.items():
+                if key not in merged_pool:
+                    merged_pool[key] = value
+                else:
+                    merged_pool[key]["info_maps"].extend(value["info_maps"])
+                    merged_pool[key]["values"].extend(value["values"])
+            self.current_pool_size = 0
+            self._set_variables_pool({}, pool_size_override=0)
+
+        self._set_variables_pool(merged_pool, pool_size_override=sys.getsizeof(merged_pool))
 
     def load_variables_pool_from_file(self, file_path: Path) -> None:
         """
@@ -437,7 +647,78 @@ class PoolManager:
         """
         # TODO this function may be best suited somewhere else as it's a reporting out function but it needs
         # _variables_usage_counter_data
-        pass
+        filename = self.file_manager.generate_file_name("variables_usage_counts", "csv")
+        file_path_csv = path / filename
+        sorted_variables_usage_counter_desc = self._variables_usage_counter.most_common()
+        variable_name_col = {"values": [variable[0] for variable in sorted_variables_usage_counter_desc]}
+        usage_count_col = {"values": [variable[1] for variable in sorted_variables_usage_counter_desc]}
+        data_dict = {"variable_name": variable_name_col, "usage_count": usage_count_col}
+        self.file_manager.dict_to_file_csv(data_dict, file_path_csv)
+
+        daily_filename = self.file_manager.generate_file_name("variables_reported_daily", "csv")
+        daily_file_path_csv = path / daily_filename
+        daily_data_dict = self._get_variables_reported_daily()
+        self.file_manager.dict_to_file_csv(daily_data_dict, daily_file_path_csv)
+
+        non_daily_filename = self.file_manager.generate_file_name("variables_not_reported_daily", "csv")
+        non_daily_file_path_csv = path / non_daily_filename
+        non_daily_data_dict = self._get_variables_not_reported_daily()
+        self.file_manager.dict_to_file_csv(non_daily_data_dict, non_daily_file_path_csv)
+
+    def _get_variables_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
+        """Builds a CSV-ready dictionary listing variables treated as daily for reporting diagnostics."""
+
+        variable_names: set[str] = set()
+        for variable_name, variable_data in sorted(self.get_flat_variables_pool().items()):
+            values = variable_data.get("values", [])
+            if not isinstance(values, list):
+                continue
+
+            if not self._is_reported_daily(variable_data):
+                continue
+
+            variable_names.update(self._get_reported_variable_names(variable_name, values))
+
+        return {"variable_name": {"values": sorted(variable_names)}}
+
+    def _get_variables_not_reported_daily(self) -> dict[str, dict[str, list[Any]]]:
+        """Builds a CSV-ready dictionary listing variables treated as non-daily for reporting diagnostics."""
+        rows: set[tuple[str, int]] = set()
+
+        for variable_name, variable_data in sorted(self.get_flat_variables_pool().items()):
+            values = variable_data.get("values", [])
+            if not isinstance(values, list):
+                continue
+
+            if self._is_reported_daily(variable_data):
+                continue
+
+            for reported_name in self._get_reported_variable_names(variable_name, values):
+                rows.add((reported_name, len(values)))
+
+        sorted_rows = sorted(rows)
+        return {
+            "variable_name": {"values": [name for name, _ in sorted_rows]},
+            "report_count": {"values": [count for _, count in sorted_rows]},
+        }
+
+    def _is_reported_daily(self, variable_data: dict[str, Any]) -> bool:
+        """Determines whether a variable should be treated as daily for reporting diagnostics."""
+
+        is_daily_variable = variable_data.get("is_daily_variable", False)
+        return is_daily_variable if isinstance(is_daily_variable, bool) else False
+
+    def _get_reported_variable_names(self, variable_name: str, values: list[Any]) -> list[str]:
+        """Returns nested variable names for dictionary-valued variables, otherwise the variable name."""
+
+        if not values or not all(isinstance(value, dict) for value in values):
+            return [variable_name]
+
+        nested_variable_names = sorted({subkey for value in values for subkey in value.keys()})
+        if not nested_variable_names:
+            return [variable_name]
+
+        return [f"{variable_name}.{nested_variable_name}" for nested_variable_name in nested_variable_names]
 
     def dump_variable_names_and_contexts(  # noqa: C901
         self,
@@ -488,7 +769,11 @@ class PoolManager:
         class_name.function_name.variable_name.info_maps: variable3_name
         class_name.function_name.variable_name.info_maps: variable4_name
         """
-        pass
+        var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.{os.linesep}"]
+        for name, variable_data in self.get_flat_variables_pool().items():
+            var_list.extend(self._format_variable_entry(name, variable_data, exclude_info_maps, format_option))
+        file_path = path / self.file_manager.generate_file_name("variable_names", "txt")
+        self.file_manager._list_to_file_txt(var_list, file_path)
 
     def _get_parsable_dicts(
         self,
@@ -496,7 +781,12 @@ class PoolManager:
         exclude_info_maps: bool,
     ) -> tuple[list[str], list[Any]]:
         """Returns parsable dictionary keys and ``info_maps`` data for a variable entry."""
-        pass
+        parsable_dicts: list[str] = []
+        var_data_info_maps: list[Any] = []
+        if not exclude_info_maps and "info_maps" in variable_data:
+            parsable_dicts.append("info_maps")
+            var_data_info_maps = variable_data.get("info_maps", [])
+        return parsable_dicts, var_data_info_maps
 
     def _format_variable_entry(
         self,
@@ -506,7 +796,31 @@ class PoolManager:
         format_option: str,
     ) -> list[str]:
         """Returns formatted lines for a single variable in the variable names dump."""
-        pass
+
+        if "values" not in variable_data:
+            return [f"{name}: **NO VARIABLES**{os.linesep}"]
+
+        parsable_dicts, var_data_info_maps = self._get_parsable_dicts(variable_data, exclude_info_maps)
+        units = var_data_info_maps[0]["units"] if var_data_info_maps else ""
+        is_variable_nested = isinstance(variable_data["values"][0], dict)
+
+        lines: list[str] = []
+        if is_variable_nested:
+            parsable_dicts.append("values")
+        else:
+            lines.append(f"{name} ({units}){os.linesep}" if units else f"{name}{os.linesep}")
+
+        prefix = name
+        if format_option == "block":
+            if f"{name}{os.linesep}" not in lines:
+                lines.append(f"{name}{os.linesep}")
+            prefix = " " * len(name)
+
+        for parsable_dict in parsable_dicts:
+            keys = variable_data[parsable_dict][0].keys()
+            lines.extend(self._format_parsable_dict_lines(name, prefix, parsable_dict, keys, units, format_option))
+
+        return lines
 
     def _format_parsable_dict_lines(
         self,
@@ -518,7 +832,28 @@ class PoolManager:
         format_option: str,
     ) -> list[str]:
         """Returns formatted lines for one parsable dictionary (values or info_maps) within a variable entry."""
-        pass
+        if format_option == "inline":
+            return [
+                (
+                    f"{name}.{parsable_dict}: {list(keys)} ({units}){os.linesep}"
+                    if not parsable_dict.endswith("info_maps") and units
+                    else f"{name}.{parsable_dict}: {list(keys)}{os.linesep}"
+                )
+            ]
+
+        lines: list[str] = []
+        for key in keys:
+            var_units = units.get(key, "") if isinstance(units, dict) else units
+            show_units = key not in self._VARIABLE_DUMP_KEYS_TO_IGNORE and var_units
+            if format_option == "basic":
+                lines.append(f"{name}.{key} ({var_units}){os.linesep}" if show_units else f"{name}.{key}{os.linesep}")
+            else:
+                lines.append(
+                    f"{prefix}.{parsable_dict}: {key} ({var_units}){os.linesep}"
+                    if show_units
+                    else f"{prefix}.{parsable_dict}: {key}{os.linesep}"
+                )
+        return lines
 
     def _set_variables_pool(
         self,
@@ -536,12 +871,34 @@ class PoolManager:
         pool_size_override : int | None, optional
             If provided, this value will be used to set the current pool size instead of calculating it.
         """
-        pass
+        self.variables_pool = new_pool
+        if pool_size_override is not None:
+            self.current_pool_size = pool_size_override
+            return
+
+        self.current_pool_size = sys.getsizeof(new_pool.__repr__())
 
     def get_flat_variables_pool(self) -> dict[str, Any]:
         """Returns a flattened mapping of variable names to data when multiple pools are loaded."""
-        pass
+
+        if not self.variables_pool:
+            return {}
+
+        if all(
+            isinstance(variable_data, dict) and "values" in variable_data
+            for variable_data in self.variables_pool.values()
+        ):
+            return self.variables_pool
+
+        flattened: dict[str, Any] = {}
+        for pool_name, pool_data in self.variables_pool.items():
+            if not isinstance(pool_data, dict):
+                continue
+            for variable_name, variable_data in pool_data.items():
+                flattened[f"{pool_name}.{variable_name}"] = variable_data
+
+        return flattened
 
     def flush_pools(self) -> None:
-        """Sets each pool to an empty dictionary."""
-        pass
+        """Sets the ``variables_pool`` to an empty dictionary."""
+        self._set_variables_pool({})
