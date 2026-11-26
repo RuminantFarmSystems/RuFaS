@@ -325,27 +325,6 @@ class RationManager:
         return AnimalModuleConstants.DMI_CONSTRAINT_FRACTION
 
     @classmethod
-    def effective_dmi_requirement_boost(cls, animal_combination: AnimalCombination | None) -> float:
-        """
-        Returns the effective DMI requirement boost for the given animal combination.
-
-        Parameters
-        ----------
-        animal_combination : AnimalCombination | None
-            The combination of animals in the pen, or None when no combination applies.
-
-        Returns
-        -------
-        float
-            1.0 when a DMI input option is used, so the ingredient inclusion bounds are centered on
-            the user-provided target; the DMI_REQUIREMENT_BOOST constant otherwise.
-
-        """
-        if cls.uses_dmi_input_option(animal_combination):
-            return 1.0
-        return AnimalModuleConstants.DMI_REQUIREMENT_BOOST
-
-    @classmethod
     def effective_dmi_retry_increase_factor(cls, animal_combination: AnimalCombination | None) -> float:
         """
         Returns the effective DMI retry increase factor for the given animal combination.
