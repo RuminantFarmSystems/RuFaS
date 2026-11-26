@@ -759,7 +759,6 @@ def test_build_bounds_user_defined_ration(
     - clip lower bounds at 0
     - trim resulting bounds by feed_minimum_list and feed_maximum_list.
     """
-    nrc_ration_config.dmi_requirement_boost = 1.0
 
     nrc_ration_config.initial_dry_matter_requirement = 20.0
     nrc_ration_config.feed_minimum_list = [0.0, 1.0]
@@ -900,7 +899,6 @@ def test_ration_config_uses_default_dmi_constants_without_intake_options(
     config = RationConfig(NutrientStandard.NRC, mock_requirements, None, 1, 1, 600)
 
     assert config.dmi_constraint_fraction == AnimalModuleConstants.DMI_CONSTRAINT_FRACTION
-    assert config.dmi_requirement_boost == AnimalModuleConstants.DMI_REQUIREMENT_BOOST
 
 
 def test_ration_config_neutralizes_dmi_constants_with_intake_option(
@@ -918,7 +916,6 @@ def test_ration_config_neutralizes_dmi_constants_with_intake_option(
     )
 
     assert config.dmi_constraint_fraction == 0.0
-    assert config.dmi_requirement_boost == 1.0
 
 
 def test_build_bounds_user_defined_ration_pins_feed_at_limit_when_target_exceeds_it(
@@ -926,7 +923,6 @@ def test_build_bounds_user_defined_ration_pins_feed_at_limit_when_target_exceeds
 ) -> None:
     """A target inclusion above a feed's limit pins the feed at its limit and warns, instead of inverting."""
     mock_om = mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.OutputManager", return_value=MagicMock())
-    nrc_ration_config.dmi_requirement_boost = 1.0
     nrc_ration_config.initial_dry_matter_requirement = 100.0
     nrc_ration_config.feed_minimum_list = [0.0, 1.0]
     nrc_ration_config.feed_maximum_list = [10.0, 10.0]
@@ -949,7 +945,6 @@ def test_build_bounds_user_defined_ration_pins_feed_at_minimum_when_target_is_be
 ) -> None:
     """A target inclusion below a feed's lower limit pins the feed at that minimum and warns."""
     mock_om = mocker.patch("RUFAS.biophysical.animal.ration.ration_optimizer.OutputManager", return_value=MagicMock())
-    nrc_ration_config.dmi_requirement_boost = 1.0
     nrc_ration_config.initial_dry_matter_requirement = 1.0
     nrc_ration_config.feed_minimum_list = [0.0, 1.0]
     nrc_ration_config.feed_maximum_list = [10.0, 10.0]
