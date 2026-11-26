@@ -13,9 +13,12 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
 @pytest.fixture
-def genetics() -> Genetics:
+def genetics(mocker: MockerFixture) -> Genetics:
     AnimalConfig.average_phenotype["fat_kg"] = {2020: 10.0}
     AnimalConfig.average_phenotype["protein_kg"] = {2020: 20.0}
+    mocker.patch.object(
+        AnimalConfig, "national_average_breeding_value", {"fat_kg": {2020: 0.0}, "protein_kg": {2020: 0.0}}
+    )
     genetics = Genetics(animal_type=AnimalType.LAC_COW, birth_year=2020)
     return genetics
 
@@ -135,7 +138,7 @@ def test_animal_genetics_init(
         mock_calculate_tbv_values.assert_not_called()
     else:
         mock_calculate_newborn_calf_tbv_values.assert_not_called()
-        mock_calculate_tbv_values.assert_called_once_with()
+        mock_calculate_tbv_values.assert_called_once_with(birth_year=birth_year)
     mock_calculate_ep_values.assert_called_once_with()
     mock_calculate_et_values.assert_called_once_with()
     mock_calculate_phenotype_values.assert_called_once_with(birth_year=birth_year)
@@ -204,16 +207,23 @@ def test_calculate_tbv_values(
     genetics: Genetics,
     mocker: MockerFixture,
 ) -> None:
-    """Unit test for _calculate_tbv_values(): the TBV distribution comes from the AnimalConfig inputs."""
+    """
+    Unit test for _calculate_tbv_values(): the TBV distribution is centered on the national average breeding values
+    of the birth year and its spread comes from the AnimalConfig inputs.
+    """
     mocker.patch.object(AnimalConfig, "tbv_fat_variance", tbv_fat_variance)
     mocker.patch.object(AnimalConfig, "tbv_protein_variance", tbv_protein_variance)
     mocker.patch.object(AnimalConfig, "tbv_correlation", tbv_correlation)
+    mock_get_national_average_breeding_values = mocker.patch.object(
+        Genetics, "get_national_average_breeding_values", return_value=(-33.1, -21.3)
+    )
     mock_generate_bivariate_random_numbers = mocker.patch.object(
         Utility, "generate_bivariate_random_numbers", return_value=(10.0, 20.0)
     )
-    genetics._calculate_tbv_values()
+    genetics._calculate_tbv_values(birth_year=2016)
+    mock_get_national_average_breeding_values.assert_called_once_with(2016)
     mock_generate_bivariate_random_numbers.assert_called_once_with(
-        0.0, 0.0, numpy.sqrt(tbv_fat_variance), numpy.sqrt(tbv_protein_variance), tbv_correlation
+        -33.1, -21.3, numpy.sqrt(tbv_fat_variance), numpy.sqrt(tbv_protein_variance), tbv_correlation
     )
 
 
@@ -358,18 +368,23 @@ def test_calculate_et_values(
 
 
 @pytest.mark.parametrize(
-    "mean_phenotype_fat, mean_phenotype_protein, birth_year,"
+    "mean_phenotype_fat, mean_phenotype_protein, birth_year, national_average_fat, national_average_protein,"
     "tbv_fat, tbv_protein, e_p_fat, e_p_protein, e_t_fat, e_t_protein,"
     "expected_phenotype_fat, expected_phenotype_protein",
     [
-        (10.0, 20.0, 2023, 100.0, 200.0, 5.0, 10.0, 3.0, 6.0, 118.0, 236.0),
-        (15.0, 25.0, 2022, 120.0, 240.0, 7.0, 14.0, 4.0, 8.0, 146.0, 287.0),
+        (10.0, 20.0, 2023, 0.0, 0.0, 100.0, 200.0, 5.0, 10.0, 3.0, 6.0, 118.0, 236.0),
+        (15.0, 25.0, 2022, 20.0, 10.0, 120.0, 240.0, 7.0, 14.0, 4.0, 8.0, 126.0, 277.0),
+        (15.0, 25.0, 2016, -33.0, -21.0, -30.0, -25.0, 7.0, 14.0, 4.0, 8.0, 29.0, 43.0),
+        (15.0, 25.0, 2016, -33.0, -21.0, -33.0, -21.0, 0.0, 0.0, 0.0, 0.0, 15.0, 25.0),
     ],
+    ids=["zero_national_average", "positive_national_average", "negative_national_average", "average_animal"],
 )
 def test_calculate_phenotype_values(
     mean_phenotype_fat: float,
     mean_phenotype_protein: float,
     birth_year: int,
+    national_average_fat: float,
+    national_average_protein: float,
     tbv_fat: float,
     tbv_protein: float,
     e_p_fat: float,
@@ -379,8 +394,13 @@ def test_calculate_phenotype_values(
     expected_phenotype_fat: float,
     expected_phenotype_protein: float,
     genetics: Genetics,
+    mocker: MockerFixture,
 ) -> None:
-    """Unit test for _calculate_phenotype_values()"""
+    """
+    Unit test for _calculate_phenotype_values(): the phenotype is the mean phenotype of the birth year plus the
+    TBV deviation from the national average of that birth year plus the environmental effects, so an average animal
+    has the mean phenotype.
+    """
     genetics.TBV_fat = tbv_fat
     genetics.TBV_protein = tbv_protein
     genetics.E_permanent_fat = e_p_fat
@@ -390,6 +410,11 @@ def test_calculate_phenotype_values(
 
     AnimalConfig.average_phenotype["fat_kg"] = {birth_year: mean_phenotype_fat}
     AnimalConfig.average_phenotype["protein_kg"] = {birth_year: mean_phenotype_protein}
+    mocker.patch.object(
+        AnimalConfig,
+        "national_average_breeding_value",
+        {"fat_kg": {birth_year: national_average_fat}, "protein_kg": {birth_year: national_average_protein}},
+    )
 
     phenotype_fat, phenotype_protein = genetics._calculate_phenotype_values(birth_year=birth_year)
 
@@ -722,6 +747,7 @@ def test_calculate_phenotype_values_too_early(genetics: Genetics, mocker: Mocker
     genetics.E_temporary_fat = 0.0
     genetics.E_temporary_protein = 0.0
     Genetics.set_phenotype_too_early_warning_raised(False)
+    mocker.patch.object(Genetics, "get_national_average_breeding_values", return_value=(0.0, 0.0))
 
     fat, protein = genetics._calculate_phenotype_values(birth_year=2000)
 
@@ -742,6 +768,7 @@ def test_calculate_phenotype_values_too_late(genetics: Genetics, mocker: MockerF
     genetics.E_temporary_fat = 0.0
     genetics.E_temporary_protein = 0.0
     Genetics.set_phenotype_too_recent_warning_raised(False)
+    mocker.patch.object(Genetics, "get_national_average_breeding_values", return_value=(0.0, 0.0))
 
     fat, protein = genetics._calculate_phenotype_values(birth_year=2030)
 
@@ -774,3 +801,181 @@ def test_calculate_phenotype_values_key_error(genetics: Genetics, mocker: Mocker
             "function": genetics._calculate_phenotype_values.__name__,
         },
     )
+
+
+def test_get_national_average_breeding_values(mocker: MockerFixture) -> None:
+    """A birth year with an entry returns the national average breeding values of that year."""
+    mocker.patch.object(
+        AnimalConfig,
+        "national_average_breeding_value",
+        {"fat_kg": {2016: -33.1, 2020: 0.0}, "protein_kg": {2016: -21.3, 2020: 0.0}},
+    )
+    mock_om = mocker.patch("RUFAS.biophysical.animal.animal_genetics.animal_genetics.OutputManager").return_value
+
+    assert Genetics.get_national_average_breeding_values(2016) == (-33.1, -21.3)
+    assert Genetics.get_national_average_breeding_values(2020) == (0.0, 0.0)
+    mock_om.add_warning.assert_not_called()
+    mock_om.add_error.assert_not_called()
+
+
+def test_get_national_average_breeding_values_too_early(mocker: MockerFixture) -> None:
+    """A birth year before the available data uses the earliest year and warns only once."""
+    mocker.patch.object(
+        AnimalConfig,
+        "national_average_breeding_value",
+        {"fat_kg": {2010: -60.8, 2020: 0.0}, "protein_kg": {2010: -43.1, 2020: 0.0}},
+    )
+    mocker.patch.object(Genetics, "national_average_too_early_warning", False)
+    mock_om = mocker.patch("RUFAS.biophysical.animal.animal_genetics.animal_genetics.OutputManager").return_value
+
+    first_result = Genetics.get_national_average_breeding_values(2000)
+    second_result = Genetics.get_national_average_breeding_values(2005)
+
+    assert first_result == (-60.8, -43.1)
+    assert second_result == (-60.8, -43.1)
+    mock_om.add_warning.assert_called_once()
+    assert Genetics.national_average_too_early_warning is True
+
+
+def test_get_national_average_breeding_values_too_late(mocker: MockerFixture) -> None:
+    """A birth year after the available data uses the latest year and warns only once."""
+    mocker.patch.object(
+        AnimalConfig,
+        "national_average_breeding_value",
+        {"fat_kg": {2010: -60.8, 2020: 0.0}, "protein_kg": {2010: -43.1, 2020: 0.0}},
+    )
+    mocker.patch.object(Genetics, "national_average_too_recent_warning", False)
+    mock_om = mocker.patch("RUFAS.biophysical.animal.animal_genetics.animal_genetics.OutputManager").return_value
+
+    first_result = Genetics.get_national_average_breeding_values(2025)
+    second_result = Genetics.get_national_average_breeding_values(2030)
+
+    assert first_result == (0.0, 0.0)
+    assert second_result == (0.0, 0.0)
+    mock_om.add_warning.assert_called_once()
+    assert Genetics.national_average_too_recent_warning is True
+
+
+def test_get_national_average_breeding_values_key_error(mocker: MockerFixture) -> None:
+    """Missing in-range national average data logs an error and re-raises the KeyError."""
+    mocker.patch.object(
+        AnimalConfig,
+        "national_average_breeding_value",
+        {"fat_kg": {2010: -60.8, 2020: 0.0}, "protein_kg": {2010: -43.1, 2020: 0.0}},
+    )
+    mock_om = mocker.patch("RUFAS.biophysical.animal.animal_genetics.animal_genetics.OutputManager").return_value
+
+    with pytest.raises(KeyError):
+        Genetics.get_national_average_breeding_values(2015)
+
+    mock_om.add_error.assert_called_once_with(
+        "National average breeding value key error.",
+        "2015",
+        {
+            "class": Genetics.__name__,
+            "function": Genetics.get_national_average_breeding_values.__name__,
+        },
+    )
+    mock_om.add_warning.assert_not_called()
+
+
+@pytest.mark.parametrize("birth_year", [2006, 2016, 2021])
+def test_animal_without_simulated_dam_is_centered_on_birth_year_averages(
+    birth_year: int, mocker: MockerFixture
+) -> None:
+    """
+    An animal entering the herd without a simulated dam has a mean TBV equal to the national average breeding value
+    of its birth year, and an average animal has the mean phenotype of its birth year.
+    """
+    national_average = {
+        "fat_kg": {2006: -71.2, 2016: -33.1, 2021: 9.1},
+        "protein_kg": {2006: -50.3, 2016: -21.3, 2021: 5.0},
+    }
+    mean_phenotype = {
+        "fat_kg": {2006: 420.0, 2016: 450.0, 2021: 510.0},
+        "protein_kg": {2006: 340.0, 2016: 365.0, 2021: 400.0},
+    }
+    mocker.patch.object(AnimalConfig, "national_average_breeding_value", national_average)
+    mocker.patch.object(AnimalConfig, "average_phenotype", mean_phenotype)
+    # Every random draw returns the mean of its distribution, so the values below are the distribution means.
+    mocker.patch.object(Utility, "generate_bivariate_random_numbers", side_effect=lambda mu_x, mu_y, *_: (mu_x, mu_y))
+
+    genetics = Genetics(birth_year=birth_year, animal_type=AnimalType.LAC_COW)
+
+    assert genetics.TBV_fat == national_average["fat_kg"][birth_year]
+    assert genetics.TBV_protein == national_average["protein_kg"][birth_year]
+    assert genetics.phenotype_fat == pytest.approx(mean_phenotype["fat_kg"][birth_year])
+    assert genetics.phenotype_protein == pytest.approx(mean_phenotype["protein_kg"][birth_year])
+
+
+def test_first_generation_gain_is_similar_across_recent_start_years(mocker: MockerFixture) -> None:
+    """
+    The mean TBV gain of the first home-raised generation over its dams barely depends on the simulation start year.
+
+    The values are taken from ``national_average_BV_HO.csv`` (dams born four years before the start year) and
+    ``TopListingSemen_HO.csv`` (January of the start year). With a mean dam TBV of 0 for every start year, the fat
+    gains for these three start years would spread over 41.7 kg and the protein gains over 26.3 kg.
+    """
+    mocker.patch.object(
+        AnimalConfig,
+        "national_average_breeding_value",
+        {
+            "fat_kg": {
+                2011: -58.059892,
+                2015: -39.008990,
+                2016: -33.112282,
+                2020: 0.0,
+                2021: 9.071858,
+                2024: 33.112282,
+            },
+            "protein_kg": {
+                2011: -40.369769,
+                2015: -26.308389,
+                2016: -21.318867,
+                2020: 0.0,
+                2021: 4.989522,
+                2024: 18.143716,
+            },
+        },
+    )
+    mocker.patch.object(
+        AnimalConfig,
+        "top_listing_semen",
+        {
+            "estimated_fat": {"2015-01": 36.21923076, "2020-01": 77.91369429, "2025-01": 119.60815782},
+            "estimated_protein": {"2015-01": 9.23811259, "2020-01": 35.53624150, "2025-01": 61.83437041},
+        },
+    )
+    mocker.patch.object(
+        AnimalConfig,
+        "average_phenotype",
+        {
+            "fat_kg": {year: 500.0 for year in (2011, 2015, 2016, 2020, 2021, 2025)},
+            "protein_kg": {year: 400.0 for year in (2011, 2015, 2016, 2020, 2021, 2025)},
+        },
+    )
+    # Calves born in 2025 use the national average of 2024, the latest year available. Marking the warning for that
+    # as already raised keeps it out of the logs.
+    mocker.patch.object(Genetics, "national_average_too_recent_warning", True)
+    # Every random draw returns the mean of its distribution, so the gains below are the expected gains.
+    mocker.patch.object(Utility, "generate_bivariate_random_numbers", side_effect=lambda mu_x, mu_y, *_: (mu_x, mu_y))
+
+    fat_gains: list[float] = []
+    protein_gains: list[float] = []
+    for start_year in (2015, 2020, 2025):
+        dam = Genetics(birth_year=start_year - 4, animal_type=AnimalType.LAC_COW)
+        calf = Genetics(
+            birth_year=start_year,
+            birth_month=1,
+            animal_type=AnimalType.CALF,
+            initialize_new_born_calf=True,
+            dam_tbv_fat=dam.TBV_fat,
+            dam_tbv_protein=dam.TBV_protein,
+        )
+        fat_gains.append(calf.TBV_fat - dam.TBV_fat)
+        protein_gains.append(calf.TBV_protein - dam.TBV_protein)
+
+    assert fat_gains == pytest.approx([47.14, 55.51, 55.27], abs=0.01)
+    assert protein_gains == pytest.approx([24.80, 28.43, 28.42], abs=0.01)
+    assert max(fat_gains) - min(fat_gains) < 10.0
+    assert max(protein_gains) - min(protein_gains) < 5.0
