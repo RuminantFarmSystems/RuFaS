@@ -85,10 +85,6 @@ class AnimalModuleConstants:
     DMI_CONSTRAINT_FRACTION: float = 0.30
     """The +/- fraction of DMI estimated allowed for ration formulation."""
 
-    DMI_REQUIREMENT_BOOST: float = 1.1
-    """The fraction of the dry matter intake requirement used as the basis for
-    the inclusion rate bounds in user defined ration formulation method."""
-
     DMI_RETRY_INCREASE_FACTOR: float = 1.1
     """Multiplier applied to the dry matter intake when a lactating-cow ration retry is warranted."""
 
