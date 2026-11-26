@@ -3,6 +3,7 @@ from random import shuffle, randint
 from typing import Any, cast
 from unittest.mock import call, MagicMock
 
+import numpy
 import pytest
 from pytest_mock import MockerFixture
 
@@ -25,6 +26,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.animal_to_manure_connection import ManureStream
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
 from RUFAS.rufas_time import RufasTime
+from RUFAS.util import Utility
 from RUFAS.weather import Weather
 
 from tests.test_biophysical.test_animal.test_herd_manager.pytest_fixtures import (
@@ -941,6 +943,11 @@ def test_check_if_replacement_heifers_needed(
     mock_time.current_date = datetime.today()
     AnimalConfig.average_phenotype["fat_kg"] = {mock_time.current_date.year: 10.0}
     AnimalConfig.average_phenotype["protein_kg"] = {mock_time.current_date.year: 10.0}
+    mocker.patch.object(
+        AnimalConfig,
+        "national_average_breeding_value",
+        {"fat_kg": {mock_time.current_date.year: 0.0}, "protein_kg": {mock_time.current_date.year: 0.0}},
+    )
 
     result = herd_manager._check_if_replacement_heifers_needed(mock_time)
 
@@ -1262,7 +1269,7 @@ def test_create_newborn_calf_genetics_disabled(herd_manager: HerdManager, mocker
 
 
 def test_update_replacement_animal_genetics(herd_manager: HerdManager, mocker: MockerFixture) -> None:
-    """Replacement genetics re-initialised using heiferIII TBV mean, EBV recalculated."""
+    """Replacement genetics re-initialised, EBV recalculated using the national average of its birth year."""
     AnimalConfig.simulate_genetics = True
     AnimalConfig.average_phenotype["fat_kg"] = {2020: 10.0}
     AnimalConfig.average_phenotype["protein_kg"] = {2020: 20.0}
@@ -1278,7 +1285,7 @@ def test_update_replacement_animal_genetics(herd_manager: HerdManager, mocker: M
     mock_genetics_cls = mocker.patch(
         "RUFAS.biophysical.animal.herd_manager.Genetics", return_value=mock_genetics_instance
     )
-    mock_genetics_cls.calculate_average_tbv.return_value = (5.0, 10.0)
+    mock_genetics_cls.get_national_average_breeding_values.return_value = (5.0, 10.0)
 
     mock_time = MagicMock(auto_spec=RufasTime)
     mock_time.current_date = datetime(2022, 6, 1)
@@ -1290,9 +1297,48 @@ def test_update_replacement_animal_genetics(herd_manager: HerdManager, mocker: M
         animal_type=replacement.animal_type,
     )
     assert replacement.genetics == mock_genetics_instance
+    mock_genetics_cls.get_national_average_breeding_values.assert_called_once_with(2020)
+    mock_genetics_cls.calculate_average_tbv.assert_not_called()
     mock_genetics_instance.calculate_ebv_and_ranking_index.assert_called_once_with(
         replacement.animal_type, 5.0, 10.0, replacement.calves
     )
+
+
+def test_update_replacement_animal_genetics_follows_national_average(
+    herd_manager: HerdManager, mocker: MockerFixture
+) -> None:
+    """
+    A purchased replacement's mean TBV and mean EBV are the national average breeding values of its birth year,
+    whatever the TBVs of the home-raised heiferIIIs are.
+    """
+    mocker.patch.object(AnimalConfig, "simulate_genetics", True)
+    mocker.patch.object(AnimalConfig, "average_phenotype", {"fat_kg": {2020: 490.0}, "protein_kg": {2020: 390.0}})
+    mocker.patch.object(
+        AnimalConfig, "national_average_breeding_value", {"fat_kg": {2020: -12.0}, "protein_kg": {2020: -7.0}}
+    )
+    # Every random draw returns the mean of its distribution, so the values below are the distribution means.
+    mocker.patch.object(Utility, "generate_bivariate_random_numbers", side_effect=lambda mu_x, mu_y, *_: (mu_x, mu_y))
+    mocker.patch.object(numpy.random, "normal", return_value=0.0)
+
+    replacement = mock_animal(AnimalType.HEIFER_III, days_born=730)
+    replacement.calves = 0
+
+    herd_manager.heiferIIIs = [mock_animal(AnimalType.HEIFER_III, id=i) for i in range(3)]
+    for home_raised_heifer in herd_manager.heiferIIIs:
+        home_raised_heifer.genetics = MagicMock(spec=Genetics)
+        home_raised_heifer.genetics.TBV_fat = 80.0
+        home_raised_heifer.genetics.TBV_protein = 40.0
+
+    mock_time = MagicMock(auto_spec=RufasTime)
+    mock_time.current_date = datetime(2022, 6, 1)
+
+    herd_manager._update_replacement_animal_genetics(replacement, mock_time)
+
+    assert replacement.genetics is not None
+    assert replacement.genetics.TBV_fat == -12.0
+    assert replacement.genetics.TBV_protein == -7.0
+    assert replacement.genetics.EBV_fat == pytest.approx(-12.0)
+    assert replacement.genetics.EBV_protein == pytest.approx(-7.0)
 
 
 def test_get_cow_removal_index_ranks_by_milk(herd_manager: HerdManager) -> None:

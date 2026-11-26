@@ -1733,18 +1733,45 @@
     },
     "estimated_protein": {
       "type": "array",
-      "description": "The estimated protein breeding value (BV, 2 x PTA) for the top listing semen, in kg.",
+      "description": "The estimated protein breeding value (BV, 2 x PTA) for the top listing semen, in kg. Values are on the CDCB genetic base set in April 2025, on which the average BV of cows born in 2020 is 0.",
       "properties": {
         "type": "number",
-        "description": "The estimated protein breeding value (BV, 2 x PTA) for the top listing semen, in kg."
+        "description": "The estimated protein breeding value (BV, 2 x PTA) for the top listing semen, in kg. Values are on the CDCB genetic base set in April 2025, on which the average BV of cows born in 2020 is 0."
       }
     },
     "estimated_fat": {
       "type": "array",
-      "description": "The estimated fat breeding value (BV, 2 x PTA) for the top listing semen, in kg.",
+      "description": "The estimated fat breeding value (BV, 2 x PTA) for the top listing semen, in kg. Values are on the CDCB genetic base set in April 2025, on which the average BV of cows born in 2020 is 0.",
       "properties": {
         "type": "number",
-        "description": "The estimated fat breeding value (BV, 2 x PTA) for the top listing semen, in kg."
+        "description": "The estimated fat breeding value (BV, 2 x PTA) for the top listing semen, in kg. Values are on the CDCB genetic base set in April 2025, on which the average BV of cows born in 2020 is 0."
+      }
+    }
+  },
+  "animal_national_average_breeding_value_properties": {
+    "data_collection_app_compatible": false,
+    "birth_year": {
+      "type": "array",
+      "description": "The birth year of the animal.",
+      "properties": {
+        "type": "number",
+        "description": "The birth year of the animal."
+      }
+    },
+    "fat_kg": {
+      "type": "array",
+      "description": "The national average fat breeding value (BV) of cows born in the given birth year, in kg. Values are on the CDCB genetic base set in April 2025, on which the average BV of cows born in 2020 is 0.",
+      "properties": {
+        "type": "number",
+        "description": "The national average fat breeding value (BV) of cows born in the given birth year, in kg. Values are on the CDCB genetic base set in April 2025, on which the average BV of cows born in 2020 is 0."
+      }
+    },
+    "protein_kg": {
+      "type": "array",
+      "description": "The national average protein breeding value (BV) of cows born in the given birth year, in kg. Values are on the CDCB genetic base set in April 2025, on which the average BV of cows born in 2020 is 0.",
+      "properties": {
+        "type": "number",
+        "description": "The national average protein breeding value (BV) of cows born in the given birth year, in kg. Values are on the CDCB genetic base set in April 2025, on which the average BV of cows born in 2020 is 0."
       }
     }
   },
