@@ -91,7 +91,7 @@ class ReportGenerator:
         )
 
         try:
-            report_filter_data = {}
+            report_filter_data: dict[str, Any] = {}
             if "cross_references" in filter_content:
                 self._check_for_missing_references(filter_content["cross_references"])
                 cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])
@@ -314,53 +314,64 @@ class ReportGenerator:
             The data pool from which the report is to be generated, structured as a dictionary.
         filter_content : dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
+            The optional ``omit_none_values`` key determines whether None values are removed from each
+            column before aggregation.
 
         Returns
         -------
         tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]], bool]
             - The aggregated report data.
-                - If no aggregation is specified, all the columns will be returned.
+                - If no aggregation is specified, all columns are returned, including empty columns.
                 - If both horizontal and vertical aggregations are specified, the returned dictionary will have one key
-                    that is either ``hor_ver_agg`` or ``ver_hor_agg`` depending on the value of the
-                    ``horizontal_first`` key in the filter content.
+                that is either ``hor_ver_agg`` or ``ver_hor_agg`` depending on the value of the
+                ``horizontal_first`` key in the filter content.
                 - If only horizontal aggregation is specified, the returned dictionary will have one key ``hor_agg``.
                 - If only vertical aggregation is specified, the returned dictionary will have one key ``ver_agg``.
-            - The event logs.
+            - The event logs generated during report preparation and aggregation.
             - A boolean indicating whether the report data has been aggregated.
 
         Raises
         ------
         ValueError
             If there is an error preparing the report data.
-            If the report data is empty.
+            If the report data contains no columns.
+            If aggregation is requested and one or more columns are empty, including columns that become
+            empty after removing None values.
             If the type of horizontal or vertical aggregation is not supported.
+
+        Notes
+        -----
+        Optionally removes None values from each column before performing aggregations.
+        An empty report always raises an error, while individual empty columns are allowed
+        when no aggregation is requested.
         """
-        try:
-            (
-                horizontal_agg_key,
-                vertical_agg_key,
-            ) = self._extract_aggregation_keys(filter_content)
-            report_data: dict[str, dict[str, list[Any]]] = filtered_pool
-            if filter_content.get("display_units", False):
-                report_data = self._add_var_units(report_data)
-            report_data = {key: report_data[key]["values"] for key in report_data}
-            if not all(report_data[key] for key in report_data):
-                raise ValueError(
-                    "Report Generator error: One or more columns in the report data are empty, "
-                    "cannot perform aggregations."
-                )
-            event_logs = self._add_constants_to_report_data(report_data, filter_content)
-        except ValueError:
-            raise
+        horizontal_agg_key, vertical_agg_key = self._extract_aggregation_keys(filter_content)
+
+        report_data: dict[str, Any] = filtered_pool
+        if filter_content.get("display_units", False):
+            report_data = self._add_var_units(report_data)
+
+        report_data = {key: report_data[key]["values"] for key in report_data}
+
+        if filter_content.get("omit_none_values", False):
+            report_data = self._omit_none_values(report_data)
 
         if not report_data:
             raise ValueError(
-                f"Report Generator error: filter {filter_content.get('filters')} in {filter_content.get('name')} "
-                "led to empty report data."
+                f"Report Generator error: filter {filter_content.get('filters')} "
+                f"in {filter_content.get('name')} led to empty report data."
             )
 
+        if (horizontal_agg_key or vertical_agg_key) and not all(report_data.values()):
+            raise ValueError(
+                "Report Generator error: One or more columns in the report data "
+                "are empty, cannot perform aggregations."
+            )
+
+        event_logs = self._add_constants_to_report_data(report_data, filter_content)
+
         if not horizontal_agg_key and not vertical_agg_key:
-            return report_data, [] if not event_logs else event_logs, False
+            return report_data, event_logs, False
 
         aggregate_report, aggregation_logs = self._route_aggregator_functions(
             report_data, filter_content, horizontal_agg_key, vertical_agg_key
@@ -372,7 +383,7 @@ class ReportGenerator:
 
     def _route_aggregator_functions(
         self,
-        report_data: dict[str, dict[str, list[Any]]],
+        report_data: dict[str, Any],
         filter_content: dict[str, Any],
         horizontal_agg_key: Optional[str] = None,
         vertical_agg_key: Optional[str] = None,
@@ -382,7 +393,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        report_data : dict[str, dict[str, list[Any]]]
+        report_data : dict[str, Any]
             The data to be aggregated.
         filter_content : dict[str, Any]
             The report filter settings.
@@ -398,7 +409,7 @@ class ReportGenerator:
             - The logs to be passed to ``OutputManager``.
 
         """
-        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
+        aggregate_report: dict[str, Any] = report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
         display_units: bool = filter_content.get("display_units", False)
 
@@ -611,7 +622,7 @@ class ReportGenerator:
 
     def _handle_horizontal_and_vertical_aggregations(
         self,
-        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
+        aggregate_report: dict[str, Any],
         horizontal_agg_key: str,
         vertical_agg_key: str,
         filter_content: dict[str, Any],
@@ -621,7 +632,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        aggregate_report : dict[str, dict[str, list[Any]]] | dict[str, list[Any]]
+        aggregate_report : dict[str, Any]
             The report data to be aggregated.
         horizontal_agg_key : str
             The key for the horizontal aggregation function.
@@ -766,7 +777,7 @@ class ReportGenerator:
         self,
         report_data: dict[str, dict[str, list[float | None]]] | dict[str, list[float | None]],
         aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
-    ) -> tuple[dict[str, list[float | None]], list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, Any], list[dict[str, str | dict[str, str]]]]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -780,13 +791,13 @@ class ReportGenerator:
 
         Returns
         -------
-        tuple[dict[str, list[float | None]], list[dict[str, str | dict[str, str]]]]
+        tuple[dict[str, Any], list[dict[str, str | dict[str, str]]]]
             - The aggregated data.
             - The event logs.
 
         """
 
-        aggregated_data: dict[str, list[float | None]] = {}
+        aggregated_data: dict[str, Any] = {}
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for key, data in report_data.items():
             vertically_aggregated_data, aggregation_log = self._handle_aggregation(aggregator, data, key)
@@ -845,15 +856,46 @@ class ReportGenerator:
 
         return aggregated_data, {}
 
+    @staticmethod
+    def _omit_none_values(report_data: dict[str, list[Any]]) -> dict[str, list[Any]]:
+        """
+        Removes None values from columns containing at least one non-None value.
+
+        Parameters
+        ----------
+        report_data : dict[str, list[Any]]
+            The report data containing columns of values.
+
+        Returns
+        -------
+        dict[str, list[Any]]
+            A new dictionary containing the report data with None values removed from
+            columns containing at least one non-None value. Columns containing only
+            None values or no values are preserved.
+
+        Notes
+        -----
+        Columns containing only None values are preserved to distinguish missing data
+        from empty columns. Columns that are already empty remain unchanged.
+        """
+        result: dict[str, list[Any]] = {}
+        for key, values in report_data.items():
+            filtered = [value for value in values if value is not None]
+            if filtered:
+                result[key] = filtered
+            else:
+                result[key] = values
+        return result
+
     def _add_constants_to_report_data(
-        self, report_data: dict[str, list[float]], filter_content: dict[str, Any]
+        self, report_data: dict[str, list[Any]], filter_content: dict[str, Any]
     ) -> list[dict[str, str | dict[str, str]]]:
         """
         Adds constants to the report data.
 
         Parameters
         ----------
-        report_data : dict[str, list[float]]
+        report_data : dict[str, list[Any]]
             The data to which constants need to be added.
         filter_content : dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
